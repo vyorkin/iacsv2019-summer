@@ -1,0 +1,587 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<link href="common/css/sf.css" rel="stylesheet" type="text/css"/>
+<title>HA2SemProg19</title>
+</head>
+<link href="common/jquery-ui/jquery-ui.css" rel="stylesheet">
+<script src="common/jquery-ui/external/jquery/jquery.js"></script>
+<script src="common/jquery-ui/jquery-ui.js"></script>
+<script src="common/toggleproofs.js"></script>
+<link href="common/css/lf19.css" rel="stylesheet" type="text/css"/>
+
+<body>
+
+<div id="page">
+
+<div id="header">
+<a href='https://www.cis.upenn.edu/~bcpierce/sf/current/index.html'>
+<img src='common/media/image/sf_logo_sm.png'></a>
+</br><a href='index.html'>  <span class='booktitleinheader'>Volume 1: Logical Foundations 19</span><br></br>
+<ul id='menu'>
+   <a href='toc.html'><li class='section_name'>Table of Contents</li></a>
+   <a href='coqindex.html'><li class='section_name'>Index</li></a>
+   <a href='deps.html'><li class='section_name'>Roadmap</li></a>
+</ul>
+</a></div>
+
+<div id="main">
+
+<h1 class="libtitle">HA2SemProg19</h1>
+
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+<a name="lab173"></a><h2 class="section">SemProg SoSe 2019, Set 2</h2>
+
+<div class="paragraph"> </div>
+
+ Submit your solutions  via StudOn until <i>Thu, June 13 @ 13:00</i>.  
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+<ul class="doclist">
+<li> Please do not change the file name.
+
+</li>
+<li> Do not post your solution in any publically available location.
+
+</li>
+<li> Please submit on time, late solutions not accepted.
+
+</li>
+<li> Before submission, please check from command line if your script compiles.
+    In other words, do run <span class="inlinecode"><span class="id" type="var">coqc</span></span> to make sure it accepts your file. If it doesn't, no points can be awarded.
+
+</li>
+<li> Please submit <i>only</i> the source file of the solution, i.e., <span class="inlinecode">*.<span class="id" type="var">v</span></span>! Compiled output <span class="inlinecode">*.<span class="id" type="var">vo</span></span> is useless for submission and will not get you any points. Compile the file for testing, not in order to submit compilation output to me.
+
+</li>
+<li> Also, remember it will be run on a different machine which does not have the
+    same folder structure as yours... Please bear this in mind and be careful
+    with using load paths (absolute or relative) in your scripts.
+
+</li>
+<li> If you resubmit a solution on StudOn (which is always possible before the
+    deadline), please make sure to delete the old
+    ones! And make sure that the final submission has the right name. Remember
+    all submissions will be downloaded together as a bunch and fed through a
+    script. Having more than one solution from a given person messes up
+    automation.
+
+</li>
+</ul>
+
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Set</span> <span class="id" type="var">Warnings</span> "-notation-overridden,-parsing".<br/>
+<span class="id" type="var">From</span> <span class="id" type="var">Coq</span> <span class="id" type="keyword">Require</span> <span class="id" type="keyword">Import</span> <span class="id" type="var">ssreflect</span> <span class="id" type="var">ssrbool</span> <span class="id" type="var">ssrfun</span>.<br/>
+</div>
+
+<div class="doc">
+Using <span class="inlinecode"><span class="id" type="var">ssreflect</span></span> is not obligatory.  
+</div>
+<div class="code code-tight">
+
+<span class="id" type="var">From</span> <span class="id" type="var">Coq</span> <span class="id" type="keyword">Require</span> <span class="id" type="keyword">Import</span> <span class="id" type="var">List</span>.<br/>
+<span class="id" type="keyword">Import</span> <span class="id" type="var">List.ListNotations</span>.<br/>
+</div>
+
+<div class="doc">
+... and also, for <span class="inlinecode"><span class="id" type="var">beq_nat</span></span>, instead of loading it from <span class="inlinecode"><span class="id" type="var">Basics19.v</span></span> ... 
+</div>
+<div class="code code-tight">
+<span class="id" type="keyword">Import</span> <span class="id" type="var">Nat</span>.<br/>
+<span class="id" type="var">From</span> <span class="id" type="var">Coq</span> <span class="id" type="keyword">Require</span> <span class="id" type="keyword">Import</span> <span class="id" type="var">Arith</span>.<br/>
+<span class="id" type="keyword">Notation</span> "x =? y" := (<span class="id" type="var">beq_nat</span> <span class="id" type="var">x</span> <span class="id" type="var">y</span>) (<span class="id" type="tactic">at</span> <span class="id" type="var">level</span> 70) : <span class="id" type="var">nat_scope</span>.<br/>
+<span class="id" type="keyword">Notation</span> "x &lt;=? y" := (<span class="id" type="var">leb</span> <span class="id" type="var">x</span> <span class="id" type="var">y</span>) (<span class="id" type="tactic">at</span> <span class="id" type="var">level</span> 70) : <span class="id" type="var">nat_scope</span>. <span class="comment">(*&nbsp;<span class="inlinecode"><span class="id" type="var">leb</span></span>&nbsp;comes&nbsp;from&nbsp;<span class="inlinecode"><span class="id" type="var">Nat</span></span>&nbsp;*)</span><br/>
+</div>
+
+<div class="doc">
+<a name="lab174"></a><h2 class="section">Exercise 1: constructive quantification</h2>
+
+<div class="paragraph"> </div>
+
+<a name="lab175"></a><h4 class="section">Exercise: 3 stars, standard (quantifiers)</h4>
+
+<div class="paragraph"> </div>
+
+ Many of familiar laws for quantifiers still hold for constructive logic. Here and everywhere below you can actually provide a normal tactic proof if writing down proof term provides too difficult.  
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Definition</span> <span class="id" type="var">notexists_forallnot</span> : <span style='font-size:120%;'>&forall;</span>(<span class="id" type="var">X</span>:<span class="id" type="keyword">Type</span>) (<span class="id" type="var">P</span> : <span class="id" type="var">X</span> → <span class="id" type="keyword">Prop</span>),<br/>
+&nbsp;&nbsp;¬(<span style='font-size:120%;'>&exist;</span><span class="id" type="var">x</span> : <span class="id" type="var">X</span>, <span class="id" type="var">P</span> <span class="id" type="var">x</span>) → (<span style='font-size:120%;'>&forall;</span><span class="id" type="var">x</span> : <span class="id" type="var">X</span>, ¬<span class="id" type="var">P</span> <span class="id" type="var">x</span>) <br/>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;REPLACE&nbsp;THIS&nbsp;LINE&nbsp;WITH&nbsp;":=&nbsp;_your_definition_&nbsp;."&nbsp;*)</span>. <span class="id" type="var">Admitted</span>.<br/><hr class='doublespaceincode'/>
+<span class="id" type="keyword">Definition</span> <span class="id" type="var">forallnot_notexists</span> : <span style='font-size:120%;'>&forall;</span>(<span class="id" type="var">X</span>:<span class="id" type="keyword">Type</span>) (<span class="id" type="var">P</span> : <span class="id" type="var">X</span> → <span class="id" type="keyword">Prop</span>),<br/>
+&nbsp;&nbsp;(<span style='font-size:120%;'>&forall;</span><span class="id" type="var">x</span>, ¬<span class="id" type="var">P</span> <span class="id" type="var">x</span>) →  ¬(<span style='font-size:120%;'>&exist;</span><span class="id" type="var">x</span>, <span class="id" type="var">P</span> <span class="id" type="var">x</span>) <br/>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;REPLACE&nbsp;THIS&nbsp;LINE&nbsp;WITH&nbsp;":=&nbsp;_your_definition_&nbsp;."&nbsp;*)</span>. <span class="id" type="var">Admitted</span>.<br/><hr class='doublespaceincode'/>
+<span class="id" type="keyword">Definition</span> <span class="id" type="var">forallnot_equiv_notexists</span> : <span style='font-size:120%;'>&forall;</span>(<span class="id" type="var">X</span>:<span class="id" type="keyword">Type</span>) (<span class="id" type="var">P</span> : <span class="id" type="var">X</span> → <span class="id" type="keyword">Prop</span>),<br/>
+&nbsp;&nbsp;(<span style='font-size:120%;'>&forall;</span><span class="id" type="var">x</span>, ¬<span class="id" type="var">P</span> <span class="id" type="var">x</span>) ↔  ¬(<span style='font-size:120%;'>&exist;</span><span class="id" type="var">x</span>, <span class="id" type="var">P</span> <span class="id" type="var">x</span>) <br/>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;REPLACE&nbsp;THIS&nbsp;LINE&nbsp;WITH&nbsp;":=&nbsp;_your_definition_&nbsp;."&nbsp;*)</span>. <span class="id" type="var">Admitted</span>.<br/><hr class='doublespaceincode'/>
+<span class="id" type="keyword">Definition</span> <span class="id" type="var">forallnotnot_equiv_notexistsnot</span> : <span style='font-size:120%;'>&forall;</span>(<span class="id" type="var">X</span>:<span class="id" type="keyword">Type</span>) (<span class="id" type="var">P</span> : <span class="id" type="var">X</span> → <span class="id" type="keyword">Prop</span>),<br/>
+&nbsp;&nbsp;(<span style='font-size:120%;'>&forall;</span><span class="id" type="var">x</span>, ¬¬<span class="id" type="var">P</span> <span class="id" type="var">x</span>) ↔  ¬(<span style='font-size:120%;'>&exist;</span><span class="id" type="var">x</span>, ¬<span class="id" type="var">P</span> <span class="id" type="var">x</span>) <br/>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;REPLACE&nbsp;THIS&nbsp;LINE&nbsp;WITH&nbsp;":=&nbsp;_your_definition_&nbsp;."&nbsp;*)</span>. <span class="id" type="var">Admitted</span>.<br/><hr class='doublespaceincode'/>
+<span class="id" type="keyword">Lemma</span>  <span class="id" type="var">CEpqENpNq</span> : <span style='font-size:120%;'>&forall;</span><span class="id" type="var">P</span> <span class="id" type="var">Q</span>, (<span class="id" type="var">P</span> ↔ <span class="id" type="var">Q</span>) → (¬<span class="id" type="var">P</span> ↔ ¬<span class="id" type="var">Q</span>).<br/>
+<span class="id" type="keyword">Proof</span>.<br/>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;FILL&nbsp;IN&nbsp;HERE&nbsp;*)</span> <span class="id" type="var">Admitted</span>.<br/><hr class='doublespaceincode'/>
+<span class="id" type="keyword">Definition</span> <span class="id" type="var">notforallnot_equiv_notnotexists</span> : <span style='font-size:120%;'>&forall;</span>(<span class="id" type="var">X</span>:<span class="id" type="keyword">Type</span>) (<span class="id" type="var">P</span> : <span class="id" type="var">X</span> → <span class="id" type="keyword">Prop</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;~(<span style='font-size:120%;'>&forall;</span><span class="id" type="var">x</span>, ¬<span class="id" type="var">P</span> <span class="id" type="var">x</span>) ↔  ¬¬(<span style='font-size:120%;'>&exist;</span><span class="id" type="var">x</span>, <span class="id" type="var">P</span> <span class="id" type="var">x</span>) <br/>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;REPLACE&nbsp;THIS&nbsp;LINE&nbsp;WITH&nbsp;":=&nbsp;_your_definition_&nbsp;."&nbsp;*)</span>. <span class="id" type="var">Admitted</span>.<br/><hr class='doublespaceincode'/>
+<span class="id" type="keyword">Definition</span> <span class="id" type="var">existsnot_notforall</span> : <span style='font-size:120%;'>&forall;</span>(<span class="id" type="var">X</span>:<span class="id" type="keyword">Type</span>) (<span class="id" type="var">P</span> : <span class="id" type="var">X</span> → <span class="id" type="keyword">Prop</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span style='font-size:120%;'>&exist;</span><span class="id" type="var">x</span>, ¬<span class="id" type="var">P</span> <span class="id" type="var">x</span>) → ¬(<span style='font-size:120%;'>&forall;</span><span class="id" type="var">x</span>,  <span class="id" type="var">P</span> <span class="id" type="var">x</span>) <br/>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;REPLACE&nbsp;THIS&nbsp;LINE&nbsp;WITH&nbsp;":=&nbsp;_your_definition_&nbsp;."&nbsp;*)</span>. <span class="id" type="var">Admitted</span>.<br/><hr class='doublespaceincode'/>
+<span class="id" type="keyword">Definition</span> <span class="id" type="var">forall_notexistsnot</span> : <span style='font-size:120%;'>&forall;</span>(<span class="id" type="var">X</span>:<span class="id" type="keyword">Type</span>) (<span class="id" type="var">P</span> : <span class="id" type="var">X</span> → <span class="id" type="keyword">Prop</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span style='font-size:120%;'>&forall;</span><span class="id" type="var">x</span>, <span class="id" type="var">P</span> <span class="id" type="var">x</span>) → ¬(<span style='font-size:120%;'>&exist;</span><span class="id" type="var">x</span>, ¬<span class="id" type="var">P</span> <span class="id" type="var">x</span>) <br/>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;REPLACE&nbsp;THIS&nbsp;LINE&nbsp;WITH&nbsp;":=&nbsp;_your_definition_&nbsp;."&nbsp;*)</span>. <span class="id" type="var">Admitted</span>.<br/>
+</div>
+
+<div class="doc">
+How about the converse of the last one? As it turns out, it requires
+    classical logic, see below ... 
+<div class="paragraph"> </div>
+
+ <span class="proofbox">&#9744;</span> 
+<div class="paragraph"> </div>
+
+<a name="lab176"></a><h2 class="section">Exercise 2: classical axioms</h2>
+
+<div class="paragraph"> </div>
+
+<a name="lab177"></a><h4 class="section">Exercise: 4 stars, standard (classical_axioms)</h4>
+
+<div class="paragraph"> </div>
+
+ Let us have a closer look on the behaviour of classical propositions in Coq. 
+<div class="paragraph"> </div>
+
+ Here are several "classical" properties and axioms. When universally
+    quantified over all propositions, all of them imply each other. Sometimes,
+    it makes sense to state them for individual propositions too, especially in
+    the context of reflection with boolean functions we are going to discuss later. 
+<div class="paragraph"> </div>
+
+ Recall again: here and everywhere below you can actually provide a normal tactic proof if writing down proof term provides too difficult.  
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Definition</span> <span class="id" type="var">em_for_P</span> (<span class="id" type="var">P</span> : <span class="id" type="keyword">Prop</span>) := <span class="id" type="var">P</span> ∨ ¬<span class="id" type="var">P</span>.<br/>
+</div>
+
+<div class="doc">
+The above is sometimes called <i>decidability</i> for <span class="inlinecode"><span class="id" type="var">P</span></span>, but in Coq one should
+    be slightly careful about this name. 
+</div>
+<div class="code code-tight">
+<span class="id" type="keyword">Definition</span> <span class="id" type="var">peirce_for_P</span> (<span class="id" type="var">P</span>:<span class="id" type="keyword">Prop</span>) := <span style='font-size:120%;'>&forall;</span><span class="id" type="var">Q</span>: <span class="id" type="keyword">Prop</span>,<br/>
+&nbsp;&nbsp;((<span class="id" type="var">P</span>→<span class="id" type="var">Q</span>)→<span class="id" type="var">P</span>)→<span class="id" type="var">P</span>.<br/>
+<span class="id" type="keyword">Definition</span> <span class="id" type="var">dn_elimination_for_P</span> (<span class="id" type="var">P</span> : <span class="id" type="keyword">Prop</span>) := <br/>
+&nbsp;&nbsp;¬¬<span class="id" type="var">P</span> → <span class="id" type="var">P</span>.<br/>
+<span class="id" type="keyword">Definition</span> <span class="id" type="var">de_morgan_not_and_not_forPQ</span>  (<span class="id" type="var">P</span> <span class="id" type="var">Q</span>:<span class="id" type="keyword">Prop</span>) :=<br/>
+&nbsp;&nbsp;~(~<span class="id" type="var">P</span> ∧ ¬<span class="id" type="var">Q</span>) → <span class="id" type="var">P</span>∨<span class="id" type="var">Q</span>.<br/>
+<span class="id" type="keyword">Definition</span> <span class="id" type="var">implies_to_or_forPQ</span> (<span class="id" type="var">P</span> <span class="id" type="var">Q</span>:<span class="id" type="keyword">Prop</span>) :=<br/>
+&nbsp;&nbsp;(<span class="id" type="var">P</span>→<span class="id" type="var">Q</span>) → (¬<span class="id" type="var">P</span>∨<span class="id" type="var">Q</span>).<br/><hr class='doublespaceincode'/>
+<span class="id" type="keyword">Definition</span> <span class="id" type="var">excluded_middle</span> := <span style='font-size:120%;'>&forall;</span><span class="id" type="var">P</span>, <span class="id" type="var">em_for_P</span> <span class="id" type="var">P</span>.<br/>
+<span class="id" type="keyword">Definition</span> <span class="id" type="var">peirce</span> := <span style='font-size:120%;'>&forall;</span><span class="id" type="var">P</span>, <span class="id" type="var">peirce_for_P</span> <span class="id" type="var">P</span>.<br/>
+<span class="id" type="keyword">Definition</span> <span class="id" type="var">double_negation_elimination</span> := <span style='font-size:120%;'>&forall;</span><span class="id" type="var">P</span>:<span class="id" type="keyword">Prop</span>, <span class="id" type="var">dn_elimination_for_P</span> <span class="id" type="var">P</span>.<br/>
+<span class="id" type="keyword">Definition</span> <span class="id" type="var">de_morgan_not_and_not</span> := <span style='font-size:120%;'>&forall;</span><span class="id" type="var">P</span> <span class="id" type="var">Q</span>:<span class="id" type="keyword">Prop</span>, <span class="id" type="var">de_morgan_not_and_not_forPQ</span> <span class="id" type="var">P</span> <span class="id" type="var">Q</span>.<br/>
+<span class="id" type="keyword">Definition</span> <span class="id" type="var">implies_to_or</span> := <span style='font-size:120%;'>&forall;</span><span class="id" type="var">P</span> <span class="id" type="var">Q</span>:<span class="id" type="keyword">Prop</span>, <span class="id" type="var">implies_to_or_forPQ</span> <span class="id" type="var">P</span> <span class="id" type="var">Q</span>.<br/>
+</div>
+
+<div class="doc">
+Fill in the definitions: 
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Definition</span> <span class="id" type="var">ito__em</span> :<br/>
+&nbsp;&nbsp;<span class="id" type="var">implies_to_or</span> → <span class="id" type="var">excluded_middle</span>   <br/>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;REPLACE&nbsp;THIS&nbsp;LINE&nbsp;WITH&nbsp;":=&nbsp;_your_definition_&nbsp;."&nbsp;*)</span>. <span class="id" type="var">Admitted</span>.<br/><hr class='doublespaceincode'/>
+<span class="id" type="keyword">Definition</span> <span class="id" type="var">em__itoP</span> : <span style='font-size:120%;'>&forall;</span><span class="id" type="var">P</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="var">em_for_P</span> <span class="id" type="var">P</span> → <span style='font-size:120%;'>&forall;</span><span class="id" type="var">Q</span>, <span class="id" type="var">implies_to_or_forPQ</span> <span class="id" type="var">P</span> <span class="id" type="var">Q</span>   <br/>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;REPLACE&nbsp;THIS&nbsp;LINE&nbsp;WITH&nbsp;":=&nbsp;_your_definition_&nbsp;."&nbsp;*)</span>. <span class="id" type="var">Admitted</span>.<br/><hr class='doublespaceincode'/>
+<span class="id" type="keyword">Definition</span> <span class="id" type="var">em__ito</span> :<br/>
+&nbsp;&nbsp;<span class="id" type="var">excluded_middle</span> → <span class="id" type="var">implies_to_or</span> <br/>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;REPLACE&nbsp;THIS&nbsp;LINE&nbsp;WITH&nbsp;":=&nbsp;_your_definition_&nbsp;."&nbsp;*)</span>. <span class="id" type="var">Admitted</span>.<br/><hr class='doublespaceincode'/>
+<span class="id" type="keyword">Definition</span> <span class="id" type="var">em__demorgan</span> :<br/>
+&nbsp;&nbsp;<span class="id" type="var">excluded_middle</span> → <span class="id" type="var">de_morgan_not_and_not</span> <br/>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;REPLACE&nbsp;THIS&nbsp;LINE&nbsp;WITH&nbsp;":=&nbsp;_your_definition_&nbsp;."&nbsp;*)</span>. <span class="id" type="var">Admitted</span>.<br/><hr class='doublespaceincode'/>
+<span class="id" type="keyword">Definition</span> <span class="id" type="var">em__dneP</span> : <span style='font-size:120%;'>&forall;</span><span class="id" type="var">P</span>, <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="var">em_for_P</span> <span class="id" type="var">P</span> → <span class="id" type="var">dn_elimination_for_P</span> <span class="id" type="var">P</span> <br/>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;REPLACE&nbsp;THIS&nbsp;LINE&nbsp;WITH&nbsp;":=&nbsp;_your_definition_&nbsp;."&nbsp;*)</span>. <span class="id" type="var">Admitted</span>.<br/><hr class='doublespaceincode'/>
+<span class="id" type="keyword">Definition</span> <span class="id" type="var">em__dne</span> : <br/>
+&nbsp;&nbsp;<span class="id" type="var">excluded_middle</span> → <span class="id" type="var">double_negation_elimination</span> <br/>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;REPLACE&nbsp;THIS&nbsp;LINE&nbsp;WITH&nbsp;":=&nbsp;_your_definition_&nbsp;."&nbsp;*)</span>. <span class="id" type="var">Admitted</span>.<br/><hr class='doublespaceincode'/>
+<span class="id" type="keyword">Definition</span> <span class="id" type="var">dne__demorganPQ</span> : <span style='font-size:120%;'>&forall;</span><span class="id" type="var">P</span> <span class="id" type="var">Q</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" type="var">dn_elimination_for_P</span> (<span class="id" type="var">P</span> ∨ <span class="id" type="var">Q</span>)) → (<span class="id" type="var">de_morgan_not_and_not_forPQ</span> <span class="id" type="var">P</span> <span class="id" type="var">Q</span>) <br/>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;REPLACE&nbsp;THIS&nbsp;LINE&nbsp;WITH&nbsp;":=&nbsp;_your_definition_&nbsp;."&nbsp;*)</span>. <span class="id" type="var">Admitted</span>.<br/><hr class='doublespaceincode'/>
+<span class="id" type="keyword">Definition</span> <span class="id" type="var">dne__demorgan</span> :<br/>
+&nbsp;&nbsp;<span class="id" type="var">double_negation_elimination</span> → <span class="id" type="var">de_morgan_not_and_not</span> <br/>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;REPLACE&nbsp;THIS&nbsp;LINE&nbsp;WITH&nbsp;":=&nbsp;_your_definition_&nbsp;."&nbsp;*)</span>. <span class="id" type="var">Admitted</span>.<br/><hr class='doublespaceincode'/>
+<span class="id" type="keyword">Definition</span> <span class="id" type="var">demorgan__em</span> : <span class="id" type="var">de_morgan_not_and_not</span> → <span class="id" type="var">excluded_middle</span> <br/>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;REPLACE&nbsp;THIS&nbsp;LINE&nbsp;WITH&nbsp;":=&nbsp;_your_definition_&nbsp;."&nbsp;*)</span>. <span class="id" type="var">Admitted</span>.<br/><hr class='doublespaceincode'/>
+<span class="id" type="keyword">Definition</span>  <span class="id" type="var">em__peirceP</span> : <span style='font-size:120%;'>&forall;</span><span class="id" type="var">P</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" type="var">em_for_P</span> <span class="id" type="var">P</span>) → <span class="id" type="var">peirce_for_P</span> <span class="id" type="var">P</span> <br/>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;REPLACE&nbsp;THIS&nbsp;LINE&nbsp;WITH&nbsp;":=&nbsp;_your_definition_&nbsp;."&nbsp;*)</span>. <span class="id" type="var">Admitted</span>.<br/><hr class='doublespaceincode'/>
+<span class="id" type="keyword">Definition</span> <span class="id" type="var">em__peirce</span> :<br/>
+&nbsp;&nbsp;<span class="id" type="var">excluded_middle</span> → <span class="id" type="var">peirce</span> <br/>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;REPLACE&nbsp;THIS&nbsp;LINE&nbsp;WITH&nbsp;":=&nbsp;_your_definition_&nbsp;."&nbsp;*)</span>. <span class="id" type="var">Admitted</span>.<br/><hr class='doublespaceincode'/>
+<span class="id" type="keyword">Lemma</span> <span class="id" type="var">peirce__em</span> :<br/>
+&nbsp;&nbsp;<span class="id" type="var">peirce</span> → <span class="id" type="var">excluded_middle</span>.<br/>
+<span class="id" type="keyword">Proof</span>.<br/>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;FILL&nbsp;IN&nbsp;HERE&nbsp;*)</span> <span class="id" type="var">Admitted</span>.<br/>
+</div>
+
+<span class="proofbox">&#9744;</span> 
+<div class="doc less-space">
+<div class="paragraph"> </div>
+
+<a name="lab178"></a><h2 class="section">Exercise 3: reflection yields classical properties</h2>
+
+<div class="paragraph"> </div>
+
+<a name="lab179"></a><h4 class="section">Exercise: 2 stars, standard (reflect_classical)</h4>
+
+<div class="paragraph"> </div>
+
+ This exercise requires a notion introduced in the lecture on May 24. Being reflected ensures validity of classical laws: 
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Theorem</span> <span class="id" type="var">reflect_classical</span> : <span style='font-size:120%;'>&forall;</span><span class="id" type="var">P</span> <span class="id" type="var">b</span>, <span class="id" type="var">reflect</span> <span class="id" type="var">P</span> <span class="id" type="var">b</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span style='font-size:120%;'>&forall;</span><span class="id" type="var">Q</span>, <span class="id" type="var">implies_to_or_forPQ</span> <span class="id" type="var">P</span> <span class="id" type="var">Q</span>) ∧<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="var">peirce_for_P</span> <span class="id" type="var">P</span> ∧<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="var">dn_elimination_for_P</span> <span class="id" type="var">P</span>.<br/>
+<span class="id" type="keyword">Proof</span>.<br/>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;FILL&nbsp;IN&nbsp;HERE&nbsp;*)</span> <span class="id" type="var">Admitted</span>.<br/><hr class='doublespaceincode'/>
+<span class="id" type="keyword">Corollary</span> <span class="id" type="var">reflect_disj</span> : <span style='font-size:120%;'>&forall;</span><span class="id" type="var">P</span> <span class="id" type="var">Q</span> <span class="id" type="var">b</span>, <span class="id" type="var">reflect</span> (<span class="id" type="var">P</span> ∨ <span class="id" type="var">Q</span>) <span class="id" type="var">b</span> → <span class="id" type="var">de_morgan_not_and_not_forPQ</span> <span class="id" type="var">P</span> <span class="id" type="var">Q</span>.<br/>
+<span class="id" type="keyword">Proof</span>.<br/>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;FILL&nbsp;IN&nbsp;HERE&nbsp;*)</span> <span class="id" type="var">Admitted</span>.<br/>
+</div>
+
+<span class="proofbox">&#9744;</span> 
+<div class="doc less-space">
+<div class="paragraph"> </div>
+
+<a name="lab180"></a><h2 class="section">Exercise 4: Reflection for predicates on lists</h2>
+
+<div class="paragraph"> </div>
+
+<a name="lab181"></a><h4 class="section">Exercise: 3 stars, standard (forall2P)</h4>
+
+<div class="paragraph"> </div>
+
+ The standard library offers an inductive predicate for comparing lists wrt to a given binary relation 
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Print</span> <span class="id" type="var">Forall2</span>.<br/><hr class='doublespaceincode'/>
+<span class="comment">(*&nbsp;==&gt;<br/>
+<span class="inlinecode"></span>
+<span class="inlinecode"><span class="id" type="keyword">Inductive</span></span> <span class="inlinecode"><span class="id" type="var">Forall2</span></span> <span class="inlinecode">(<span class="id" type="var">A</span></span> <span class="inlinecode"><span class="id" type="var">B</span></span> <span class="inlinecode">:</span> <span class="inlinecode"><span class="id" type="keyword">Type</span>)</span> <span class="inlinecode">(<span class="id" type="var">R</span></span> <span class="inlinecode">:</span> <span class="inlinecode"><span class="id" type="var">A</span></span> <span class="inlinecode">→</span> <span class="inlinecode"><span class="id" type="var">B</span></span> <span class="inlinecode">→</span> <span class="inlinecode"><span class="id" type="keyword">Prop</span>)</span> <span class="inlinecode">:</span> <span class="inlinecode"><span class="id" type="var">list</span></span> <span class="inlinecode"><span class="id" type="var">A</span></span> <span class="inlinecode">→</span> <span class="inlinecode"><span class="id" type="var">list</span></span> <span class="inlinecode"><span class="id" type="var">B</span></span> <span class="inlinecode">→</span> <span class="inlinecode"><span class="id" type="keyword">Prop</span></span> <span class="inlinecode">:=</span>
+    <span class="inlinecode"><span class="id" type="var">Forall2_nil</span></span> <span class="inlinecode">:</span> <span class="inlinecode"><span class="id" type="var">Forall2</span></span> <span class="inlinecode"><span class="id" type="var">R</span></span> <span class="inlinecode">[]</span> <span class="inlinecode">[]</span>
+  <span class="inlinecode">|</span> <span class="inlinecode"><span class="id" type="var">Forall2_cons</span></span> <span class="inlinecode">:</span> <span class="inlinecode"><span style='font-size:120%;'>&forall;</span></span> <span class="inlinecode">(<span class="id" type="var">x</span></span> <span class="inlinecode">:</span> <span class="inlinecode"><span class="id" type="var">A</span>)</span> <span class="inlinecode">(<span class="id" type="var">y</span></span> <span class="inlinecode">:</span> <span class="inlinecode"><span class="id" type="var">B</span>)</span> <span class="inlinecode">(<span class="id" type="var">l</span></span> <span class="inlinecode">:</span> <span class="inlinecode"><span class="id" type="var">list</span></span> <span class="inlinecode"><span class="id" type="var">A</span>)</span> <span class="inlinecode">(<span class="id" type="var">l'</span></span> <span class="inlinecode">:</span> <span class="inlinecode"><span class="id" type="var">list</span></span> <span class="inlinecode"><span class="id" type="var">B</span>),</span>
+                   <span class="inlinecode"><span class="id" type="var">R</span></span> <span class="inlinecode"><span class="id" type="var">x</span></span> <span class="inlinecode"><span class="id" type="var">y</span></span> <span class="inlinecode">→</span> <span class="inlinecode"><span class="id" type="var">Forall2</span></span> <span class="inlinecode"><span class="id" type="var">R</span></span> <span class="inlinecode"><span class="id" type="var">l</span></span> <span class="inlinecode"><span class="id" type="var">l'</span></span> <span class="inlinecode">→</span> <span class="inlinecode"><span class="id" type="var">Forall2</span></span> <span class="inlinecode"><span class="id" type="var">R</span></span> <span class="inlinecode">(<span class="id" type="var">x</span></span> <span class="inlinecode">::</span> <span class="inlinecode"><span class="id" type="var">l</span>)</span> <span class="inlinecode">(<span class="id" type="var">y</span></span> <span class="inlinecode">::</span> <span class="inlinecode"><span class="id" type="var">l'</span>)</span>
+<span class="inlinecode"></span><br/>
+&nbsp;*)</span><br/>
+</div>
+
+<div class="doc">
+First, let us recall what it means for a relation to be reflected by a binary function. 
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Definition</span> <span class="id" type="var">Rreflected</span> {<span class="id" type="var">A</span> <span class="id" type="var">B</span> : <span class="id" type="keyword">Type</span>} (<span class="id" type="var">R</span> : <span class="id" type="var">A</span> → <span class="id" type="var">B</span> → <span class="id" type="keyword">Prop</span>) (<span class="id" type="var">f</span>: <span class="id" type="var">A</span> → <span class="id" type="var">B</span> → <span class="id" type="var">bool</span>) :=<br/>
+&nbsp;&nbsp;<span style='font-size:120%;'>&forall;</span><span class="id" type="var">a</span> <span class="id" type="var">b</span>, <span class="id" type="var">reflect</span> (<span class="id" type="var">R</span> <span class="id" type="var">a</span> <span class="id" type="var">b</span>) (<span class="id" type="var">f</span> <span class="id" type="var">a</span> <span class="id" type="var">b</span>).<br/>
+</div>
+
+<div class="doc">
+Define its boolean counterpart. It might be a good idea to do pattern matching on two arguments at the same time. 
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Fixpoint</span>  <span class="id" type="var">forall2</span> {<span class="id" type="var">A</span> <span class="id" type="var">B</span> : <span class="id" type="keyword">Type</span>} (<span class="id" type="var">R</span> : <span class="id" type="var">A</span> → <span class="id" type="var">B</span> → <span class="id" type="keyword">Prop</span>)  (<span class="id" type="var">f</span>: <span class="id" type="var">A</span> → <span class="id" type="var">B</span> → <span class="id" type="var">bool</span>) (<span class="id" type="var">P</span>: <span class="id" type="var">Rreflected</span> <span class="id" type="var">R</span> <span class="id" type="var">f</span>) (<span class="id" type="var">la</span>: <span class="id" type="var">list</span> <span class="id" type="var">A</span>) (<span class="id" type="var">lb</span> : <span class="id" type="var">list</span> <span class="id" type="var">B</span>) : <span class="id" type="var">bool</span> <span class="comment">(*&nbsp;REPLACE&nbsp;THIS&nbsp;LINE&nbsp;WITH&nbsp;":=&nbsp;_your_definition_&nbsp;."&nbsp;*)</span>. <span class="id" type="var">Admitted</span>.<br/>
+</div>
+
+<div class="doc">
+In the following proof, you might: 
+
+<div class="paragraph"> </div>
+
+<ul class="doclist">
+<li> want to think whether you do induction first, or rather apply some trivial reflection view first to split the goal
+
+</li>
+<li> recall you can handle boolean conjunctions with <span class="inlinecode"><span class="id" type="tactic">move</span></span> <span class="inlinecode">⇒</span> <span class="inlinecode">/<span class="id" type="var">andP</span></span> <span class="inlinecode">...</span>
+
+</li>
+<li> realize that (instantiated) premises can be also used as reflection views. 
+
+</li>
+</ul>
+
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Theorem</span> <span class="id" type="var">forall2P</span> {<span class="id" type="var">A</span> <span class="id" type="var">B</span> : <span class="id" type="keyword">Type</span>} (<span class="id" type="var">R</span> : <span class="id" type="var">A</span> → <span class="id" type="var">B</span> → <span class="id" type="keyword">Prop</span>) (<span class="id" type="var">f</span>: <span class="id" type="var">A</span> → <span class="id" type="var">B</span> → <span class="id" type="var">bool</span>) : <span style='font-size:120%;'>&forall;</span>(<span class="id" type="var">P</span>: <span class="id" type="var">Rreflected</span> <span class="id" type="var">R</span> <span class="id" type="var">f</span>), <span class="id" type="var">Rreflected</span> (<span class="id" type="var">Forall2</span> <span class="id" type="var">R</span>) (<span class="id" type="var">forall2</span> <span class="id" type="var">R</span> <span class="id" type="var">f</span> <span class="id" type="var">P</span>).<br/>
+<span class="id" type="keyword">Proof</span>.<br/>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;FILL&nbsp;IN&nbsp;HERE&nbsp;*)</span> <span class="id" type="var">Admitted</span>.<br/>
+</div>
+
+<span class="proofbox">&#9744;</span> 
+<div class="doc less-space">
+<div class="paragraph"> </div>
+
+<a name="lab182"></a><h2 class="section">Exercise 5: Kuroda and some classical aspects of negation</h2>
+
+<div class="paragraph"> </div>
+
+<a name="lab183"></a><h4 class="section">Exercise: 3 stars, standard  (notexistsnot_forall)</h4>
+
+<div class="paragraph"> </div>
+
+ Just like in the propositional case, there are many propositions which
+    cannot be proved in the intuitionistic logic, but are not as strong as
+    classical axioms either. Here is a famous example: 
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Definition</span> <span class="id" type="var">kuroda</span> (<span class="id" type="var">X</span>:<span class="id" type="keyword">Type</span>) (<span class="id" type="var">P</span> : <span class="id" type="var">X</span> → <span class="id" type="keyword">Prop</span>) := (<span style='font-size:120%;'>&forall;</span><span class="id" type="var">x</span>, ¬¬<span class="id" type="var">P</span> <span class="id" type="var">x</span>) → ¬~(<span style='font-size:120%;'>&forall;</span><span class="id" type="var">x</span>, <span class="id" type="var">P</span> <span class="id" type="var">x</span>).<br/>
+</div>
+
+<div class="doc">
+This law of course trivially follows from classical logic. 
+<div class="paragraph"> </div>
+
+ Here and everywhere below you can actually provide a normal tactic proof if writing down proof term provides too difficult.  
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Definition</span> <span class="id" type="var">classic_kuroda</span> : <span style='font-size:120%;'>&forall;</span><span class="id" type="var">X</span> <span class="id" type="var">P</span>, (<span style='font-size:120%;'>&forall;</span>(<span class="id" type="var">x</span> : <span class="id" type="var">X</span>), <span class="id" type="var">em_for_P</span> (<span class="id" type="var">P</span> <span class="id" type="var">x</span>)) → <span class="id" type="var">kuroda</span> <span class="id" type="var">X</span> <span class="id" type="var">P</span> <br/>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;REPLACE&nbsp;THIS&nbsp;LINE&nbsp;WITH&nbsp;":=&nbsp;_your_definition_&nbsp;."&nbsp;*)</span>. <span class="id" type="var">Admitted</span>.<br/>
+</div>
+
+<div class="doc">
+Do you think you can prove any of the classical axioms from <span class="inlinecode"><span class="id" type="var">kuroda</span></span>? 
+<div class="paragraph"> </div>
+
+ Here is an example of a law governing the interaction of negation and
+    quantification, which only requires the Kuroda axiom: 
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Definition</span> <span class="id" type="var">notforall_notnotexistsnot</span> :<br/>
+&nbsp;&nbsp;<span style='font-size:120%;'>&forall;</span>(<span class="id" type="var">X</span>:<span class="id" type="keyword">Type</span>) (<span class="id" type="var">P</span> : <span class="id" type="var">X</span> → <span class="id" type="keyword">Prop</span>), <span class="id" type="var">kuroda</span> <span class="id" type="var">X</span> <span class="id" type="var">P</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;¬(<span style='font-size:120%;'>&forall;</span><span class="id" type="var">x</span>,  <span class="id" type="var">P</span> <span class="id" type="var">x</span>) → ¬¬(<span style='font-size:120%;'>&exist;</span><span class="id" type="var">x</span>, ¬<span class="id" type="var">P</span> <span class="id" type="var">x</span>) <br/>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;REPLACE&nbsp;THIS&nbsp;LINE&nbsp;WITH&nbsp;":=&nbsp;_your_definition_&nbsp;."&nbsp;*)</span>. <span class="id" type="var">Admitted</span>.<br/>
+</div>
+
+<div class="doc">
+However, there are laws which require more of classical logic. Some not all
+    that much: 
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Theorem</span> <span class="id" type="var">notexistsnot_forall</span> :<br/>
+&nbsp;&nbsp;<span style='font-size:120%;'>&forall;</span>(<span class="id" type="var">X</span>:<span class="id" type="keyword">Type</span>) (<span class="id" type="var">P</span> : <span class="id" type="var">X</span> → <span class="id" type="keyword">Prop</span>),<br/>
+&nbsp;&nbsp;(<span style='font-size:120%;'>&forall;</span><span class="id" type="var">x</span>, <span class="id" type="var">em_for_P</span> (<span class="id" type="var">P</span> <span class="id" type="var">x</span>)) →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;¬(<span style='font-size:120%;'>&exist;</span><span class="id" type="var">x</span>, ¬<span class="id" type="var">P</span> <span class="id" type="var">x</span>) → (<span style='font-size:120%;'>&forall;</span><span class="id" type="var">x</span>, <span class="id" type="var">P</span> <span class="id" type="var">x</span>).<br/>
+<span class="id" type="keyword">Proof</span>.<br/>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;FILL&nbsp;IN&nbsp;HERE&nbsp;*)</span> <span class="id" type="var">Admitted</span>.<br/>
+</div>
+
+<span class="proofbox">&#9744;</span> 
+
+<div class="doc">
+<a name="lab184"></a><h2 class="section">Optional exercises</h2>
+
+<div class="paragraph"> </div>
+
+<a name="lab185"></a><h2 class="section">Exercise 6, optional: the drinker paradox</h2>
+
+<div class="paragraph"> </div>
+
+<a name="lab186"></a><h4 class="section">Exercise: 4 stars, standard, optional (the_drinker_paradox)</h4>
+
+<div class="paragraph"> </div>
+
+ But some theorems require more or less the full strength of classical
+    logic... although as we will see in one of following exercises, even with
+    these beasts it is still possible to be a bit more refined when approaching
+    them from a constructive point of view. 
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Theorem</span> <span class="id" type="var">notforallnot_exists</span> : <span class="id" type="var">excluded_middle</span> →<br/>
+&nbsp;&nbsp;<span style='font-size:120%;'>&forall;</span>(<span class="id" type="var">X</span>:<span class="id" type="keyword">Type</span>) (<span class="id" type="var">P</span> : <span class="id" type="var">X</span> → <span class="id" type="keyword">Prop</span>),<br/>
+&nbsp;&nbsp;&nbsp;¬(<span style='font-size:120%;'>&forall;</span><span class="id" type="var">x</span>, ¬<span class="id" type="var">P</span> <span class="id" type="var">x</span>) → (<span style='font-size:120%;'>&exist;</span><span class="id" type="var">x</span>, <span class="id" type="var">P</span> <span class="id" type="var">x</span>) .<br/>
+<span class="id" type="keyword">Proof</span>.<br/>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;FILL&nbsp;IN&nbsp;HERE&nbsp;*)</span> <span class="id" type="var">Admitted</span>.<br/><hr class='doublespaceincode'/>
+<span class="id" type="keyword">Theorem</span> <span class="id" type="var">notforall_existsnot</span> : <span class="id" type="var">excluded_middle</span> →<br/>
+&nbsp;&nbsp;<span style='font-size:120%;'>&forall;</span>(<span class="id" type="var">X</span>:<span class="id" type="keyword">Type</span>) (<span class="id" type="var">P</span> : <span class="id" type="var">X</span> → <span class="id" type="keyword">Prop</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;¬(<span style='font-size:120%;'>&forall;</span><span class="id" type="var">x</span>, <span class="id" type="var">P</span> <span class="id" type="var">x</span>) → (<span style='font-size:120%;'>&exist;</span><span class="id" type="var">x</span>, ¬<span class="id" type="var">P</span> <span class="id" type="var">x</span>) .<br/>
+<span class="id" type="keyword">Proof</span>.<br/>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;FILL&nbsp;IN&nbsp;HERE&nbsp;*)</span> <span class="id" type="var">Admitted</span>.<br/>
+</div>
+
+<div class="doc">
+And finally the difficult direction of the infamous <i>drinker paradox</i> . Note
+    that we need also to assume non-emptiness (inhabitation) of X for this one:
+    we don't have it for free! 
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Definition</span> <span class="id" type="var">inhabited</span> (<span class="id" type="var">X</span> : <span class="id" type="keyword">Type</span>) := <span style='font-size:120%;'>&exist;</span>(<span class="id" type="var">x</span>: <span class="id" type="var">X</span>), <span class="id" type="var">x</span> = <span class="id" type="var">x</span>.<br/><hr class='doublespaceincode'/>
+<span class="id" type="keyword">Theorem</span> <span class="id" type="var">the_heart_of_the_drinker_paradox</span> :  <span class="id" type="var">excluded_middle</span> →<br/>
+&nbsp;&nbsp;<span style='font-size:120%;'>&forall;</span>(<span class="id" type="var">R</span> : <span class="id" type="keyword">Prop</span>) (<span class="id" type="var">X</span>: <span class="id" type="keyword">Type</span>) (<span class="id" type="var">P</span> : <span class="id" type="var">X</span> → <span class="id" type="keyword">Prop</span>), <span class="id" type="var">inhabited</span> <span class="id" type="var">X</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;((<span style='font-size:120%;'>&forall;</span><span class="id" type="var">x</span> : <span class="id" type="var">X</span>, <span class="id" type="var">P</span> <span class="id" type="var">x</span>) → <span class="id" type="var">R</span>) → (<span style='font-size:120%;'>&exist;</span><span class="id" type="var">x</span>, <span class="id" type="var">P</span> <span class="id" type="var">x</span>  → <span class="id" type="var">R</span>).<br/>
+<span class="id" type="keyword">Proof</span>.<br/>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;FILL&nbsp;IN&nbsp;HERE&nbsp;*)</span> <span class="id" type="var">Admitted</span>.<br/><hr class='doublespaceincode'/>
+<span class="id" type="keyword">Corollary</span> <span class="id" type="var">the_drinker_paradox</span> : <span class="id" type="var">excluded_middle</span> → <span style='font-size:120%;'>&forall;</span>(<span class="id" type="var">R</span> : <span class="id" type="keyword">Prop</span>) (<span class="id" type="var">X</span>: <span class="id" type="keyword">Type</span>) (<span class="id" type="var">P</span> : <span class="id" type="var">X</span> → <span class="id" type="keyword">Prop</span>),  <span class="id" type="var">inhabited</span> <span class="id" type="var">X</span> → (<span style='font-size:120%;'>&exist;</span><span class="id" type="var">x</span>, <span class="id" type="var">P</span> <span class="id" type="var">x</span>  ↔ (<span style='font-size:120%;'>&forall;</span><span class="id" type="var">x</span> : <span class="id" type="var">X</span>, <span class="id" type="var">P</span> <span class="id" type="var">x</span>)).<br/>
+<span class="id" type="keyword">Proof</span>.<br/>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;FILL&nbsp;IN&nbsp;HERE&nbsp;*)</span> <span class="id" type="var">Admitted</span>.<br/>
+</div>
+
+<span class="proofbox">&#9744;</span> 
+<div class="doc less-space">
+<div class="paragraph"> </div>
+
+<a name="lab187"></a><h2 class="section">Exercise 7, optional: constant domain</h2>
+
+<div class="paragraph"> </div>
+
+<a name="lab188"></a><h4 class="section">Exercise: 4 stars, standard, optional (notforall_existsnot_CD)</h4>
+
+<div class="paragraph"> </div>
+
+ Incidentally, some of laws above can be derived from axioms which do not
+    rely on classical logic. 
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Definition</span> <span class="id" type="var">constant_domain</span> (<span class="id" type="var">X</span> : <span class="id" type="keyword">Type</span>) :=<br/>
+&nbsp;&nbsp;<span style='font-size:120%;'>&forall;</span>(<span class="id" type="var">P</span> : <span class="id" type="var">X</span> → <span class="id" type="keyword">Prop</span>) (<span class="id" type="var">Q</span>: <span class="id" type="keyword">Prop</span>), (<span style='font-size:120%;'>&forall;</span> <span class="id" type="var">x</span>, (<span class="id" type="var">P</span> <span class="id" type="var">x</span> ∨ <span class="id" type="var">Q</span>)) → ((<span style='font-size:120%;'>&forall;</span><span class="id" type="var">x</span>, <span class="id" type="var">P</span> <span class="id" type="var">x</span>) ∨ <span class="id" type="var">Q</span>).<br/>
+</div>
+
+<div class="doc">
+Here and everywhere below you can actually provide a normal tactic proof if writing down proof term provides too difficult.  
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Theorem</span> <span class="id" type="var">empty_domain_constant</span> : <span style='font-size:120%;'>&forall;</span><span class="id" type="var">X</span>, ~(<span class="id" type="var">inhabited</span> <span class="id" type="var">X</span>) → <span class="id" type="var">constant_domain</span> <span class="id" type="var">X</span>.<br/>
+<span class="id" type="keyword">Proof</span>.<br/>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;FILL&nbsp;IN&nbsp;HERE&nbsp;*)</span> <span class="id" type="var">Admitted</span>.<br/><hr class='doublespaceincode'/>
+<span class="id" type="keyword">Theorem</span> <span class="id" type="var">bool_constant</span> : <span class="id" type="var">constant_domain</span> <span class="id" type="var">bool</span>.<br/>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;FILL&nbsp;IN&nbsp;HERE&nbsp;*)</span> <span class="id" type="var">Admitted</span>.<br/><hr class='doublespaceincode'/>
+<span class="id" type="keyword">Theorem</span> <span class="id" type="var">em_constant</span> : <span class="id" type="var">excluded_middle</span> → <span style='font-size:120%;'>&forall;</span><span class="id" type="var">X</span>, <span class="id" type="var">constant_domain</span> <span class="id" type="var">X</span>.<br/>
+<span class="id" type="keyword">Proof</span>.<br/>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;FILL&nbsp;IN&nbsp;HERE&nbsp;*)</span> <span class="id" type="var">Admitted</span>.<br/>
+</div>
+
+<div class="doc">
+The constant domain axiom/property allows to get some existential
+    quantification out of negated universal one... which, in general, is not a
+    constructive thing: negating an universal sentence does not produce any
+    witness! 
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Theorem</span> <span class="id" type="var">CD_often_nonempty</span> :<br/>
+&nbsp;&nbsp;<span style='font-size:120%;'>&forall;</span>(<span class="id" type="var">X</span>: <span class="id" type="keyword">Type</span>) (<span class="id" type="var">P</span> : <span class="id" type="var">X</span> → <span class="id" type="keyword">Prop</span>), <span class="id" type="var">constant_domain</span> <span class="id" type="var">X</span> →  ¬(<span style='font-size:120%;'>&forall;</span><span class="id" type="var">x</span>, <span class="id" type="var">P</span> <span class="id" type="var">x</span>) → <span class="id" type="var">inhabited</span> <span class="id" type="var">X</span>.<br/>
+<span class="id" type="keyword">Proof</span>.<br/>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;FILL&nbsp;IN&nbsp;HERE&nbsp;*)</span> <span class="id" type="var">Admitted</span>.<br/>
+</div>
+
+<div class="doc">
+And the connection between quantifiers becomes even better if the property
+    in question behaves decently. 
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Definition</span> <span class="id" type="var">wem_prop</span> (<span class="id" type="var">X</span> : <span class="id" type="keyword">Type</span>) (<span class="id" type="var">P</span> : <span class="id" type="var">X</span> → <span class="id" type="keyword">Prop</span>) := <span style='font-size:120%;'>&forall;</span>(<span class="id" type="var">x</span> : <span class="id" type="var">X</span>), ¬(<span class="id" type="var">P</span> <span class="id" type="var">x</span>) ∨ ¬¬(<span class="id" type="var">P</span> <span class="id" type="var">x</span>).<br/>
+</div>
+
+<div class="doc">
+<span class="inlinecode"><span class="id" type="var">wem</span></span> here stands for <i>weak excluded middle</i>. Here is our final result about
+    constant domains, which formalizes what I mean by an <i>even better
+    connection</i> between quantifiers. It may seem a non-exciting statement, but
+    you need to be reasonably smart when looking for the right instance of the
+    constant domain axiom. 
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Theorem</span> <span class="id" type="var">notforall_existsnot_CD</span> : <span style='font-size:120%;'>&forall;</span>(<span class="id" type="var">X</span>:<span class="id" type="keyword">Type</span>), <span class="id" type="var">constant_domain</span> <span class="id" type="var">X</span> →                                             <br/>
+&nbsp;&nbsp;<span style='font-size:120%;'>&forall;</span> (<span class="id" type="var">P</span> : <span class="id" type="var">X</span> → <span class="id" type="keyword">Prop</span>), <span class="id" type="var">wem_prop</span> <span class="id" type="var">X</span> <span class="id" type="var">P</span> →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;¬(<span style='font-size:120%;'>&forall;</span><span class="id" type="var">x</span>,  ¬<span class="id" type="var">P</span> <span class="id" type="var">x</span>) → (<span style='font-size:120%;'>&exist;</span><span class="id" type="var">x</span>, ¬¬<span class="id" type="var">P</span> <span class="id" type="var">x</span>) .<br/>
+<span class="id" type="keyword">Proof</span>.<br/>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;FILL&nbsp;IN&nbsp;HERE&nbsp;*)</span> <span class="id" type="var">Admitted</span>.<br/>
+</div>
+
+<div class="doc">
+Note that in light of <span class="inlinecode"><span class="id" type="var">em_constant</span></span> earlier in this exercise, this would
+    allow an alternative approach to proving <span class="inlinecode"><span class="id" type="var">notforallnot_exists</span></span> and
+    <span class="inlinecode"><span class="id" type="var">notforall_existsnot</span></span> in the preceding exercise. 
+<div class="paragraph"> </div>
+
+ <span class="proofbox">&#9744;</span> 
+<div class="paragraph"> </div>
+
+<a name="lab189"></a><h2 class="section">Exercise 8, optional: impredicative connectives</h2>
+
+<div class="paragraph"> </div>
+
+<a name="lab190"></a><h4 class="section">Exercise: 4 stars, standard, optional (impredicative)</h4>
+
+<div class="paragraph"> </div>
+
+ In constructive logic, it is known there is a way of defining all the
+    logical connectives once we have universal quantification over propositions.
+    Here is how it goes: please fill in all the missing proofs. 
+<div class="paragraph"> </div>
+
+ Note btw that these impredicative connectives are defined on <span class="inlinecode"><span class="id" type="keyword">Prop</span></span> only.
+    Hence, we are not going to run into problems that plagued us with
+    impredicative quantification over <span class="inlinecode"><span class="id" type="keyword">Types</span></span> when we discussed the issue during
+    the lecture. 
+<div class="paragraph"> </div>
+
+ Here again you can actually provide a normal tactic proof if writing down proof term provides too difficult.  
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Definition</span> <span class="id" type="var">soFalse</span> : <span class="id" type="keyword">Prop</span> := <span style='font-size:120%;'>&forall;</span><span class="id" type="var">B</span> : <span class="id" type="keyword">Prop</span>, <span class="id" type="var">B</span>.<br/><hr class='doublespaceincode'/>
+<span class="id" type="keyword">Definition</span> <span class="id" type="var">so_False</span> : <span class="id" type="var">soFalse</span> ↔ <span class="id" type="var">False</span> <br/>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;REPLACE&nbsp;THIS&nbsp;LINE&nbsp;WITH&nbsp;":=&nbsp;_your_definition_&nbsp;."&nbsp;*)</span>. <span class="id" type="var">Admitted</span>.<br/><hr class='doublespaceincode'/>
+<span class="id" type="keyword">Definition</span> <span class="id" type="var">soneg</span> (<span class="id" type="var">P</span>: <span class="id" type="keyword">Prop</span>) : <span class="id" type="keyword">Prop</span> := <span style='font-size:120%;'>&forall;</span><span class="id" type="var">B</span> : <span class="id" type="keyword">Prop</span>, <span class="id" type="var">P</span> → <span class="id" type="var">B</span>.<br/><hr class='doublespaceincode'/>
+<span class="id" type="keyword">Definition</span> <span class="id" type="var">so_neg</span> : <span style='font-size:120%;'>&forall;</span>(<span class="id" type="var">P</span> : <span class="id" type="keyword">Prop</span>), <span class="id" type="var">soneg</span> <span class="id" type="var">P</span> ↔ (<span class="id" type="var">P</span> → <span class="id" type="var">soFalse</span>) <br/>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;REPLACE&nbsp;THIS&nbsp;LINE&nbsp;WITH&nbsp;":=&nbsp;_your_definition_&nbsp;."&nbsp;*)</span>. <span class="id" type="var">Admitted</span>.<br/><hr class='doublespaceincode'/>
+<span class="id" type="keyword">Definition</span> <span class="id" type="var">soor</span> (<span class="id" type="var">A</span> <span class="id" type="var">B</span>: <span class="id" type="keyword">Prop</span>) : <span class="id" type="keyword">Prop</span> := <span style='font-size:120%;'>&forall;</span>(<span class="id" type="var">Q</span>: <span class="id" type="keyword">Prop</span>), (<span class="id" type="var">A</span> → <span class="id" type="var">Q</span>) → (<span class="id" type="var">B</span> → <span class="id" type="var">Q</span>) → <span class="id" type="var">Q</span>.<br/><hr class='doublespaceincode'/>
+<span class="id" type="keyword">Definition</span> <span class="id" type="var">so_or</span> : <span style='font-size:120%;'>&forall;</span>(<span class="id" type="var">A</span> <span class="id" type="var">B</span> : <span class="id" type="keyword">Prop</span>), (<span class="id" type="var">A</span> ∨ <span class="id" type="var">B</span>) ↔ (<span class="id" type="var">soor</span> <span class="id" type="var">A</span> <span class="id" type="var">B</span>) <br/>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;REPLACE&nbsp;THIS&nbsp;LINE&nbsp;WITH&nbsp;":=&nbsp;_your_definition_&nbsp;."&nbsp;*)</span>. <span class="id" type="var">Admitted</span>.<br/><hr class='doublespaceincode'/>
+<span class="id" type="keyword">Definition</span> <span class="id" type="var">soand</span> (<span class="id" type="var">A</span> <span class="id" type="var">B</span>: <span class="id" type="keyword">Prop</span>) : <span class="id" type="keyword">Prop</span> := <span style='font-size:120%;'>&forall;</span>(<span class="id" type="var">Q</span>: <span class="id" type="keyword">Prop</span>), (<span class="id" type="var">A</span> → <span class="id" type="var">B</span> → <span class="id" type="var">Q</span>) →<span class="id" type="var">Q</span>.<br/><hr class='doublespaceincode'/>
+<span class="id" type="keyword">Definition</span> <span class="id" type="var">so_and</span> : <span style='font-size:120%;'>&forall;</span><span class="id" type="var">A</span> <span class="id" type="var">B</span>, (<span class="id" type="var">A</span> ∧ <span class="id" type="var">B</span>) ↔ (<span class="id" type="var">soand</span> <span class="id" type="var">A</span> <span class="id" type="var">B</span>) <br/>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;REPLACE&nbsp;THIS&nbsp;LINE&nbsp;WITH&nbsp;":=&nbsp;_your_definition_&nbsp;."&nbsp;*)</span>. <span class="id" type="var">Admitted</span>.<br/><hr class='doublespaceincode'/>
+<span class="id" type="keyword">Definition</span> <span class="id" type="var">soexist</span> (<span class="id" type="var">X</span> : <span class="id" type="keyword">Type</span>) (<span class="id" type="var">A</span> : <span class="id" type="var">X</span> → <span class="id" type="keyword">Prop</span>) : <span class="id" type="keyword">Prop</span> := <span style='font-size:120%;'>&forall;</span>(<span class="id" type="var">P</span> : <span class="id" type="keyword">Prop</span>), (<span style='font-size:120%;'>&forall;</span>(<span class="id" type="var">x</span> : <span class="id" type="var">X</span>), (<span class="id" type="var">A</span> <span class="id" type="var">x</span> → <span class="id" type="var">P</span>)) → <span class="id" type="var">P</span>.<br/><hr class='doublespaceincode'/>
+<span class="id" type="keyword">Definition</span> <span class="id" type="var">so_exist</span> : <span style='font-size:120%;'>&forall;</span>(<span class="id" type="var">X</span> : <span class="id" type="keyword">Type</span>) (<span class="id" type="var">A</span> : <span class="id" type="var">X</span> → <span class="id" type="keyword">Prop</span>), ((<span class="id" type="var">ex</span> <span class="id" type="var">A</span>) ↔ (<span class="id" type="var">soexist</span> <span class="id" type="var">X</span> <span class="id" type="var">A</span>)) <br/>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;REPLACE&nbsp;THIS&nbsp;LINE&nbsp;WITH&nbsp;":=&nbsp;_your_definition_&nbsp;."&nbsp;*)</span>. <span class="id" type="var">Admitted</span>.<br/>
+</div>
+
+<span class="proofbox">&#9744;</span> 
+<div class="code code-tight">
+
+<span class="comment">(*&nbsp;Sun&nbsp;Jul&nbsp;14&nbsp;22:07:54&nbsp;MSK&nbsp;2019&nbsp;*)</span><br/>
+</div>
+</div>
+
+
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,61 @@
+fold_map_correct (standard, automatically graded)
+Score: 0.0 / 1.0
+Reason: Admitted proof.
+
+fold_flat_map_correct (standard, automatically graded)
+Score: 0.0 / 1.0
+Reason: Admitted proof.
+
+fold_append_correct (standard, automatically graded)
+Score: 0.0 / 1.0
+Reason: Admitted proof.
+
+test_partition1 (standard, automatically graded)
+Score: 0.0 / 1.0
+Reason: Admitted proof.
+
+partition_fst (standard, automatically graded)
+Score: 0.0 / 1.0
+Reason: Admitted proof.
+
+partition_snd (standard, automatically graded)
+Score: 0.0 / 1.0
+Reason: Admitted proof.
+
+combine_after_split (standard, automatically graded)
+Score: 0.0 / 3.0
+Reason: Admitted proof.
+
+combine_after_split (standard, automatically graded)
+Score: 0.0 / 3.0
+Reason: Admitted proof.
+
+succ_3 (standard, automatically graded)
+Score: 0.0 / 1.0
+Reason: Admitted proof.
+
+plus_3 (standard, automatically graded)
+Score: 0.0 / 1.0
+Reason: Admitted proof.
+
+mult_3 (standard, automatically graded)
+Score: 0.0 / 1.0
+Reason: Admitted proof.
+
+exp_3 (advanced, automatically graded)
+Score: 0.0 / 3.0
+Reason: Admitted proof.
+
+Points possible - standard: 15
+Points possible - advanced: 18
+
+   ###########################
+   ##### Grading Results #####
+   ###########################
+
+   Standard:  0.0 / 15.0 so far
+                and  0.0 ungraded
+
+   Advanced:  0.0 / 18.0 so far
+                and  0.0 ungraded
+

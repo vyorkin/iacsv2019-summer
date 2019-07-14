@@ -1,0 +1,511 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<link href="common/css/sf.css" rel="stylesheet" type="text/css"/>
+<title>Table of contents</title>
+</head>
+<link href="common/jquery-ui/jquery-ui.css" rel="stylesheet">
+<script src="common/jquery-ui/external/jquery/jquery.js"></script>
+<script src="common/jquery-ui/jquery-ui.js"></script>
+<script src="common/toggleproofs.js"></script>
+<link href="common/css/lf19.css" rel="stylesheet" type="text/css"/>
+
+<script>
+
+$(document).ready(function() {
+
+    $("#accordion").show().accordion({
+        autoHeight: false
+    });
+
+    $("#accordion div").css({ 'height': 'auto' });
+});      
+
+
+$( function() {
+    var icons = {
+      header: "ui-icon-circle-arrow-e",
+      activeHeader: "ui-icon-circle-arrow-s"
+    };
+    
+    $( "#accordion" ).accordion({
+      icons: icons
+    });
+    $("#accordion").accordion({collapsible : true, active : 'none'});
+
+    $( "#toggle" ).button().on( "click", function() {
+      if ( $( "#accordion" ).accordion( "option", "icons" ) ) {
+        $( "#accordion" ).accordion( "option", "icons", null );
+      } else {
+        $( "#accordion" ).accordion( "option", "icons", icons );
+      }
+    });
+  } );
+  </script>
+<body>
+
+<div id="page">
+
+<div id="header">
+<a href='https://www.cis.upenn.edu/~bcpierce/sf/current/index.html'>
+<img src='common/media/image/sf_logo_sm.png'></a>
+</br><a href='index.html'>  <span class='booktitleinheader'>Volume 1: Logical Foundations 19</span><br></br>
+<ul id='menu'>
+   <a href='toc.html'><li class='section_name'>Table of Contents</li></a>
+   <a href='coqindex.html'><li class='section_name'>Index</li></a>
+   <a href='deps.html'><li class='section_name'>Roadmap</li></a>
+</ul>
+</div>
+</a></div>
+
+<div id="main">
+
+<div id="toc">
+<div id="accordion">
+<h2><a href="Basics19.html">Basics19</a></h2>
+<div>
+<ul class="doclist">
+<li><a href="Basics19.html">Top</a>
+<li><a href="Basics19.html#lab1">Basics: Functional Programming and First Proofs in Coq</a>
+
+</li>
+<li><a href="Basics19.html#lab2">Introduction</a>
+
+</li>
+<li><a href="Basics19.html#lab3">Enumerated Types</a>
+<div>
+<ul class="doclist">
+<li><a href="Basics19.html#lab4">Days of the Week</a>
+
+</li>
+<li><a href="Basics19.html#lab13">Booleans</a>
+
+</li>
+<li><a href="Basics19.html#lab16">Modules</a>
+
+</li>
+<li><a href="Basics19.html#lab23">New Types from Old</a>
+
+</li>
+<li><a href="Basics19.html#lab24">Tuples</a>
+
+</li>
+<li><a href="Basics19.html#lab25">Numbers</a>
+
+</li>
+</ul>
+</div>
+
+</li>
+</ul>
+</div>
+<h2><a href="FirstProofs19.html">First real proofs in Coq&nbsp;&nbsp;&nbsp;&nbsp;(<i>FirstProofs19</i>)</a></h2>
+<div>
+<ul class="doclist">
+<li><a href="FirstProofs19.html">Top</a>
+<li><a href="FirstProofs19.html#lab31">Proof by Simplification</a>
+
+</li>
+<li><a href="FirstProofs19.html#lab32">Proof by Rewriting</a>
+
+</li>
+<li><a href="FirstProofs19.html#lab34">Proof by Case Analysis</a>
+
+</li>
+<li><a href="FirstProofs19.html#lab36">More Exercises</a>
+<div>
+<ul class="doclist">
+<li><a href="FirstProofs19.html#lab38">Proof by Induction</a>
+
+</li>
+</ul>
+</div>
+
+</li>
+<li><a href="FirstProofs19.html#lab42">Proofs Within Proofs</a>
+<div>
+<ul class="doclist">
+<li><a href="FirstProofs19.html#lab45">Induction beyond natural numbers</a>
+
+</li>
+</ul>
+</div>
+
+</li>
+</ul>
+</div>
+<h2><a href="ListsAndPoly19.html">ListsAndPoly19</a></h2>
+<div>
+<ul class="doclist">
+<li><a href="ListsAndPoly19.html">Top</a>
+<li><a href="ListsAndPoly19.html#lab46">ListAndPoly19: Working with Structured Data and Polymorphism</a>
+
+</li>
+<li><a href="ListsAndPoly19.html#lab47">Separate Compilation</a>
+
+</li>
+<li><a href="ListsAndPoly19.html#lab48">Lists of Numbers</a>
+<div>
+<ul class="doclist">
+<li><a href="ListsAndPoly19.html#lab49">Standard functions on lists</a>
+
+</li>
+<li><a href="ListsAndPoly19.html#lab58">Higher-Order Functions</a>
+
+</li>
+<li><a href="ListsAndPoly19.html#lab59">Map</a>
+
+</li>
+<li><a href="ListsAndPoly19.html#lab61">Fold</a>
+
+</li>
+<li><a href="ListsAndPoly19.html#lab65">More polymorphic types</a>
+
+</li>
+</ul>
+</div>
+
+</li>
+</ul>
+</div>
+<h2><a href="Tactics19.html">More Basic Tactics&nbsp;&nbsp;&nbsp;&nbsp;(<i>Tactics19</i>)</a></h2>
+<div>
+<ul class="doclist">
+<li><a href="Tactics19.html">Top</a>
+<li><div>
+<ul class="doclist">
+<li><a href="Tactics19.html#lab67">The <span class="inlinecode"><span class="id" type="tactic">apply</span></span> Tactic</a>
+
+</li>
+<li><a href="Tactics19.html#lab69"><span class="inlinecode"><span class="id" type="tactic">apply</span></span> <span class="inlinecode">...</span> <span class="inlinecode"><span class="id" type="keyword">with</span></span> <span class="inlinecode">...</span> vs. <span class="inlinecode"><span class="id" type="tactic">apply</span></span> in <span class="inlinecode"><span class="id" type="var">ssreflect</span></span></a>
+
+</li>
+<li><a href="Tactics19.html#lab70">Injective and Disjoint Constructors</a>
+
+</li>
+<li><a href="Tactics19.html#lab71">Using Tactics on Hypotheses</a>
+
+</li>
+<li><a href="Tactics19.html#lab72">Varying the Induction Hypothesis</a>
+
+</li>
+<li><a href="Tactics19.html#lab74">Unfolding Definitions</a>
+
+</li>
+<li><a href="Tactics19.html#lab75">Destructing Compound Expressions</a>
+
+</li>
+<li><a href="Tactics19.html#lab77">Review</a>
+
+</li>
+<li><a href="Tactics19.html#lab78">Standard Coq alternatives</a>
+
+</li>
+<li><a href="Tactics19.html#lab79">Micro Sermon</a>
+
+</li>
+<li><a href="Tactics19.html#lab80">Additional Exercises</a>
+
+</li>
+</ul>
+</div>
+
+</li>
+</ul>
+</div>
+<h2><a href="HA1SemProg19.html">HA1SemProg19</a></h2>
+<div>
+<ul class="doclist">
+<li><a href="HA1SemProg19.html">Top</a>
+<li><a href="HA1SemProg19.html#lab84">Blatt 1 &mdash;- Polymorphism and Tactics</a>
+<div>
+<ul class="doclist">
+<li><a href="HA1SemProg19.html#lab85">SemProg SoSe 2019, Set 1</a>
+
+</li>
+<li><a href="HA1SemProg19.html#lab86">Exercise 1</a>
+
+</li>
+<li><a href="HA1SemProg19.html#lab88">Exercise 2</a>
+
+</li>
+<li><a href="HA1SemProg19.html#lab90">Exercise 3</a>
+
+</li>
+<li><a href="HA1SemProg19.html#lab92">Exercise 4</a>
+
+</li>
+<li><a href="HA1SemProg19.html#lab94">Exercise 5: Church addition and multiplication</a>
+
+</li>
+<li><a href="HA1SemProg19.html#lab96">Bonus Exercise 6: Church exponentiation</a>
+
+</li>
+</ul>
+</div>
+
+</li>
+</ul>
+</div>
+<h2><a href="LogicIntro19.html">LogicIntro19</a></h2>
+<div>
+<ul class="doclist">
+<li><a href="LogicIntro19.html">Top</a>
+<li><div>
+<ul class="doclist">
+<li><a href="LogicIntro19.html#lab98">LogicIntro: Introduction to logic, propositions and proofs</a>
+
+</li>
+<li><a href="LogicIntro19.html#lab99">Understanding Prop and logic in Coq</a>
+
+</li>
+<li><a href="LogicIntro19.html#lab101">Natural deduction</a>
+
+</li>
+<li><a href="LogicIntro19.html#lab102">Logical Connectives</a>
+
+</li>
+<li><a href="LogicIntro19.html#lab103">Conjunction</a>
+
+</li>
+<li><a href="LogicIntro19.html#lab111">Universal quantifiers, implications and functions</a>
+
+</li>
+<li><a href="LogicIntro19.html#lab113">Disjunction</a>
+
+</li>
+<li><a href="LogicIntro19.html#lab116">Falsehood and Negation</a>
+
+</li>
+<li><a href="LogicIntro19.html#lab125">Equality</a>
+
+</li>
+<li><a href="LogicIntro19.html#lab127">Truth</a>
+
+</li>
+</ul>
+</div>
+
+</li>
+</ul>
+</div>
+<h2><a href="MoreLogic19.html">MoreLogic19</a></h2>
+<div>
+<ul class="doclist">
+<li><a href="MoreLogic19.html">Top</a>
+<li><div>
+<ul class="doclist">
+<li><a href="MoreLogic19.html#lab128">More Logic: More about logic, propositions and proofs</a>
+
+</li>
+<li><a href="MoreLogic19.html#lab129">Classical logic and boolean axioms?</a>
+
+</li>
+<li><a href="MoreLogic19.html#lab130">Existential Quantification</a>
+
+</li>
+</ul>
+</div>
+
+</li>
+<li><a href="MoreLogic19.html#lab136">Impredicative Quantification</a>
+<div>
+<ul class="doclist">
+<li><a href="MoreLogic19.html#lab140">Programming with Propositions</a>
+
+</li>
+<li><a href="MoreLogic19.html#lab144">Coq vs. Set Theory</a>
+
+</li>
+<li><a href="MoreLogic19.html#lab145">Functional Extensionality</a>
+
+</li>
+</ul>
+</div>
+
+</li>
+</ul>
+</div>
+<h2><a href="IndProp19.html">Inductively Defined Propositions&nbsp;&nbsp;&nbsp;&nbsp;(<i>IndProp19</i>)</a></h2>
+<div>
+<ul class="doclist">
+<li><a href="IndProp19.html">Top</a>
+<li><a href="IndProp19.html#lab146">Inductively Defined Propositions</a>
+<div>
+<ul class="doclist">
+<li><a href="IndProp19.html#lab148">Using Evidence in Proofs</a>
+
+</li>
+<li><a href="IndProp19.html#lab149">Full Syntax of Case Distinction</a>
+
+</li>
+<li><a href="IndProp19.html#lab150">Boolean Reflection</a>
+
+</li>
+<li><a href="IndProp19.html#lab151">Induction on Evidence</a>
+
+</li>
+</ul>
+</div>
+
+</li>
+</ul>
+</div>
+<h2><a href="IndRel19.html">IndRel19</a></h2>
+<div>
+<ul class="doclist">
+<li><a href="IndRel19.html">Top</a>
+<li><div>
+<ul class="doclist">
+<li><a href="IndRel19.html#lab155">Inductive Relations</a>
+
+</li>
+</ul>
+</div>
+
+</li>
+<li><a href="IndRel19.html#lab157">Induction Principles</a>
+
+</li>
+<li><a href="IndRel19.html#lab165">Polymorphism</a>
+<div>
+<ul class="doclist">
+<li><a href="IndRel19.html#lab171">Explicit Proof Objects for Induction</a>
+
+</li>
+<li><a href="IndRel19.html#lab172">Setoid Rewriting</a>
+
+</li>
+</ul>
+</div>
+
+</li>
+</ul>
+</div>
+<h2><a href="HA2SemProg19.html">HA2SemProg19</a></h2>
+<div>
+<ul class="doclist">
+<li><a href="HA2SemProg19.html">Top</a>
+<li><div>
+<ul class="doclist">
+<li><a href="HA2SemProg19.html#lab173">SemProg SoSe 2019, Set 2</a>
+
+</li>
+<li><a href="HA2SemProg19.html#lab174">Exercise 1: constructive quantification</a>
+
+</li>
+<li><a href="HA2SemProg19.html#lab176">Exercise 2: classical axioms</a>
+
+</li>
+<li><a href="HA2SemProg19.html#lab178">Exercise 3: reflection yields classical properties</a>
+
+</li>
+<li><a href="HA2SemProg19.html#lab180">Exercise 4: Reflection for predicates on lists</a>
+
+</li>
+<li><a href="HA2SemProg19.html#lab182">Exercise 5: Kuroda and some classical aspects of negation</a>
+
+</li>
+<li><a href="HA2SemProg19.html#lab184">Optional exercises</a>
+
+</li>
+<li><a href="HA2SemProg19.html#lab185">Exercise 6, optional: the drinker paradox</a>
+
+</li>
+<li><a href="HA2SemProg19.html#lab187">Exercise 7, optional: constant domain</a>
+
+</li>
+<li><a href="HA2SemProg19.html#lab189">Exercise 8, optional: impredicative connectives</a>
+
+</li>
+</ul>
+</div>
+
+</li>
+</ul>
+</div>
+<h2><a href="Maps19.html">Maps19</a></h2>
+<div>
+<ul class="doclist">
+<li><a href="Maps19.html">Top</a>
+<li><div>
+<ul class="doclist">
+<li><a href="Maps19.html#lab191">Maps: Total and Partial Maps</a>
+
+</li>
+<li><a href="Maps19.html#lab192">Identifiers</a>
+
+</li>
+<li><a href="Maps19.html#lab193">Total Maps</a>
+
+</li>
+</ul>
+</div>
+
+</li>
+<li><a href="Maps19.html#lab195">Partial maps</a>
+
+</li>
+</ul>
+</div>
+<h2><a href="ToyImpArBool19.html">ToyImpArBool19</a></h2>
+<div>
+<ul class="doclist">
+<li><a href="ToyImpArBool19.html">Top</a>
+<li><div>
+<ul class="doclist">
+<li><a href="ToyImpArBool19.html#lab196">Arithmetic and Boolean Expressions</a>
+
+</li>
+<li><a href="ToyImpArBool19.html#lab197">Syntax</a>
+
+</li>
+<li><a href="ToyImpArBool19.html#lab198">Evaluation</a>
+
+</li>
+<li><a href="ToyImpArBool19.html#lab199">Optimization</a>
+
+</li>
+<li><a href="ToyImpArBool19.html#lab201">Coq Automation</a>
+
+</li>
+<li><a href="ToyImpArBool19.html#lab202">Tacticals</a>
+
+</li>
+<li><a href="ToyImpArBool19.html#lab205">Defining New Tactic Notations</a>
+
+</li>
+<li><a href="ToyImpArBool19.html#lab206">The <span class="inlinecode"><span class="id" type="var">done</span></span> Tactic, aka <span class="inlinecode"><span class="id" type="tactic">by</span></span> <span class="inlinecode">[]</span></a>
+
+</li>
+<li><a href="ToyImpArBool19.html#lab207">The <span class="inlinecode"><span class="id" type="tactic">omega</span></span> Tactic</a>
+
+</li>
+<li><a href="ToyImpArBool19.html#lab208">A Few More Handy Tactics</a>
+
+</li>
+<li><a href="ToyImpArBool19.html#lab209">Evaluation as a Relation</a>
+
+</li>
+<li><a href="ToyImpArBool19.html#lab210">Inference Rule Notation</a>
+
+</li>
+<li><a href="ToyImpArBool19.html#lab211">Equivalence of the Definitions</a>
+
+</li>
+</ul>
+</div>
+
+</li>
+</ul>
+</div>
+</div>
+</div>
+
+</div>
+
+</div>
+</body>
+</html>

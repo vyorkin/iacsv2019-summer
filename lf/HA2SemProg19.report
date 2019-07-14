@@ -1,0 +1,61 @@
+notexists_forallnot (standard, automatically graded)
+Score: 0.0 / 1.0
+Reason: Admitted proof.
+
+notforallnot_equiv_notnotexists (standard, automatically graded)
+Score: 0.0 / 1.0
+Reason: Admitted proof.
+
+forall_notexistsnot (standard, automatically graded)
+Score: 0.0 / 1.0
+Reason: Admitted proof.
+
+em__ito (standard, automatically graded)
+Score: 0.0 / 1.0
+Reason: Admitted proof.
+
+em__dne (standard, automatically graded)
+Score: 0.0 / 1.0
+Reason: Admitted proof.
+
+demorgan__em (standard, automatically graded)
+Score: 0.0 / 1.0
+Reason: Admitted proof.
+
+peirce__em (standard, automatically graded)
+Score: 0.0 / 1.0
+Reason: Admitted proof.
+
+reflect_classical (standard, automatically graded)
+Score: 0.0 / 1.0
+Reason: Admitted proof.
+
+reflect_disj (standard, automatically graded)
+Score: 0.0 / 1.0
+Reason: Admitted proof.
+
+forall2P (standard, automatically graded)
+Score: 0.0 / 3.0
+Reason: Admitted proof.
+
+notforall_notnotexistsnot (standard, automatically graded)
+Score: 0.0 / 1.0
+Reason: Admitted proof.
+
+notexistsnot_forall (standard, automatically graded)
+Score: 0.0 / 2.0
+Reason: Admitted proof.
+
+Points possible - standard: 15
+Points possible - advanced: 15
+
+   ###########################
+   ##### Grading Results #####
+   ###########################
+
+   Standard:  0.0 / 15.0 so far
+                and  0.0 ungraded
+
+   Advanced:  0.0 / 15.0 so far
+                and  0.0 ungraded
+

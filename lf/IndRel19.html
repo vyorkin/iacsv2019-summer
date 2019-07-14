@@ -1,0 +1,919 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<link href="common/css/sf.css" rel="stylesheet" type="text/css"/>
+<title>IndRel19</title>
+</head>
+<link href="common/jquery-ui/jquery-ui.css" rel="stylesheet">
+<script src="common/jquery-ui/external/jquery/jquery.js"></script>
+<script src="common/jquery-ui/jquery-ui.js"></script>
+<script src="common/toggleproofs.js"></script>
+<link href="common/css/lf19.css" rel="stylesheet" type="text/css"/>
+
+<body>
+
+<div id="page">
+
+<div id="header">
+<a href='https://www.cis.upenn.edu/~bcpierce/sf/current/index.html'>
+<img src='common/media/image/sf_logo_sm.png'></a>
+</br><a href='index.html'>  <span class='booktitleinheader'>Volume 1: Logical Foundations 19</span><br></br>
+<ul id='menu'>
+   <a href='toc.html'><li class='section_name'>Table of Contents</li></a>
+   <a href='coqindex.html'><li class='section_name'>Index</li></a>
+   <a href='deps.html'><li class='section_name'>Roadmap</li></a>
+</ul>
+</a></div>
+
+<div id="main">
+
+<h1 class="libtitle">IndRel19</h1>
+
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+ Adapted from <i>Software Foundations</i>  for SemProg@FAU 2013&mdash;2019 
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Set</span> <span class="id" type="var">Warnings</span> "-notation-overridden,-parsing".<br/>
+<span class="id" type="var">From</span> <span class="id" type="var">Coq</span> <span class="id" type="keyword">Require</span> <span class="id" type="keyword">Import</span> <span class="id" type="var">ssreflect</span> <span class="id" type="var">ssrbool</span> <span class="id" type="var">ssrfun</span>.<br/><hr class='doublespaceincode'/>
+<span class="id" type="keyword">Require</span> <span class="id" type="keyword">Import</span> <span class="id" type="var">PeanoNat</span>. <span class="comment">(*&nbsp;for&nbsp;basic&nbsp;properties&nbsp;of&nbsp;<span class="inlinecode"><span class="id" type="var">nat</span></span>&nbsp;functions!&nbsp;*)</span><br/>
+<span class="id" type="keyword">Import</span> <span class="id" type="var">Nat</span>.<br/>
+</div>
+
+<div class="doc">
+<a name="lab155"></a><h2 class="section">Inductive Relations</h2>
+
+<div class="paragraph"> </div>
+
+ A proposition parameterized by a number (such as <span class="inlinecode"><span class="id" type="var">ev</span></span>)
+    can be thought of as a <i>property</i> &mdash; i.e., it defines
+    a subset of <span class="inlinecode"><span class="id" type="var">nat</span></span>, namely those numbers for which the proposition
+    is provable.  In the same way, a two-argument proposition can be
+    thought of as a <i>relation</i> &mdash; i.e., it defines a set of pairs for
+    which the proposition is provable. 
+</div>
+
+<div class="doc">
+One useful example is the "less than or equal to"
+    relation on numbers. 
+<div class="paragraph"> </div>
+
+ The following definition should be fairly intuitive.  It
+    says that there are two ways to give evidence that one number is
+    less than or equal to another: either observe that they are the
+    same number, or give evidence that the first is less than or equal
+    to the predecessor of the second. 
+</div>
+<div class="code code-tight">
+
+<span class="comment">(*&nbsp;Inductive&nbsp;le&nbsp;:&nbsp;nat&nbsp;<span class="nowrap"><span style='font-size:85%;'><span style='vertical-align:5%;'><span style='letter-spacing:-.2em;'>-</span></span>&gt;</span></span>&nbsp;nat&nbsp;<span class="nowrap"><span style='font-size:85%;'><span style='vertical-align:5%;'><span style='letter-spacing:-.2em;'>-</span></span>&gt;</span></span>&nbsp;Prop&nbsp;:=&nbsp;*)</span><br/>
+<span class="comment">(*&nbsp;&nbsp;&nbsp;|&nbsp;le_n&nbsp;:&nbsp;forall&nbsp;n,&nbsp;le&nbsp;n&nbsp;n&nbsp;*)</span><br/>
+<span class="comment">(*&nbsp;&nbsp;&nbsp;|&nbsp;le_S&nbsp;:&nbsp;forall&nbsp;n&nbsp;m,&nbsp;(le&nbsp;n&nbsp;m)&nbsp;<span class="nowrap"><span style='font-size:85%;'><span style='vertical-align:5%;'><span style='letter-spacing:-.2em;'>-</span></span>&gt;</span></span>&nbsp;(le&nbsp;n&nbsp;(S&nbsp;m)).&nbsp;*)</span><br/><hr class='doublespaceincode'/>
+<span class="id" type="keyword">Inductive</span> <span class="id" type="var">le</span> (<span class="id" type="var">n</span>: <span class="id" type="var">nat</span>) : <span class="id" type="var">nat</span> → <span class="id" type="keyword">Prop</span> := <br/>
+&nbsp;&nbsp;&nbsp;| <span class="id" type="var">le_n</span> : <span class="id" type="var">le</span> <span class="id" type="var">n</span> <span class="id" type="var">n</span><br/>
+&nbsp;&nbsp;&nbsp;| <span class="id" type="var">le_S</span> : <span style='font-size:120%;'>&forall;</span><span class="id" type="var">m</span>, (<span class="id" type="var">le</span> <span class="id" type="var">n</span> <span class="id" type="var">m</span>) → (<span class="id" type="var">le</span> <span class="id" type="var">n</span> (<span class="id" type="var">S</span> <span class="id" type="var">m</span>)).<br/><hr class='doublespaceincode'/>
+<span class="comment">(*&nbsp;Locate&nbsp;"&lt;=".&nbsp;*)</span><br/>
+&nbsp;<span class="id" type="keyword">Notation</span> "m ≤ n" := (<span class="id" type="var">le</span> <span class="id" type="var">m</span> <span class="id" type="var">n</span>).<br/>
+</div>
+
+<div class="doc">
+Proofs of facts about <span class="inlinecode">≤</span> using the constructors <span class="inlinecode"><span class="id" type="var">le_n</span></span> and
+    <span class="inlinecode"><span class="id" type="var">le_S</span></span> follow the same patterns as proofs about properties, like
+    <span class="inlinecode"><span class="id" type="var">ev</span></span> above. We can <span class="inlinecode"><span class="id" type="tactic">apply</span></span> the constructors to prove <span class="inlinecode">≤</span>
+    goals (e.g., to show that <span class="inlinecode">3≤3</span> or <span class="inlinecode">3≤6</span>), and we can use
+    tactics like <span class="inlinecode"><span class="id" type="tactic">inversion</span></span> to extract information from <span class="inlinecode">≤</span>
+    hypotheses in the context (e.g., to prove that <span class="inlinecode">(2</span> <span class="inlinecode">≤</span> <span class="inlinecode">1)</span> <span class="inlinecode">→</span> <span class="inlinecode">2+2=5</span>.) 
+<div class="paragraph"> </div>
+
+ Here are some sanity checks on the definition.  (Notice that,
+    although these are the same kind of simple "unit tests" as we gave
+    for the testing functions we wrote in the first few lectures, we
+    must construct their proofs explicitly &mdash; <span class="inlinecode"><span class="id" type="tactic">simpl</span></span> and
+    <span class="inlinecode"><span class="id" type="tactic">reflexivity</span></span> don't do the job, because the proofs aren't just a
+    matter of simplifying computations.) 
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Theorem</span> <span class="id" type="var">test_le<sub>1</sub></span> :<br/>
+&nbsp;&nbsp;3 ≤ 3.<br/>
+<span class="id" type="keyword">Proof</span>.<br/>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;WORKED&nbsp;IN&nbsp;CLASS&nbsp;*)</span><br/>
+&nbsp;&nbsp;<span class="id" type="tactic">apply</span> <span class="id" type="var">le_n</span>. <span class="id" type="keyword">Qed</span>.<br/><hr class='doublespaceincode'/>
+<span class="id" type="keyword">Theorem</span> <span class="id" type="var">test_le<sub>2</sub></span> :<br/>
+&nbsp;&nbsp;3 ≤ 6.<br/>
+<span class="id" type="keyword">Proof</span>.<br/>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;WORKED&nbsp;IN&nbsp;CLASS&nbsp;*)</span><br/>
+&nbsp;&nbsp;<span class="id" type="tactic">do</span> 3!(<span class="id" type="tactic">apply</span> <span class="id" type="var">le_S</span>). <span class="id" type="tactic">apply</span> <span class="id" type="var">le_n</span>. <span class="id" type="keyword">Qed</span>.<br/><hr class='doublespaceincode'/>
+<span class="id" type="keyword">Theorem</span> <span class="id" type="var">test_le<sub>3</sub></span> :<br/>
+&nbsp;&nbsp;(2 ≤ 1) → 2 + 2 = 5.<br/>
+<span class="id" type="keyword">Proof</span>.<br/>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;WORKED&nbsp;IN&nbsp;CLASS&nbsp;*)</span><br/>
+&nbsp;&nbsp;<span class="id" type="tactic">case</span> <span class="id" type="var">E</span> : <span class="id" type="var">_</span> / ⇒ [| <span class="id" type="var">n</span> <span class="id" type="var">H</span>] //.<br/>
+&nbsp;&nbsp;<span class="id" type="tactic">case</span> <span class="id" type="var">F</span> : <span class="id" type="var">_</span> / <span class="id" type="var">H</span>; <span class="id" type="tactic">by</span> <span class="id" type="tactic">rewrite</span> <span class="id" type="var">F</span> <span class="id" type="keyword">in</span> <span class="id" type="var">E</span>.<br/>
+<span class="id" type="keyword">Qed</span>.<br/>
+</div>
+
+<div class="doc">
+Note it would be possible to define our relation in an almost identical way: 
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Inductive</span> <span class="id" type="var">le'</span> : <span class="id" type="var">nat</span> → <span class="id" type="var">nat</span> → <span class="id" type="keyword">Prop</span> := <br/>
+&nbsp;&nbsp;&nbsp;| <span class="id" type="var">le'_n</span> : <span style='font-size:120%;'>&forall;</span><span class="id" type="var">n</span>, <span class="id" type="var">le'</span> <span class="id" type="var">n</span> <span class="id" type="var">n</span> <br/>
+&nbsp;&nbsp;&nbsp;| <span class="id" type="var">le'_S</span> : <span style='font-size:120%;'>&forall;</span><span class="id" type="var">n</span> <span class="id" type="var">m</span>, (<span class="id" type="var">le'</span> <span class="id" type="var">n</span> <span class="id" type="var">m</span>) → (<span class="id" type="var">le'</span> <span class="id" type="var">n</span> (<span class="id" type="var">S</span> <span class="id" type="var">m</span>)).<br/>
+</div>
+
+<div class="doc">
+But proving lemmas like the one one above using the <span class="inlinecode"><span class="id" type="var">ssreflect</span></span> strategy would get somewhat more difficult. You can try it and see what would get problematic... 
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Theorem</span> <span class="id" type="var">test_le'3</span> :<br/>
+&nbsp;&nbsp;(<span class="id" type="var">le'</span> 2 1) → 2 + 2 = 5.<br/>
+<span class="id" type="keyword">Proof</span>.<br/><hr class='doublespaceincode'/>
+&nbsp;&nbsp;<span class="id" type="tactic">case</span> <span class="id" type="var">E</span> : <span class="id" type="var">_</span> <span class="id" type="var">_</span> /  ⇒ [<span class="id" type="var">n</span> | <span class="id" type="var">n</span> <span class="id" type="var">m</span> <span class="id" type="var">H</span>] //.<br/>
+</div>
+
+<div class="doc">
+Here we can still handle the first case... 
+</div>
+<div class="code code-tight">
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="tactic">by</span> <span class="id" type="tactic">rewrite</span> -<span class="id" type="var">E</span>.<br/>
+</div>
+
+<div class="doc">
+But what now? The goal you are seeing now is simply nonsensical, even though there is nothing obviously inconsistent in the premises. If it is not obvious yet, try:
+</div>
+<div class="code code-tight">
+
+&nbsp;&nbsp;&nbsp;<span class="id" type="tactic">rewrite</span> !<span class="id" type="var">add_succ_l</span> !<span class="id" type="var">add_succ_r</span>.<br/>
+</div>
+
+<div class="doc">
+Not looking good, is it? 
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Abort</span>.<br/>
+</div>
+
+<div class="doc">
+We see here one of advantages of reasons why chosing one of arguments to be a parameter might be a good design choice. More will be seen when we discuss the shape of automatically generated induction principles later in this lecture. Let us also mention that similar problems may occur in the context of, e.g., formalizations of homotopy type theory in Coq. 
+<div class="paragraph"> </div>
+
+ The "strictly less than" relation <span class="inlinecode"><span class="id" type="var">n</span></span> <span class="inlinecode">&lt;</span> <span class="inlinecode"><span class="id" type="var">m</span></span> can be defined
+    in terms of <span class="inlinecode"><span class="id" type="var">le</span></span>. 
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Definition</span> <span class="id" type="var">lt</span> (<span class="id" type="var">n</span> <span class="id" type="var">m</span>:<span class="id" type="var">nat</span>) := <span class="id" type="var">le</span> (<span class="id" type="var">S</span> <span class="id" type="var">n</span>) <span class="id" type="var">m</span>.<br/><hr class='doublespaceincode'/>
+<span class="id" type="keyword">Notation</span> "m &lt; n" := (<span class="id" type="var">lt</span> <span class="id" type="var">m</span> <span class="id" type="var">n</span>).<br/><hr class='doublespaceincode'/>
+</div>
+
+<div class="doc">
+In fact, this relation is already defined: 
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Print</span> <span class="id" type="var">le</span>.<br/>
+<span class="id" type="keyword">Print</span> <span class="id" type="var">Peano.le</span>.<br/><hr class='doublespaceincode'/>
+<span class="comment">(*&nbsp;=&gt;&nbsp;Inductive&nbsp;le&nbsp;(n&nbsp;:&nbsp;nat)&nbsp;:&nbsp;nat&nbsp;<span class="nowrap"><span style='font-size:85%;'><span style='vertical-align:5%;'><span style='letter-spacing:-.2em;'>-</span></span>&gt;</span></span>&nbsp;Prop&nbsp;:=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;le_n&nbsp;:&nbsp;n&nbsp;&lt;=&nbsp;n&nbsp;|&nbsp;le_S&nbsp;:&nbsp;forall&nbsp;m&nbsp;:&nbsp;nat,&nbsp;n&nbsp;&lt;=&nbsp;m&nbsp;<span class="nowrap"><span style='font-size:85%;'><span style='vertical-align:5%;'><span style='letter-spacing:-.2em;'>-</span></span>&gt;</span></span>&nbsp;n&nbsp;&lt;=&nbsp;S&nbsp;m&nbsp;*)</span><br/>
+</div>
+
+<div class="doc">
+Similarly,  <span class="inlinecode"><span class="id" type="var">lt</span></span> is also already there:  
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Print</span> <span class="id" type="var">lt</span>.<br/>
+<span class="id" type="keyword">Print</span> <span class="id" type="var">Peano.lt</span>.<br/><hr class='doublespaceincode'/>
+<span class="comment">(*&nbsp;=&gt;&nbsp;lt&nbsp;=&nbsp;fun&nbsp;n&nbsp;:&nbsp;nat&nbsp;=&gt;&nbsp;<span class="inlinecode"><span class="id" type="var">eta</span></span> <span class="inlinecode"><span class="id" type="var">le</span></span>  <span class="inlinecode"><span class="id" type="var">Peano.le</span></span> <span class="inlinecode">(<span class="id" type="var">S</span></span> <span class="inlinecode"><span class="id" type="var">n</span>)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;nat&nbsp;<span class="nowrap"><span style='font-size:85%;'><span style='vertical-align:5%;'><span style='letter-spacing:-.2em;'>-</span></span>&gt;</span></span>&nbsp;nat&nbsp;<span class="nowrap"><span style='font-size:85%;'><span style='vertical-align:5%;'><span style='letter-spacing:-.2em;'>-</span></span>&gt;</span></span>&nbsp;Prop&nbsp;*)</span><br/>
+</div>
+
+<div class="doc">
+Obviously, <span class="inlinecode"><span class="id" type="var">le</span></span> has its own reflection view: 
+</div>
+<div class="code code-tight">
+
+
+<br/>
+<span class="id" type="keyword">Check</span> <span class="id" type="var">leb_spec0</span>.<br/><hr class='doublespaceincode'/>
+<span class="comment">(*&nbsp;=&gt;&nbsp;leb_spec0<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;forall&nbsp;x&nbsp;y&nbsp;:&nbsp;nat,&nbsp;reflect&nbsp;(x&nbsp;&lt;=&nbsp;y)&nbsp;(x&nbsp;&lt;=?&nbsp;y)&nbsp;*)</span><br/>
+</div>
+
+<div class="doc">
+Some other simple relations on numbers: 
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Inductive</span> <span class="id" type="var">square_of</span>  (<span class="id" type="var">n</span> : <span class="id" type="var">nat</span>) : <span class="id" type="var">nat</span> → <span class="id" type="keyword">Prop</span> :=<br/>
+&nbsp;&nbsp;<span class="id" type="var">sq</span> : <span class="id" type="var">square_of</span> <span class="id" type="var">n</span> (<span class="id" type="var">n</span> * <span class="id" type="var">n</span>).<br/><hr class='doublespaceincode'/>
+<span class="id" type="keyword">Inductive</span> <span class="id" type="var">next_nat</span> : <span class="id" type="var">nat</span> → <span class="id" type="var">nat</span> → <span class="id" type="keyword">Prop</span> :=<br/>
+&nbsp;&nbsp;| <span class="id" type="var">nn</span> : <span style='font-size:120%;'>&forall;</span><span class="id" type="var">n</span>:<span class="id" type="var">nat</span>, <span class="id" type="var">next_nat</span> <span class="id" type="var">n</span> (<span class="id" type="var">S</span> <span class="id" type="var">n</span>).<br/>
+</div>
+
+<div class="doc">
+<a name="lab156"></a><h3 class="section">Exercises</h3>
+
+<div class="paragraph"> </div>
+
+ Define an inductive binary relation <span class="inlinecode"><span class="id" type="var">full_relation</span></span> that holds
+    between every pair of natural numbers. 
+<div class="paragraph"> </div>
+
+ Define then the corresponding (trivial) fuction <span class="inlinecode"><span class="id" type="var">full</span></span> on booleans and provide (trivial) reflection view <span class="inlinecode"><span class="id" type="var">fullP</span></span>. 
+</div>
+<div class="code code-tight">
+
+<span class="comment">(*&nbsp;FILL&nbsp;IN&nbsp;HERE&nbsp;*)</span><br/>
+</div>
+
+<div class="doc">
+Now for a change define an inductive binary relation <span class="inlinecode"><span class="id" type="var">empty_relation</span></span> (on numbers)
+    that never holds. 
+<div class="paragraph"> </div>
+
+ Define then the corresponding (trivial) fuction <span class="inlinecode"><span class="id" type="var">empty</span></span> on booleans and provide (trivial) reflection view <span class="inlinecode"><span class="id" type="var">emptyP</span></span>. 
+</div>
+<div class="code code-tight">
+
+<span class="comment">(*&nbsp;FILL&nbsp;IN&nbsp;HERE&nbsp;*)</span><br/>
+</div>
+
+<div class="doc">
+Recall what we said last time:  <span class="inlinecode"><span class="id" type="keyword">Prop</span></span> and <span class="inlinecode"><span class="id" type="var">bool</span></span> are complementary: <span class="inlinecode"><span class="id" type="keyword">Prop</span></span> allows robust natural
+    deduction, <span class="inlinecode"><span class="id" type="var">bool</span></span> allows brute-force evaluation. 
+<div class="paragraph"> </div>
+
+ As you may guess, overusing inductively defined relations/propositions is not entirely in the spirit of <span class="inlinecode"><span class="id" type="var">ssreflect</span></span>. Its design principle  is to reflect such relations and propositions as  recursive functions into booleans wherever possible. But it is not always possible, and one of the reasons has to do with differences between classical and constructive logic. Besides, while such functions are better suited for direct computations in Gallina, inductively defined propositions can often be better candidates for inductive proofs. 
+<div class="paragraph"> </div>
+
+ In fact, speaking of induction: with the Curry-Howard correspondence and its realization in Coq in
+    mind, we can now take a deeper look at induction principles. 
+</div>
+
+<div class="doc">
+<a name="lab157"></a><h1 class="section">Induction Principles</h1>
+
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+<ul class="doclist">
+<li> Every time we declare a new <span class="inlinecode"><span class="id" type="keyword">Inductive</span></span> datatype, Coq
+    automatically generates an <i>induction principle</i> for this type.
+
+</li>
+<li> This induction principle is a theorem like any other: If <span class="inlinecode"><span class="id" type="var">t</span></span> is
+    defined inductively, the corresponding induction principle is
+    called <span class="inlinecode"><span class="id" type="var">t_ind</span></span>.  
+
+</li>
+<li> Here is the one for natural numbers: 
+</li>
+</ul>
+
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Check</span> <span class="id" type="var">nat_ind</span>.<br/>
+<span class="comment">(*&nbsp;&nbsp;===&gt;&nbsp;nat_ind&nbsp;:<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;forall&nbsp;P&nbsp;:&nbsp;nat&nbsp;<span class="nowrap"><span style='font-size:85%;'><span style='vertical-align:5%;'><span style='letter-spacing:-.2em;'>-</span></span>&gt;</span></span>&nbsp;Prop,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;P&nbsp;0&nbsp;&nbsp;<span class="nowrap"><span style='font-size:85%;'><span style='vertical-align:5%;'><span style='letter-spacing:-.2em;'>-</span></span>&gt;</span></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(forall&nbsp;n&nbsp;:&nbsp;nat,&nbsp;P&nbsp;n&nbsp;<span class="nowrap"><span style='font-size:85%;'><span style='vertical-align:5%;'><span style='letter-spacing:-.2em;'>-</span></span>&gt;</span></span>&nbsp;P&nbsp;(S&nbsp;n))&nbsp;&nbsp;<span class="nowrap"><span style='font-size:85%;'><span style='vertical-align:5%;'><span style='letter-spacing:-.2em;'>-</span></span>&gt;</span></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;forall&nbsp;n&nbsp;:&nbsp;nat,&nbsp;P&nbsp;n&nbsp;&nbsp;*)</span><br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+<ul class="doclist">
+<li> The <span class="inlinecode"><span class="id" type="tactic">induction</span></span> tactic of  plain <span class="inlinecode"><span class="id" type="keyword">Ltac</span></span> is a straightforward wrapper that, at its
+    core, simply performs <span class="inlinecode"><span class="id" type="tactic">apply</span></span> <span class="inlinecode"><span class="id" type="var">t_ind</span></span>. <span class="inlinecode"><span class="id" type="tactic">elim</span></span> does more, but it does use <span class="inlinecode"><span class="id" type="var">t_ind</span></span>.
+
+</li>
+<li> To see this more clearly,
+    let's experiment with directly using <span class="inlinecode"><span class="id" type="tactic">apply</span></span> <span class="inlinecode"><span class="id" type="var">nat_ind</span></span>, instead of
+    the <span class="inlinecode"><span class="id" type="tactic">induction</span></span> tactic, to carry out some proofs.
+
+</li>
+<li> Here, for
+    example, is an alternate proof of a theorem that we saw earlier. 
+</li>
+</ul>
+
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Theorem</span> <span class="id" type="var">mult_0_r'</span> : <span style='font-size:120%;'>&forall;</span><span class="id" type="var">n</span>:<span class="id" type="var">nat</span>,<br/>
+&nbsp;&nbsp;<span class="id" type="var">n</span> * 0 = 0.<br/>
+<span class="id" type="keyword">Proof</span>.<br/>
+&nbsp;&nbsp;<span class="id" type="tactic">by</span> <span class="id" type="tactic">apply</span>: <span class="id" type="var">nat_ind</span>.<br/>
+<span class="id" type="keyword">Qed</span>.<br/>
+</div>
+
+<div class="doc">
+<a name="lab158"></a><h3 class="section"> </h3>
+
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+    These generated principles follow a similar pattern. If we define
+    a type <span class="inlinecode"><span class="id" type="var">t</span></span> with constructors <span class="inlinecode"><span class="id" type="var">c<sub>1</sub></span></span> ... <span class="inlinecode"><span class="id" type="var">cn</span></span>, Coq generates a
+    theorem with this shape:
+
+<div class="paragraph"> </div>
+
+<div class="code code-tight">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="var">t_ind</span>&nbsp;:&nbsp;<span style='font-size:120%;'>&forall;</span><span class="id" type="var">P</span>&nbsp;:&nbsp;<span class="id" type="var">t</span>&nbsp;→&nbsp;<span class="id" type="keyword">Prop</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;... <span class="id" type="tactic">case</span>&nbsp;<span class="id" type="keyword">for</span>&nbsp;<span class="id" type="var">c<sub>1</sub></span>&nbsp;... →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;... <span class="id" type="tactic">case</span>&nbsp;<span class="id" type="keyword">for</span>&nbsp;<span class="id" type="var">c<sub>2</sub></span>&nbsp;... →&nbsp;...<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;... <span class="id" type="tactic">case</span>&nbsp;<span class="id" type="keyword">for</span>&nbsp;<span class="id" type="var">cn</span>&nbsp;... →<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style='font-size:120%;'>&forall;</span><span class="id" type="var">n</span>&nbsp;:&nbsp;<span class="id" type="var">t</span>,&nbsp;<span class="id" type="var">P</span>&nbsp;<span class="id" type="var">n</span>
+<div class="paragraph"> </div>
+
+</div>
+ 
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+    The specific shape of each case depends on the arguments to the
+    corresponding constructor.  Before trying to write down a general
+    rule, let's look at some more examples. First, an example where
+    the constructors take no arguments: 
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Inductive</span> <span class="id" type="var">yesno</span> : <span class="id" type="keyword">Type</span> :=<br/>
+&nbsp;&nbsp;| <span class="id" type="var">yes</span> : <span class="id" type="var">yesno</span><br/>
+&nbsp;&nbsp;| <span class="id" type="var">no</span> : <span class="id" type="var">yesno</span>.<br/><hr class='doublespaceincode'/>
+<span class="id" type="keyword">Check</span> <span class="id" type="var">yesno_ind</span>.<br/>
+<span class="comment">(*&nbsp;===&gt;&nbsp;yesno_ind&nbsp;:&nbsp;forall&nbsp;P&nbsp;:&nbsp;yesno&nbsp;<span class="nowrap"><span style='font-size:85%;'><span style='vertical-align:5%;'><span style='letter-spacing:-.2em;'>-</span></span>&gt;</span></span>&nbsp;Prop,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;P&nbsp;yes&nbsp;&nbsp;<span class="nowrap"><span style='font-size:85%;'><span style='vertical-align:5%;'><span style='letter-spacing:-.2em;'>-</span></span>&gt;</span></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;P&nbsp;no&nbsp;&nbsp;<span class="nowrap"><span style='font-size:85%;'><span style='vertical-align:5%;'><span style='letter-spacing:-.2em;'>-</span></span>&gt;</span></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;forall&nbsp;y&nbsp;:&nbsp;yesno,&nbsp;P&nbsp;y&nbsp;*)</span><br/>
+</div>
+
+<div class="doc">
+<a name="lab159"></a><h4 class="section">Exercise: 1 star, standard, optional (rgb)</h4>
+ Write out the induction principle that Coq will generate for the
+    following datatype.  Write down your answer on paper or type it
+    into a comment, and then compare it with what Coq prints. 
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Inductive</span> <span class="id" type="var">rgb</span> : <span class="id" type="keyword">Type</span> :=<br/>
+&nbsp;&nbsp;| <span class="id" type="tactic">red</span> : <span class="id" type="var">rgb</span><br/>
+&nbsp;&nbsp;| <span class="id" type="var">green</span> : <span class="id" type="var">rgb</span><br/>
+&nbsp;&nbsp;| <span class="id" type="var">blue</span> : <span class="id" type="var">rgb</span>.<br/>
+<span class="id" type="keyword">Check</span> <span class="id" type="var">rgb_ind</span>.<br/>
+</div>
+
+<span class="proofbox">&#9744;</span> 
+<div class="doc less-space">
+<div class="paragraph"> </div>
+
+<a name="lab160"></a><h3 class="section"> </h3>
+
+<div class="paragraph"> </div>
+
+ Here's another example, this time with one of the constructors
+    taking some arguments. 
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Inductive</span> <span class="id" type="var">natlist</span> : <span class="id" type="keyword">Type</span> :=<br/>
+&nbsp;&nbsp;| <span class="id" type="var">nnil</span> : <span class="id" type="var">natlist</span><br/>
+&nbsp;&nbsp;| <span class="id" type="var">ncons</span> : <span class="id" type="var">nat</span> → <span class="id" type="var">natlist</span> → <span class="id" type="var">natlist</span>.<br/><hr class='doublespaceincode'/>
+<span class="id" type="keyword">Check</span> <span class="id" type="var">natlist_ind</span>.<br/><hr class='doublespaceincode'/>
+
+<br/>
+<span class="comment">(*&nbsp;===&gt;&nbsp;(Modulo&nbsp;a&nbsp;little&nbsp;variable&nbsp;renaming)<br/>
+&nbsp;&nbsp;&nbsp;natlist_ind&nbsp;:<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;forall&nbsp;P&nbsp;:&nbsp;natlist&nbsp;<span class="nowrap"><span style='font-size:85%;'><span style='vertical-align:5%;'><span style='letter-spacing:-.2em;'>-</span></span>&gt;</span></span>&nbsp;Prop,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;P&nbsp;nnil&nbsp;&nbsp;<span class="nowrap"><span style='font-size:85%;'><span style='vertical-align:5%;'><span style='letter-spacing:-.2em;'>-</span></span>&gt;</span></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(forall&nbsp;(n&nbsp;:&nbsp;nat)&nbsp;(l&nbsp;:&nbsp;natlist),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;P&nbsp;l&nbsp;<span class="nowrap"><span style='font-size:85%;'><span style='vertical-align:5%;'><span style='letter-spacing:-.2em;'>-</span></span>&gt;</span></span>&nbsp;P&nbsp;(ncons&nbsp;n&nbsp;l))&nbsp;<span class="nowrap"><span style='font-size:85%;'><span style='vertical-align:5%;'><span style='letter-spacing:-.2em;'>-</span></span>&gt;</span></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;forall&nbsp;n&nbsp;:&nbsp;natlist,&nbsp;P&nbsp;n&nbsp;*)</span><br/>
+</div>
+
+<div class="doc">
+<a name="lab161"></a><h4 class="section">Exercise: 1 star, standard, optional (natlist1)</h4>
+ Suppose we had written the above definition a little
+   differently: 
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Inductive</span> <span class="id" type="var">natlist1</span> : <span class="id" type="keyword">Type</span> :=<br/>
+&nbsp;&nbsp;| <span class="id" type="var">nnil1</span> : <span class="id" type="var">natlist1</span><br/>
+&nbsp;&nbsp;| <span class="id" type="var">nsnoc1</span> : <span class="id" type="var">natlist1</span> → <span class="id" type="var">nat</span> → <span class="id" type="var">natlist1</span>.<br/>
+</div>
+
+<div class="doc">
+Now what will the induction principle look like?  <span class="proofbox">&#9744;</span> 
+<div class="paragraph"> </div>
+
+<a name="lab162"></a><h3 class="section"> </h3>
+
+<div class="paragraph"> </div>
+
+ From these examples, we can extract this general rule:
+
+<div class="paragraph"> </div>
+
+<ul class="doclist">
+<li> The type declaration gives several constructors; each
+      corresponds to one clause of the induction principle.
+
+</li>
+<li> Each constructor <span class="inlinecode"><span class="id" type="var">c</span></span> takes argument types <span class="inlinecode"><span class="id" type="var">a<sub>1</sub></span></span> ... <span class="inlinecode"><span class="id" type="var">an</span></span>.
+
+</li>
+<li> Each <span class="inlinecode"><span class="id" type="var">ai</span></span> can be either <span class="inlinecode"><span class="id" type="var">t</span></span> (the datatype we are defining) or
+      some other type <span class="inlinecode"><span class="id" type="var">s</span></span>.
+
+</li>
+<li> The corresponding case of the induction principle says:
+
+<div class="paragraph"> </div>
+
+<ul class="doclist">
+<li> "For all values <span class="inlinecode"><span class="id" type="var">x<sub>1</sub></span></span>...<span class="inlinecode"><span class="id" type="var">xn</span></span> of types <span class="inlinecode"><span class="id" type="var">a<sub>1</sub></span></span>...<span class="inlinecode"><span class="id" type="var">an</span></span>, if <span class="inlinecode"><span class="id" type="var">P</span></span>
+          holds for each of the inductive arguments (each <span class="inlinecode"><span class="id" type="var">xi</span></span> of type
+          <span class="inlinecode"><span class="id" type="var">t</span></span>), then <span class="inlinecode"><span class="id" type="var">P</span></span> holds for <span class="inlinecode"><span class="id" type="var">c</span></span> <span class="inlinecode"><span class="id" type="var">x<sub>1</sub></span></span> <span class="inlinecode">...</span> <span class="inlinecode"><span class="id" type="var">xn</span></span>".
+
+</li>
+</ul>
+
+</li>
+</ul>
+
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+<a name="lab163"></a><h4 class="section">Exercise: 1 star, standard, optional (byntree_ind)</h4>
+ Write out the induction principle that Coq will generate for the
+    following datatype.  (Again, write down your answer on paper or
+    type it into a comment, and then compare it with what Coq
+    prints.) 
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Inductive</span> <span class="id" type="var">byntree</span> : <span class="id" type="keyword">Type</span> :=<br/>
+&nbsp;| <span class="id" type="var">bempty</span> : <span class="id" type="var">byntree</span><br/>
+&nbsp;| <span class="id" type="var">bleaf</span>  : <span class="id" type="var">yesno</span> → <span class="id" type="var">byntree</span><br/>
+&nbsp;| <span class="id" type="var">nbranch</span> : <span class="id" type="var">yesno</span> → <span class="id" type="var">byntree</span> → <span class="id" type="var">byntree</span> → <span class="id" type="var">byntree</span>.<br/>
+</div>
+
+<span class="proofbox">&#9744;</span> 
+<div class="doc less-space">
+<div class="paragraph"> </div>
+
+<a name="lab164"></a><h4 class="section">Exercise: 1 star, standard, optional (ex_set)</h4>
+ Here is an induction principle for an inductively defined
+    set.
+
+<div class="paragraph"> </div>
+
+<div class="code code-tight">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="var">ExSet_ind</span>&nbsp;:<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style='font-size:120%;'>&forall;</span><span class="id" type="var">P</span>&nbsp;:&nbsp;<span class="id" type="var">ExSet</span>&nbsp;→&nbsp;<span class="id" type="keyword">Prop</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span style='font-size:120%;'>&forall;</span><span class="id" type="var">b</span>&nbsp;:&nbsp;<span class="id" type="var">bool</span>,&nbsp;<span class="id" type="var">P</span>&nbsp;(<span class="id" type="var">con1</span>&nbsp;<span class="id" type="var">b</span>))&nbsp;→<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span style='font-size:120%;'>&forall;</span>(<span class="id" type="var">n</span>&nbsp;:&nbsp;<span class="id" type="var">nat</span>)&nbsp;(<span class="id" type="var">e</span>&nbsp;:&nbsp;<span class="id" type="var">ExSet</span>),&nbsp;<span class="id" type="var">P</span>&nbsp;<span class="id" type="var">e</span>&nbsp;→&nbsp;<span class="id" type="var">P</span>&nbsp;(<span class="id" type="var">con2</span>&nbsp;<span class="id" type="var">n</span>&nbsp;<span class="id" type="var">e</span>))&nbsp;→<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style='font-size:120%;'>&forall;</span><span class="id" type="var">e</span>&nbsp;:&nbsp;<span class="id" type="var">ExSet</span>,&nbsp;<span class="id" type="var">P</span>&nbsp;<span class="id" type="var">e</span>
+<div class="paragraph"> </div>
+
+</div>
+    Give an <span class="inlinecode"><span class="id" type="keyword">Inductive</span></span> definition of <span class="inlinecode"><span class="id" type="var">ExSet</span></span>: 
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Inductive</span> <span class="id" type="var">ExSet</span> : <span class="id" type="keyword">Type</span> :=<br/>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;FILL&nbsp;IN&nbsp;HERE&nbsp;*)</span><br/>
+.<br/>
+</div>
+
+<span class="proofbox">&#9744;</span> 
+<div class="doc less-space">
+<div class="paragraph"> </div>
+
+<a name="lab165"></a><h1 class="section">Polymorphism</h1>
+
+<div class="paragraph"> </div>
+
+ Next, what about polymorphic datatypes?
+
+<div class="paragraph"> </div>
+
+    The inductive definition of polymorphic lists
+
+<div class="paragraph"> </div>
+
+<div class="code code-tight">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="keyword">Inductive</span>&nbsp;<span class="id" type="var">list</span>&nbsp;(<span class="id" type="var">X</span>:<span class="id" type="keyword">Type</span>)&nbsp;:&nbsp;<span class="id" type="keyword">Type</span>&nbsp;:=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;<span class="id" type="var">nil</span>&nbsp;:&nbsp;<span class="id" type="var">list</span>&nbsp;<span class="id" type="var">X</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;<span class="id" type="var">cons</span>&nbsp;:&nbsp;<span class="id" type="var">X</span>&nbsp;→&nbsp;<span class="id" type="var">list</span>&nbsp;<span class="id" type="var">X</span>&nbsp;→&nbsp;<span class="id" type="var">list</span>&nbsp;<span class="id" type="var">X</span>.
+<div class="paragraph"> </div>
+
+</div>
+    is very similar to that of <span class="inlinecode"><span class="id" type="var">natlist</span></span>.  The main difference is
+    that, here, the whole definition is <i>parameterized</i> on a set <span class="inlinecode"><span class="id" type="var">X</span></span>:
+    that is, we are defining a <i>family</i> of inductive types <span class="inlinecode"><span class="id" type="var">list</span></span> <span class="inlinecode"><span class="id" type="var">X</span></span>,
+    one for each <span class="inlinecode"><span class="id" type="var">X</span></span>.  (Note that, wherever <span class="inlinecode"><span class="id" type="var">list</span></span> appears in the body
+    of the declaration, it is always applied to the parameter <span class="inlinecode"><span class="id" type="var">X</span></span>.)
+ 
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+    The induction principle is likewise parameterized on <span class="inlinecode"><span class="id" type="var">X</span></span>:
+
+<div class="paragraph"> </div>
+
+<div class="code code-tight">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="var">list_ind</span>&nbsp;:<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style='font-size:120%;'>&forall;</span>(<span class="id" type="var">X</span>&nbsp;:&nbsp;<span class="id" type="keyword">Type</span>)&nbsp;(<span class="id" type="var">P</span>&nbsp;:&nbsp;<span class="id" type="var">list</span>&nbsp;<span class="id" type="var">X</span>&nbsp;→&nbsp;<span class="id" type="keyword">Prop</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="var">P</span>&nbsp;[]&nbsp;→<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span style='font-size:120%;'>&forall;</span>(<span class="id" type="var">x</span>&nbsp;:&nbsp;<span class="id" type="var">X</span>)&nbsp;(<span class="id" type="var">l</span>&nbsp;:&nbsp;<span class="id" type="var">list</span>&nbsp;<span class="id" type="var">X</span>),&nbsp;<span class="id" type="var">P</span>&nbsp;<span class="id" type="var">l</span>&nbsp;→&nbsp;<span class="id" type="var">P</span>&nbsp;(<span class="id" type="var">x</span>&nbsp;::&nbsp;<span class="id" type="var">l</span>))&nbsp;→<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style='font-size:120%;'>&forall;</span><span class="id" type="var">l</span>&nbsp;:&nbsp;<span class="id" type="var">list</span>&nbsp;<span class="id" type="var">X</span>,&nbsp;<span class="id" type="var">P</span>&nbsp;<span class="id" type="var">l</span>
+<div class="paragraph"> </div>
+
+</div>
+    Note that the <i>whole</i> induction principle is parameterized on
+    <span class="inlinecode"><span class="id" type="var">X</span></span>.  That is, <span class="inlinecode"><span class="id" type="var">list_ind</span></span> can be thought of as a polymorphic
+    function that, when applied to a type <span class="inlinecode"><span class="id" type="var">X</span></span>, gives us back an
+    induction principle specialized to the type <span class="inlinecode"><span class="id" type="var">list</span></span> <span class="inlinecode"><span class="id" type="var">X</span></span>. 
+<div class="paragraph"> </div>
+
+<a name="lab166"></a><h4 class="section">Exercise: 1 star, standard, optional (tree)</h4>
+ Write out the induction principle that Coq will generate for
+   the following datatype.  Compare your answer with what Coq
+   prints. 
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Inductive</span> <span class="id" type="var">tree</span> (<span class="id" type="var">X</span>:<span class="id" type="keyword">Type</span>) : <span class="id" type="keyword">Type</span> :=<br/>
+&nbsp;&nbsp;| <span class="id" type="var">leaf</span> : <span class="id" type="var">X</span> → <span class="id" type="var">tree</span> <span class="id" type="var">X</span><br/>
+&nbsp;&nbsp;| <span class="id" type="var">node</span> : <span class="id" type="var">tree</span> <span class="id" type="var">X</span> → <span class="id" type="var">tree</span> <span class="id" type="var">X</span> → <span class="id" type="var">tree</span> <span class="id" type="var">X</span>.<br/>
+<span class="id" type="keyword">Check</span> <span class="id" type="var">tree_ind</span>.<br/>
+</div>
+
+<span class="proofbox">&#9744;</span> 
+<div class="doc less-space">
+<div class="paragraph"> </div>
+
+<a name="lab167"></a><h3 class="section">Exercises</h3>
+<a name="lab168"></a><h4 class="section">Exercise: 1 star, standard, optional (mytype)</h4>
+ Find an inductive definition that gives rise to the
+    following induction principle:
+
+<div class="paragraph"> </div>
+
+<div class="code code-tight">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="var">mytype_ind</span>&nbsp;:<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style='font-size:120%;'>&forall;</span>(<span class="id" type="var">X</span>&nbsp;:&nbsp;<span class="id" type="keyword">Type</span>)&nbsp;(<span class="id" type="var">P</span>&nbsp;:&nbsp;<span class="id" type="var">mytype</span>&nbsp;<span class="id" type="var">X</span>&nbsp;→&nbsp;<span class="id" type="keyword">Prop</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span style='font-size:120%;'>&forall;</span><span class="id" type="var">x</span>&nbsp;:&nbsp;<span class="id" type="var">X</span>,&nbsp;<span class="id" type="var">P</span>&nbsp;(<span class="id" type="var">constr1</span>&nbsp;<span class="id" type="var">X</span>&nbsp;<span class="id" type="var">x</span>))&nbsp;→<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span style='font-size:120%;'>&forall;</span><span class="id" type="var">n</span>&nbsp;:&nbsp;<span class="id" type="var">nat</span>,&nbsp;<span class="id" type="var">P</span>&nbsp;(<span class="id" type="var">constr2</span>&nbsp;<span class="id" type="var">X</span>&nbsp;<span class="id" type="var">n</span>))&nbsp;→<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span style='font-size:120%;'>&forall;</span><span class="id" type="var">m</span>&nbsp;:&nbsp;<span class="id" type="var">mytype</span>&nbsp;<span class="id" type="var">X</span>,&nbsp;<span class="id" type="var">P</span>&nbsp;<span class="id" type="var">m</span>&nbsp;→<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style='font-size:120%;'>&forall;</span><span class="id" type="var">n</span>&nbsp;:&nbsp;<span class="id" type="var">nat</span>,&nbsp;<span class="id" type="var">P</span>&nbsp;(<span class="id" type="var">constr3</span>&nbsp;<span class="id" type="var">X</span>&nbsp;<span class="id" type="var">m</span>&nbsp;<span class="id" type="var">n</span>))&nbsp;→<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style='font-size:120%;'>&forall;</span><span class="id" type="var">m</span>&nbsp;:&nbsp;<span class="id" type="var">mytype</span>&nbsp;<span class="id" type="var">X</span>,&nbsp;<span class="id" type="var">P</span>&nbsp;<span class="id" type="var">m</span>
+<div class="paragraph"> </div>
+
+</div>
+ <span class="proofbox">&#9744;</span> 
+<div class="paragraph"> </div>
+
+<a name="lab169"></a><h4 class="section">Exercise: 1 star, standard, optional (foo)</h4>
+ Find an inductive definition that gives rise to the
+    following induction principle:
+
+<div class="paragraph"> </div>
+
+<div class="code code-tight">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="var">foo_ind</span>&nbsp;:<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style='font-size:120%;'>&forall;</span>(<span class="id" type="var">X</span>&nbsp;<span class="id" type="var">Y</span>&nbsp;:&nbsp;<span class="id" type="keyword">Type</span>)&nbsp;(<span class="id" type="var">P</span>&nbsp;:&nbsp;<span class="id" type="var">foo</span>&nbsp;<span class="id" type="var">X</span>&nbsp;<span class="id" type="var">Y</span>&nbsp;→&nbsp;<span class="id" type="keyword">Prop</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span style='font-size:120%;'>&forall;</span><span class="id" type="var">x</span>&nbsp;:&nbsp;<span class="id" type="var">X</span>,&nbsp;<span class="id" type="var">P</span>&nbsp;(<span class="id" type="var">bar</span>&nbsp;<span class="id" type="var">X</span>&nbsp;<span class="id" type="var">Y</span>&nbsp;<span class="id" type="var">x</span>))&nbsp;→<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span style='font-size:120%;'>&forall;</span><span class="id" type="var">y</span>&nbsp;:&nbsp;<span class="id" type="var">Y</span>,&nbsp;<span class="id" type="var">P</span>&nbsp;(<span class="id" type="var">baz</span>&nbsp;<span class="id" type="var">X</span>&nbsp;<span class="id" type="var">Y</span>&nbsp;<span class="id" type="var">y</span>))&nbsp;→<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span style='font-size:120%;'>&forall;</span><span class="id" type="var">f<sub>1</sub></span>&nbsp;:&nbsp;<span class="id" type="var">nat</span>&nbsp;→&nbsp;<span class="id" type="var">foo</span>&nbsp;<span class="id" type="var">X</span>&nbsp;<span class="id" type="var">Y</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span style='font-size:120%;'>&forall;</span><span class="id" type="var">n</span>&nbsp;:&nbsp;<span class="id" type="var">nat</span>,&nbsp;<span class="id" type="var">P</span>&nbsp;(<span class="id" type="var">f<sub>1</sub></span>&nbsp;<span class="id" type="var">n</span>))&nbsp;→&nbsp;<span class="id" type="var">P</span>&nbsp;(<span class="id" type="var">quux</span>&nbsp;<span class="id" type="var">X</span>&nbsp;<span class="id" type="var">Y</span>&nbsp;<span class="id" type="var">f<sub>1</sub></span>))&nbsp;→<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style='font-size:120%;'>&forall;</span><span class="id" type="var">f<sub>2</sub></span>&nbsp;:&nbsp;<span class="id" type="var">foo</span>&nbsp;<span class="id" type="var">X</span>&nbsp;<span class="id" type="var">Y</span>,&nbsp;<span class="id" type="var">P</span>&nbsp;<span class="id" type="var">f<sub>2</sub></span>
+<div class="paragraph"> </div>
+
+</div>
+ <span class="proofbox">&#9744;</span> 
+<div class="paragraph"> </div>
+
+<a name="lab170"></a><h4 class="section">Exercise: 1 star, standard, optional (foo')</h4>
+ Consider the following inductive definition: 
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Inductive</span> <span class="id" type="var">foo'</span> (<span class="id" type="var">X</span>:<span class="id" type="keyword">Type</span>) : <span class="id" type="keyword">Type</span> :=<br/>
+&nbsp;&nbsp;| <span class="id" type="var">C<sub>1</sub></span> : <span class="id" type="var">list</span> <span class="id" type="var">X</span> → <span class="id" type="var">foo'</span> <span class="id" type="var">X</span> → <span class="id" type="var">foo'</span> <span class="id" type="var">X</span><br/>
+&nbsp;&nbsp;| <span class="id" type="var">C<sub>2</sub></span> : <span class="id" type="var">foo'</span> <span class="id" type="var">X</span>.<br/>
+</div>
+
+<div class="doc">
+What induction principle will Coq generate for <span class="inlinecode"><span class="id" type="var">foo'</span></span>?  Fill
+   in the blanks, then check your answer with Coq.)
+
+<div class="paragraph"> </div>
+
+<div class="code code-tight">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="var">foo'_ind</span>&nbsp;:<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style='font-size:120%;'>&forall;</span>(<span class="id" type="var">X</span>&nbsp;:&nbsp;<span class="id" type="keyword">Type</span>)&nbsp;(<span class="id" type="var">P</span>&nbsp;:&nbsp;<span class="id" type="var">foo'</span>&nbsp;<span class="id" type="var">X</span>&nbsp;→&nbsp;<span class="id" type="keyword">Prop</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span style='font-size:120%;'>&forall;</span>(<span class="id" type="var">l</span>&nbsp;:&nbsp;<span class="id" type="var">list</span>&nbsp;<span class="id" type="var">X</span>)&nbsp;(<span class="id" type="var">f</span>&nbsp;:&nbsp;<span class="id" type="var">foo'</span>&nbsp;<span class="id" type="var">X</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="var">_______________________</span>&nbsp;→<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="var">_______________________</span>&nbsp;&nbsp;&nbsp;)&nbsp;→<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="var">___________________________________________</span>&nbsp;→<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style='font-size:120%;'>&forall;</span><span class="id" type="var">f</span>&nbsp;:&nbsp;<span class="id" type="var">foo'</span>&nbsp;<span class="id" type="var">X</span>,&nbsp;<span class="id" type="var">________________________</span>
+<div class="paragraph"> </div>
+
+</div>
+
+<div class="paragraph"> </div>
+
+ <span class="proofbox">&#9744;</span> 
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+<ul class="doclist">
+<li> Interestingly, we can get induction to work with our self-written induction principles&mdash;provided we prove first these new induction principles do the job, of course! 
+
+</li>
+<li> Some theorems can be proved slightly more conveniently this way... 
+</li>
+</ul>
+
+</div>
+
+<div class="doc">
+<a name="lab171"></a><h2 class="section">Explicit Proof Objects for Induction</h2>
+
+<div class="paragraph"> </div>
+
+ Recall the induction principle on naturals that Coq generates for
+    us automatically from the Inductive declation for <span class="inlinecode"><span class="id" type="var">nat</span></span>. 
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Check</span> <span class="id" type="var">nat_ind</span>.<br/>
+<span class="comment">(*&nbsp;===&gt;&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;nat_ind&nbsp;:&nbsp;forall&nbsp;P&nbsp;:&nbsp;nat&nbsp;<span class="nowrap"><span style='font-size:85%;'><span style='vertical-align:5%;'><span style='letter-spacing:-.2em;'>-</span></span>&gt;</span></span>&nbsp;Prop,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;P&nbsp;0&nbsp;<span class="nowrap"><span style='font-size:85%;'><span style='vertical-align:5%;'><span style='letter-spacing:-.2em;'>-</span></span>&gt;</span></span>&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(forall&nbsp;n&nbsp;:&nbsp;nat,&nbsp;P&nbsp;n&nbsp;<span class="nowrap"><span style='font-size:85%;'><span style='vertical-align:5%;'><span style='letter-spacing:-.2em;'>-</span></span>&gt;</span></span>&nbsp;P&nbsp;(S&nbsp;n))&nbsp;<span class="nowrap"><span style='font-size:85%;'><span style='vertical-align:5%;'><span style='letter-spacing:-.2em;'>-</span></span>&gt;</span></span>&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;forall&nbsp;n&nbsp;:&nbsp;nat,&nbsp;P&nbsp;n&nbsp;&nbsp;*)</span><br/>
+</div>
+
+<div class="doc">
+There's nothing magic about this induction lemma: it's just
+   another Coq lemma that requires a proof.  Coq generates the proof
+   automatically too...  
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Print</span> <span class="id" type="var">nat_ind</span>.<br/>
+<span class="id" type="keyword">Print</span> <span class="id" type="var">nat_rect</span>.<br/>
+<span class="comment">(*&nbsp;===&gt;&nbsp;(after&nbsp;some&nbsp;manual&nbsp;inlining&nbsp;and&nbsp;tidying)<br/>
+&nbsp;&nbsp;&nbsp;nat_ind&nbsp;=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;fun&nbsp;(P&nbsp;:&nbsp;nat&nbsp;<span class="nowrap"><span style='font-size:85%;'><span style='vertical-align:5%;'><span style='letter-spacing:-.2em;'>-</span></span>&gt;</span></span>&nbsp;Prop)&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(f&nbsp;:&nbsp;P&nbsp;0)&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(f<sub>0</sub>&nbsp;:&nbsp;forall&nbsp;n&nbsp;:&nbsp;nat,&nbsp;P&nbsp;n&nbsp;<span class="nowrap"><span style='font-size:85%;'><span style='vertical-align:5%;'><span style='letter-spacing:-.2em;'>-</span></span>&gt;</span></span>&nbsp;P&nbsp;(S&nbsp;n))&nbsp;=&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;fix&nbsp;F&nbsp;(n&nbsp;:&nbsp;nat)&nbsp;:&nbsp;P&nbsp;n&nbsp;:=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;match&nbsp;n&nbsp;with<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;0&nbsp;=&gt;&nbsp;f<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;S&nbsp;n<sub>0</sub>&nbsp;=&gt;&nbsp;f<sub>0</sub>&nbsp;n<sub>0</sub>&nbsp;(F&nbsp;n<sub>0</sub>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end.<br/>
+&nbsp;*)</span><br/>
+</div>
+
+<div class="doc">
+Note the use of inlined <span class="inlinecode"><span class="id" type="var">fix</span></span> here. 
+<div class="paragraph"> </div>
+
+ We can read this as follows: 
+     Suppose we have evidence <span class="inlinecode"><span class="id" type="var">f</span></span> that <span class="inlinecode"><span class="id" type="var">P</span></span> holds on 0,  and 
+     evidence <span class="inlinecode"><span class="id" type="var">f<sub>0</sub></span></span> that <span class="inlinecode"><span style='font-size:120%;'>&forall;</span></span> <span class="inlinecode"><span class="id" type="var">n</span>:<span class="id" type="var">nat</span>,</span> <span class="inlinecode"><span class="id" type="var">P</span></span> <span class="inlinecode"><span class="id" type="var">n</span></span> <span class="inlinecode">→</span> <span class="inlinecode"><span class="id" type="var">P</span></span> <span class="inlinecode">(<span class="id" type="var">S</span></span> <span class="inlinecode"><span class="id" type="var">n</span>)</span>.  
+     Then we can prove that <span class="inlinecode"><span class="id" type="var">P</span></span> holds of an arbitrary nat <span class="inlinecode"><span class="id" type="var">n</span></span> via 
+     a recursive function <span class="inlinecode"><span class="id" type="var">F</span></span>.  <span class="inlinecode"><span class="id" type="var">F</span></span> pattern matches on <span class="inlinecode"><span class="id" type="var">n</span></span>: 
+
+<div class="paragraph"> </div>
+
+<ul class="doclist">
+<li> If it finds 0, <span class="inlinecode"><span class="id" type="var">F</span></span> uses <span class="inlinecode"><span class="id" type="var">f</span></span> to show that <span class="inlinecode"><span class="id" type="var">P</span></span> <span class="inlinecode"><span class="id" type="var">n</span></span> holds.
+
+</li>
+<li> If it finds <span class="inlinecode"><span class="id" type="var">S</span></span> <span class="inlinecode"><span class="id" type="var">n<sub>0</sub></span></span>, <span class="inlinecode"><span class="id" type="var">F</span></span> applies itself recursively on <span class="inlinecode"><span class="id" type="var">n<sub>0</sub></span></span> 
+         to obtain evidence that <span class="inlinecode"><span class="id" type="var">P</span></span> <span class="inlinecode"><span class="id" type="var">n<sub>0</sub></span></span> holds; then it applies <span class="inlinecode"><span class="id" type="var">f<sub>0</sub></span></span> 
+         on that evidence to show that <span class="inlinecode"><span class="id" type="var">P</span></span> <span class="inlinecode">(<span class="id" type="var">S</span></span> <span class="inlinecode"><span class="id" type="var">n</span>)</span> holds. 
+
+</li>
+</ul>
+    <span class="inlinecode"><span class="id" type="var">F</span></span> is just an ordinary recursive function that happens to 
+    operate on evidence in <span class="inlinecode"><span class="id" type="keyword">Prop</span></span> rather than on terms in <span class="inlinecode"><span class="id" type="keyword">Set</span></span>.
+
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+ We can adapt this approach to proving <span class="inlinecode"><span class="id" type="var">nat_ind</span></span> to help prove
+    <i>non-standard</i> induction principles too. Recall our definition of <span class="inlinecode"><span class="id" type="var">ev</span></span>: 
+</div>
+<div class="code code-tight">
+
+
+<br/>
+<span class="id" type="keyword">Inductive</span> <span class="id" type="var">ev</span> : <span class="id" type="var">nat</span> → <span class="id" type="keyword">Prop</span> :=<br/>
+| <span class="id" type="var">ev_0</span> : <span class="id" type="var">ev</span> 0<br/>
+| <span class="id" type="var">ev_SS</span> : <span style='font-size:120%;'>&forall;</span><span class="id" type="var">n</span> : <span class="id" type="var">nat</span>, <span class="id" type="var">ev</span> <span class="id" type="var">n</span> → <span class="id" type="var">ev</span> (<span class="id" type="var">S</span> (<span class="id" type="var">S</span> <span class="id" type="var">n</span>)).<br/><hr class='doublespaceincode'/>
+</div>
+
+<div class="doc">
+   Recall also our desire to
+    prove that
+
+<div class="paragraph"> </div>
+
+    <span class="inlinecode"><span style='font-size:120%;'>&forall;</span></span> <span class="inlinecode"><span class="id" type="var">n</span></span> <span class="inlinecode">:</span> <span class="inlinecode"><span class="id" type="var">nat</span>,</span> <span class="inlinecode"><span class="id" type="var">even</span></span> <span class="inlinecode"><span class="id" type="var">n</span></span> <span class="inlinecode">→</span> <span class="inlinecode"><span class="id" type="var">ev</span></span> <span class="inlinecode"><span class="id" type="var">n</span></span>.
+
+<div class="paragraph"> </div>
+
+    Attempts to do this by standard induction on <span class="inlinecode"><span class="id" type="var">n</span></span> fail, because the
+    induction principle only lets us proceed when we can prove that
+    <span class="inlinecode"><span class="id" type="var">even</span></span> <span class="inlinecode"><span class="id" type="var">n</span></span> <span class="inlinecode">→</span> <span class="inlinecode"><span class="id" type="var">even</span></span> <span class="inlinecode">(<span class="id" type="var">S</span></span> <span class="inlinecode"><span class="id" type="var">n</span>)</span> &mdash; which is of course never provable.  We could prove it by induction on evidence, we could also do  a bit of a hack:
+
+<div class="paragraph"> </div>
+
+    <span class="inlinecode"><span class="id" type="keyword">Theorem</span></span> <span class="inlinecode"><span class="id" type="var">even__ev</span></span> <span class="inlinecode">:</span> <span class="inlinecode"><span style='font-size:120%;'>&forall;</span></span> <span class="inlinecode"><span class="id" type="var">n</span></span> <span class="inlinecode">:</span> <span class="inlinecode"><span class="id" type="var">nat</span>,</span>
+     <span class="inlinecode">(<span class="id" type="var">even</span></span> <span class="inlinecode"><span class="id" type="var">n</span></span> <span class="inlinecode">→</span> <span class="inlinecode"><span class="id" type="var">ev</span></span> <span class="inlinecode"><span class="id" type="var">n</span>)</span> <span class="inlinecode">∧</span> <span class="inlinecode">(<span class="id" type="var">even</span></span> <span class="inlinecode">(<span class="id" type="var">S</span></span> <span class="inlinecode"><span class="id" type="var">n</span>)</span> <span class="inlinecode">→</span> <span class="inlinecode"><span class="id" type="var">ev</span></span> <span class="inlinecode">(<span class="id" type="var">S</span></span> <span class="inlinecode"><span class="id" type="var">n</span>))</span>.
+ 
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+   But we can make a much better proof by defining and proving a
+    non-standard induction principle that goes "by twos":
+
+<div class="paragraph"> </div>
+
+ 
+</div>
+<div class="code code-tight">
+
+&nbsp;<span class="id" type="keyword">Definition</span> <span class="id" type="var">nat_ind2</span> : <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style='font-size:120%;'>&forall;</span>(<span class="id" type="var">P</span> : <span class="id" type="var">nat</span> → <span class="id" type="keyword">Prop</span>), <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="var">P</span> 0 → <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="var">P</span> 1 → <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span style='font-size:120%;'>&forall;</span><span class="id" type="var">n</span> : <span class="id" type="var">nat</span>, <span class="id" type="var">P</span> <span class="id" type="var">n</span> → <span class="id" type="var">P</span> (<span class="id" type="var">S</span>(<span class="id" type="var">S</span> <span class="id" type="var">n</span>))) → <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style='font-size:120%;'>&forall;</span><span class="id" type="var">n</span> : <span class="id" type="var">nat</span> , <span class="id" type="var">P</span> <span class="id" type="var">n</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="keyword">fun</span> <span class="id" type="var">P</span> ⇒ <span class="id" type="keyword">fun</span> <span class="id" type="var">P<sub>0</sub></span> ⇒ <span class="id" type="keyword">fun</span> <span class="id" type="var">P<sub>1</sub></span> ⇒ <span class="id" type="keyword">fun</span> <span class="id" type="var">PSS</span> ⇒ <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="var">fix</span> <span class="id" type="var">f</span> (<span class="id" type="var">n</span>:<span class="id" type="var">nat</span>) := <span class="id" type="keyword">match</span> <span class="id" type="var">n</span> <span class="id" type="keyword">with</span> <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0 ⇒ <span class="id" type="var">P<sub>0</sub></span> <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| 1 ⇒ <span class="id" type="var">P<sub>1</sub></span> <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" type="var">S</span> (<span class="id" type="var">S</span> <span class="id" type="var">n'</span>) ⇒ <span class="id" type="var">PSS</span> <span class="id" type="var">n'</span> (<span class="id" type="var">f</span> <span class="id" type="var">n'</span>) <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="keyword">end</span>.<br/>
+</div>
+
+<div class="doc">
+Again, note the use of inlined <span class="inlinecode"><span class="id" type="var">fix</span></span> here. 
+</div>
+<div class="code code-tight">
+
+
+<br/><hr class='doublespaceincode'/>
+<span class="id" type="keyword">Lemma</span> <span class="id" type="var">even__ev'</span> : <span style='font-size:120%;'>&forall;</span><span class="id" type="var">n</span>, <span class="id" type="var">even</span> <span class="id" type="var">n</span> → <span class="id" type="var">ev</span> <span class="id" type="var">n</span>.<br/>
+<span class="id" type="keyword">Proof</span>.<br/>
+&nbsp;<span class="id" type="tactic">move</span> ⇒ <span class="id" type="var">n</span>.<br/>
+&nbsp;<span class="id" type="tactic">elim</span> <span class="id" type="var">n</span> <span class="id" type="keyword">using</span> <span class="id" type="var">nat_ind2</span> ⇒ /= [<span class="id" type="var">Hev</span> | |<span class="id" type="var">n'</span> <span class="id" type="var">IHn'</span> <span class="id" type="var">Hev</span>]. </div>
+
+<div class="doc">
+&lt;- da liegt der Hund begraben! 
+</div>
+<div class="code code-tight">
+&nbsp;&nbsp;-  <span class="id" type="tactic">apply</span> <span class="id" type="var">ev_0</span>.<br/>
+&nbsp;&nbsp;-  <span class="id" type="tactic">by</span> <span class="id" type="tactic">case</span> <span class="id" type="var">H'</span>: <span class="id" type="var">_</span> /.<br/>
+&nbsp;&nbsp;-  <span class="comment">(*&nbsp;do&nbsp;you&nbsp;understand&nbsp;why&nbsp;<span class="inlinecode"><span class="id" type="var">Hev</span></span>&nbsp;looks&nbsp;the&nbsp;way&nbsp;it&nbsp;does?&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="tactic">by</span> <span class="id" type="tactic">apply</span> <span class="id" type="var">ev_SS</span>, <span class="id" type="var">IHn'</span>.<br/>
+<span class="id" type="keyword">Qed</span>.<br/>
+</div>
+
+<div class="doc">
+<a name="lab172"></a><h2 class="section">Setoid Rewriting</h2>
+
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+<ul class="doclist">
+<li>  Finally, something which is quite orthogonal to <span class="inlinecode"><span class="id" type="var">ssreflect</span></span> way of doing things, and contents of today's lecture ...
+
+</li>
+<li>  Some of Coq's tactics treat <span class="inlinecode"><span class="id" type="var">iff</span></span> statements specially, avoiding
+    the need for some low-level proof-state manipulation.  
+
+</li>
+<li>  In particular, <span class="inlinecode"><span class="id" type="tactic">rewrite</span></span> and some of its relatives can be used with <span class="inlinecode"><span class="id" type="var">iff</span></span>
+    statements, not just equalities.  To enable this behavior, we need
+    to import a Coq library that supports it: 
+</li>
+</ul>
+
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Require</span> <span class="id" type="keyword">Import</span> <span class="id" type="var">Coq.Setoids.Setoid</span>.<br/>
+</div>
+
+<div class="doc">
+Here is a simple example demonstrating how these tactics work with
+    <span class="inlinecode"><span class="id" type="var">iff</span></span>.  First, let's use a couple of basic iff equivalences... 
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Check</span> <span class="id" type="var">eq_mul_0</span>.<br/><hr class='doublespaceincode'/>
+<span class="comment">(*&nbsp;=&gt;&nbsp;eq_mul_0<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;forall&nbsp;n&nbsp;m&nbsp;:&nbsp;nat,&nbsp;n&nbsp;*&nbsp;m&nbsp;=&nbsp;0&nbsp;&lt;<span class="nowrap"><span style='font-size:85%;'><span style='vertical-align:5%;'><span style='letter-spacing:-.2em;'>-</span></span>&gt;</span></span>&nbsp;n&nbsp;=&nbsp;0&nbsp;\/&nbsp;m&nbsp;=&nbsp;0&nbsp;*)</span><br/><hr class='doublespaceincode'/>
+<span class="id" type="keyword">Check</span> <span class="id" type="var">or_assoc</span>.<br/>
+</div>
+
+<div class="doc">
+We can now use these facts with <span class="inlinecode"><span class="id" type="tactic">rewrite</span></span> and <span class="inlinecode"><span class="id" type="tactic">reflexivity</span></span> to
+    give smooth proofs of statements involving equivalences.  Here is
+    a ternary version of the previous <span class="inlinecode"><span class="id" type="var">mult_0</span></span> result: 
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Theorem</span> <span class="id" type="var">mult_0_3</span> :<br/>
+&nbsp;&nbsp;<span style='font-size:120%;'>&forall;</span><span class="id" type="var">n</span> <span class="id" type="var">m</span> <span class="id" type="var">p</span>, <span class="id" type="var">n</span> * <span class="id" type="var">m</span> * <span class="id" type="var">p</span> = 0 ↔ <span class="id" type="var">n</span> = 0 ∨ <span class="id" type="var">m</span> = 0 ∨ <span class="id" type="var">p</span> = 0.<br/>
+<span class="id" type="keyword">Proof</span>.<br/>
+&nbsp;&nbsp;<span class="id" type="tactic">move</span> ⇒ <span class="id" type="var">n</span> <span class="id" type="var">m</span> <span class="id" type="var">p</span>.<br/>
+&nbsp;&nbsp;<span class="id" type="tactic">rewrite</span> !<span class="id" type="var">eq_mul_0</span>. <span class="comment">(*&nbsp;see&nbsp;what&nbsp;happened?&nbsp;And&nbsp;we&nbsp;finish&nbsp;the&nbsp;same&nbsp;way:&nbsp;*)</span><br/>
+&nbsp;&nbsp;<span class="id" type="tactic">by</span> <span class="id" type="tactic">rewrite</span> <span class="id" type="var">or_assoc</span>.<br/>
+<span class="id" type="keyword">Qed</span>.<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+<ul class="doclist">
+<li> "Setoid" is a set equipped with (well-behaved) equivalence relation. 
+
+</li>
+<li> Uses of setoid rewriting go beyond equivalence in <span class="inlinecode"><span class="id" type="keyword">Prop</span></span>. 
+
+</li>
+<li> Esp. in  <span class="inlinecode"><span class="id" type="var">ssreflect</span></span> style, you often want to transform  <span class="inlinecode"><span class="id" type="keyword">Prop</span></span> equivalence to <span class="inlinecode"><span class="id" type="var">bool</span></span> equivalence ... 
+</li>
+</ul>
+
+<div class="paragraph"> </div>
+
+ To finish with setoid <span class="inlinecode"><span class="id" type="var">iff</span></span>, the <span class="inlinecode"><span class="id" type="tactic">apply</span></span> tactic can also be used with <span class="inlinecode">↔</span>. When given an
+    equivalence as its argument, <span class="inlinecode"><span class="id" type="tactic">apply</span></span> tries to guess which side of
+    the equivalence to use. 
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Lemma</span> <span class="id" type="var">apply_iff_example</span> :<br/>
+&nbsp;&nbsp;<span style='font-size:120%;'>&forall;</span><span class="id" type="var">n</span> <span class="id" type="var">m</span> : <span class="id" type="var">nat</span>, <span class="id" type="var">n</span> * <span class="id" type="var">m</span> = 0 → <span class="id" type="var">n</span> = 0 ∨ <span class="id" type="var">m</span> = 0.<br/>
+<span class="id" type="keyword">Proof</span>.<br/>
+&nbsp;&nbsp;<span class="id" type="tactic">intros</span> <span class="id" type="var">n</span> <span class="id" type="var">m</span> <span class="id" type="var">H</span>. <span class="id" type="tactic">apply</span> <span class="id" type="var">eq_mul_0</span>. <span class="id" type="tactic">apply</span> <span class="id" type="var">H</span>.<br/>
+<span class="id" type="keyword">Qed</span>.<br/><hr class='doublespaceincode'/>
+<span class="comment">(*&nbsp;Sun&nbsp;Jul&nbsp;14&nbsp;22:07:54&nbsp;MSK&nbsp;2019&nbsp;*)</span><br/>
+</div>
+</div>
+
+
+
+</div>
+
+</body>
+</html>

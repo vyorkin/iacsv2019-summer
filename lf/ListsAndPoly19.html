@@ -1,0 +1,1159 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<link href="common/css/sf.css" rel="stylesheet" type="text/css"/>
+<title>ListsAndPoly19</title>
+</head>
+<link href="common/jquery-ui/jquery-ui.css" rel="stylesheet">
+<script src="common/jquery-ui/external/jquery/jquery.js"></script>
+<script src="common/jquery-ui/jquery-ui.js"></script>
+<script src="common/toggleproofs.js"></script>
+<link href="common/css/lf19.css" rel="stylesheet" type="text/css"/>
+
+<body>
+
+<div id="page">
+
+<div id="header">
+<a href='https://www.cis.upenn.edu/~bcpierce/sf/current/index.html'>
+<img src='common/media/image/sf_logo_sm.png'></a>
+</br><a href='index.html'>  <span class='booktitleinheader'>Volume 1: Logical Foundations 19</span><br></br>
+<ul id='menu'>
+   <a href='toc.html'><li class='section_name'>Table of Contents</li></a>
+   <a href='coqindex.html'><li class='section_name'>Index</li></a>
+   <a href='deps.html'><li class='section_name'>Roadmap</li></a>
+</ul>
+</a></div>
+
+<div id="main">
+
+<h1 class="libtitle">ListsAndPoly19</h1>
+
+
+<div class="doc">
+<a name="lab46"></a><h1 class="section">ListAndPoly19: Working with Structured Data and Polymorphism</h1>
+
+<div class="paragraph"> </div>
+
+ Adapted from the Software Foundations for SemProg@FAU 2013&mdash;2019 
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Set</span> <span class="id" type="var">Warnings</span> "-notation-overridden,-parsing".<br/>
+<span class="id" type="var">From</span> <span class="id" type="var">Coq</span> <span class="id" type="keyword">Require</span> <span class="id" type="keyword">Import</span> <span class="id" type="var">ssreflect</span> <span class="id" type="var">ssrbool</span>.<br/>
+</div>
+
+<div class="doc">
+<a name="lab47"></a><h1 class="section">Separate Compilation</h1>
+
+<div class="paragraph"> </div>
+
+ Before getting started, let us try again  to import our
+    definitions from one of the previous chapters: 
+</div>
+<div class="code code-tight">
+
+<span class="id" type="var">From</span> <span class="id" type="var">LF<sub>19</sub></span> <span class="id" type="keyword">Require</span> <span class="id" type="keyword">Export</span> <span class="id" type="var">Basics19</span>.<br/>
+</div>
+
+<div class="doc">
+For the <span class="inlinecode"><span class="id" type="keyword">Require</span></span> <span class="inlinecode"><span class="id" type="keyword">Export</span></span> to work, Coq needs to be able to
+    find a compiled version of <span class="inlinecode"><span class="id" type="var">Basics19.v</span></span>, called <span class="inlinecode"><span class="id" type="var">Basics19.vo</span></span>, in a directory
+    associated with the prefix <span class="inlinecode"><span class="id" type="var">LF</span></span>.  This file is analogous to the <span class="inlinecode">.<span class="id" type="var">class</span></span>
+    files compiled from <span class="inlinecode">.<span class="id" type="var">java</span></span> source files and the <span class="inlinecode">.<span class="id" type="var">o</span></span> files compiled from
+    <span class="inlinecode">.<span class="id" type="var">c</span></span> files.
+
+<div class="paragraph"> </div>
+
+    First you need a file named <span class="inlinecode"><span class="id" type="var">_CoqProject</span></span> containing the following line:
+
+<div class="paragraph"> </div>
+
+      <span class="inlinecode">-<span class="id" type="var">Q</span></span> <span class="inlinecode">.</span> <span class="inlinecode"><span class="id" type="var">LF<sub>19</sub></span></span>
+
+<div class="paragraph"> </div>
+
+    This maps the current directory "<span class="inlinecode">.</span>", which contains <span class="inlinecode"><span class="id" type="var">Basics19.v</span></span> etc.,
+    to the prefix (or "logical directory") "<span class="inlinecode"><span class="id" type="var">LF<sub>19</sub></span></span>".
+    PG and CoqIDE read <span class="inlinecode"><span class="id" type="var">_CoqProject</span></span> automatically, so they know to where to
+    look for the file <span class="inlinecode"><span class="id" type="var">Basics19.vo</span></span> corresponding to the library <span class="inlinecode"><span class="id" type="var">LF<sub>19</sub>.Basics19</span></span>.
+
+<div class="paragraph"> </div>
+
+    Once <span class="inlinecode"><span class="id" type="var">_CoqProject</span></span> is thus created, there are various ways to build
+    <span class="inlinecode"><span class="id" type="var">Basics19.vo</span></span>:
+
+<div class="paragraph"> </div>
+
+<ul class="doclist">
+<li> In Proof General: The compilation can be made to happen automatically
+       when you submit the <span class="inlinecode"><span class="id" type="keyword">Require</span></span> line above to PG, by setting the emacs
+       variable <span class="inlinecode"><span class="id" type="var">coq</span>-<span class="id" type="var">compile</span>-<span class="id" type="keyword">before</span>-<span class="id" type="var">require</span></span> to <span class="inlinecode"><span class="id" type="var">t</span></span>.
+
+<div class="paragraph"> </div>
+
+
+</li>
+<li> In CoqIDE: Open <span class="inlinecode"><span class="id" type="var">Basics19.v</span></span>; then, in the "Compile" menu, click
+       on "Compile Buffer".
+
+<div class="paragraph"> </div>
+
+
+</li>
+<li> From the command line: Generate a <span class="inlinecode"><span class="id" type="var">Makefile</span></span> using the <span class="inlinecode"><span class="id" type="var">coq_makefile</span></span>
+       utility, that comes installed with Coq (if you obtained the whole
+       volume as a single archive, a <span class="inlinecode"><span class="id" type="var">Makefile</span></span> should already exist
+       and you can skip this step):
+
+<div class="paragraph"> </div>
+
+         <span class="inlinecode"><span class="id" type="var">coq_makefile</span></span> <span class="inlinecode">-<span class="id" type="var">f</span></span> <span class="inlinecode"><span class="id" type="var">_CoqProject</span></span> <span class="inlinecode">*.<span class="id" type="var">v</span></span> <span class="inlinecode">-<span class="id" type="var">o</span></span> <span class="inlinecode"><span class="id" type="var">Makefile</span></span>
+
+<div class="paragraph"> </div>
+
+       Note: You should rerun that command whenever you add or remove Coq files
+       to the directory.
+
+<div class="paragraph"> </div>
+
+       Then you can compile <span class="inlinecode"><span class="id" type="var">Basics19.v</span></span> by running <span class="inlinecode"><span class="id" type="var">make</span></span> with the corresponding
+       <span class="inlinecode">.<span class="id" type="var">vo</span></span> file as a target:
+
+<div class="paragraph"> </div>
+
+         <span class="inlinecode"><span class="id" type="var">make</span></span> <span class="inlinecode"><span class="id" type="var">Basics19.vo</span></span>
+
+<div class="paragraph"> </div>
+
+       All files in the directory can be compiled by giving no arguments:
+
+<div class="paragraph"> </div>
+
+         <span class="inlinecode"><span class="id" type="var">make</span></span>
+
+<div class="paragraph"> </div>
+
+       Under the hood, <span class="inlinecode"><span class="id" type="var">make</span></span> uses the Coq compiler, <span class="inlinecode"><span class="id" type="var">coqc</span></span>.  You can also
+       run <span class="inlinecode"><span class="id" type="var">coqc</span></span> directly:
+
+<div class="paragraph"> </div>
+
+         <span class="inlinecode"><span class="id" type="var">coqc</span></span> <span class="inlinecode">-<span class="id" type="var">Q</span></span> <span class="inlinecode">.</span> <span class="inlinecode"><span class="id" type="var">LF<sub>19</sub></span></span> <span class="inlinecode"><span class="id" type="var">Basics19.v</span></span>
+
+<div class="paragraph"> </div>
+
+       But <span class="inlinecode"><span class="id" type="var">make</span></span> also calculates dependencies between source files to compile
+       them in the right order, so <span class="inlinecode"><span class="id" type="var">make</span></span> should generally be prefered over
+       explicit <span class="inlinecode"><span class="id" type="var">coqc</span></span>.
+
+</li>
+</ul>
+
+<div class="paragraph"> </div>
+
+    If you have trouble (e.g., if you get complaints about missing
+    identifiers later in the file), it may be because the "load path"
+    for Coq is not set up correctly.  The <span class="inlinecode"><span class="id" type="keyword">Print</span></span> <span class="inlinecode"><span class="id" type="var">LoadPath</span>.</span> command
+    may be helpful in sorting out such issues.
+
+<div class="paragraph"> </div>
+
+    In particular, if you see a message like
+
+<div class="paragraph"> </div>
+
+        <span class="inlinecode"><span class="id" type="var">Compiled</span></span> <span class="inlinecode"><span class="id" type="var">library</span></span> <span class="inlinecode"><span class="id" type="var">Foo</span></span> <span class="inlinecode"><span class="id" type="var">makes</span></span> <span class="inlinecode"><span class="id" type="var">inconsistent</span></span> <span class="inlinecode"><span class="id" type="var">assumptions</span></span> <span class="inlinecode"><span class="id" type="var">over</span></span>
+        <span class="inlinecode"><span class="id" type="var">library</span></span> <span class="inlinecode"><span class="id" type="var">Bar</span></span>
+
+<div class="paragraph"> </div>
+
+    check whether you have multiple installations of Coq on your machine.
+    It may be that commands (like <span class="inlinecode"><span class="id" type="var">coqc</span></span>) that you execute in a terminal
+    window are getting a different version of Coq than commands executed by
+    Proof General or CoqIDE.
+
+<div class="paragraph"> </div>
+
+<ul class="doclist">
+<li> Another common reason is that the library <span class="inlinecode"><span class="id" type="var">Bar</span></span> was modified and
+      recompiled without also recompiling <span class="inlinecode"><span class="id" type="var">Foo</span></span> which depends on it.  Recompile
+      <span class="inlinecode"><span class="id" type="var">Foo</span></span>, or everything if too many files are affected.  (Using the third
+      solution above: <span class="inlinecode"><span class="id" type="var">make</span></span> <span class="inlinecode"><span class="id" type="var">clean</span>;</span> <span class="inlinecode"><span class="id" type="var">make</span></span>.)
+
+</li>
+</ul>
+    One more tip for CoqIDE users: If you see messages like <span class="inlinecode"><span class="id" type="var">Error</span>:</span>
+    <span class="inlinecode"><span class="id" type="var">Unable</span></span> <span class="inlinecode"><span class="id" type="var">to</span></span> <span class="inlinecode"><span class="id" type="var">locate</span></span> <span class="inlinecode"><span class="id" type="var">library</span></span> <span class="inlinecode"><span class="id" type="var">Basics19</span></span>, a likely reason is
+    inconsistencies between compiling things <i>within CoqIDE</i> vs <i>using
+    <span class="inlinecode"><span class="id" type="var">coqc</span></span> from the command line</i>.  This typically happens when there
+    are two incompatible versions of <span class="inlinecode"><span class="id" type="var">coqc</span></span> installed on your
+    system (one associated with CoqIDE, and one associated with <span class="inlinecode"><span class="id" type="var">coqc</span></span>
+    from the terminal).  The workaround for this situation is
+    compiling using CoqIDE only (i.e. choosing "make" from the menu),
+    and avoiding using <span class="inlinecode"><span class="id" type="var">coqc</span></span> directly at all. 
+</div>
+
+<div class="doc">
+<a name="lab48"></a><h1 class="section">Lists of Numbers</h1>
+
+<div class="paragraph"> </div>
+
+ Generalizing the definition of pairs, we can describe the
+    type of <i>lists</i> of numbers like this: "A list is either the empty
+    list or else a pair of a number and another list." 
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Inductive</span> <span class="id" type="var">natlist</span> : <span class="id" type="keyword">Type</span> :=<br/>
+&nbsp;&nbsp;| <span class="id" type="var">nil_nat</span>  : <span class="id" type="var">natlist</span><br/>
+&nbsp;&nbsp;| <span class="id" type="var">con_nat</span> : <span class="id" type="var">nat</span> → <span class="id" type="var">natlist</span> → <span class="id" type="var">natlist</span>.<br/>
+</div>
+
+<div class="doc">
+Of course, this is something you have seen in functional programming and all of you expect to see a polymorphic definition. This is how it looks like in the standard library: 
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Print</span> <span class="id" type="var">list</span>.<br/>
+</div>
+
+<div class="doc">
+===&gt;
+
+<div class="paragraph"> </div>
+
+<div class="code code-tight">
+<span class="id" type="keyword">Inductive</span>&nbsp;<span class="id" type="var">list</span>&nbsp;(<span class="id" type="var">A</span>&nbsp;:&nbsp;<span class="id" type="keyword">Type</span>)&nbsp;:&nbsp;<span class="id" type="keyword">Type</span>&nbsp;:=&nbsp;&nbsp;<span class="id" type="var">nil</span>&nbsp;:&nbsp;<span class="id" type="var">list</span>&nbsp;<span class="id" type="var">A</span>&nbsp;|&nbsp;<span class="id" type="var">cons</span>&nbsp;:&nbsp;<span class="id" type="var">A</span>&nbsp;→&nbsp;<span class="id" type="var">list</span>&nbsp;<span class="id" type="var">A</span>&nbsp;→&nbsp;<span class="id" type="var">list</span>&nbsp;<span class="id" type="var">A</span>
+<div class="paragraph"> </div>
+
+</div>
+ 
+<div class="paragraph"> </div>
+
+ <span class="inlinecode"><span class="id" type="var">list</span></span> is a <i>function</i> from types to (inductively
+    defined) types. 
+<div class="paragraph"> </div>
+
+ Note what Coq tells us:
+
+<div class="paragraph"> </div>
+
+<div class="code code-tight">
+<span class="id" type="var">For</span>&nbsp;<span class="id" type="var">nil</span>:&nbsp;<span class="id" type="var">Argument</span>&nbsp;<span class="id" type="var">A</span>&nbsp;<span class="id" type="var">is</span>&nbsp;<span class="id" type="var">implicit</span>&nbsp;<span class="id" type="var">and</span>&nbsp;<span class="id" type="var">maximally</span>&nbsp;<span class="id" type="var">inserted</span><br/>
+<span class="id" type="var">For</span>&nbsp;<span class="id" type="var">cons</span>:&nbsp;<span class="id" type="var">Argument</span>&nbsp;<span class="id" type="var">A</span>&nbsp;<span class="id" type="var">is</span>&nbsp;<span class="id" type="var">implicit</span>&nbsp;<span class="id" type="var">and</span>&nbsp;<span class="id" type="var">maximally</span>&nbsp;<span class="id" type="var">inserted</span>
+<div class="paragraph"> </div>
+
+</div>
+
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Check</span> <span class="id" type="var">nil</span>.<br/>
+</div>
+
+<div class="doc">
+===&gt; 
+
+<div class="paragraph"> </div>
+
+<div class="code code-tight">
+<span class="id" type="var">nil</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;<span class="id" type="var">list</span>&nbsp;?<span class="id" type="var">A</span><br/>
+<span class="id" type="keyword">where</span><br/>
+?<span class="id" type="var">A</span>&nbsp;:&nbsp;[&nbsp;&#x22A2;&nbsp;<span class="id" type="keyword">Type</span>]
+<div class="paragraph"> </div>
+
+</div>
+ 
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Check</span> <span class="id" type="var">cons</span>.<br/>
+</div>
+
+<div class="doc">
+===&gt;
+
+<div class="paragraph"> </div>
+
+<div class="code code-tight">
+<span class="id" type="var">cons</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;?<span class="id" type="var">A</span>&nbsp;→&nbsp;<span class="id" type="var">list</span>&nbsp;?<span class="id" type="var">A</span>&nbsp;→&nbsp;<span class="id" type="var">list</span>&nbsp;?<span class="id" type="var">A</span><br/>
+<span class="id" type="keyword">where</span><br/>
+?<span class="id" type="var">A</span>&nbsp;:&nbsp;[&nbsp;&#x22A2;&nbsp;<span class="id" type="keyword">Type</span>]
+<div class="paragraph"> </div>
+
+</div>
+ 
+<div class="paragraph"> </div>
+
+ We can force the implicit arguments to be explicit by
+   prefixing the function name with <span class="inlinecode">@</span>. 
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Check</span> @<span class="id" type="var">nil</span>.<br/>
+</div>
+
+<div class="doc">
+===&gt;
+
+<div class="paragraph"> </div>
+
+<div class="code code-tight">
+@<span class="id" type="var">nil</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;<span style='font-size:120%;'>&forall;</span><span class="id" type="var">A</span>&nbsp;:&nbsp;<span class="id" type="keyword">Type</span>,&nbsp;<span class="id" type="var">list</span>&nbsp;<span class="id" type="var">A</span>
+<div class="paragraph"> </div>
+
+</div>
+
+<div class="paragraph"> </div>
+
+ Lots of standard notations are already defined for us: 
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Require</span> <span class="id" type="keyword">Export</span> <span class="id" type="var">Coq.Lists.List</span>.<br/>
+<span class="id" type="keyword">Export</span> <span class="id" type="var">ListNotations</span>.<br/><hr class='doublespaceincode'/>
+<span class="id" type="keyword">Check</span> (1::2::<span class="id" type="var">nil</span>).<br/>
+</div>
+
+<div class="doc">
+===&gt;
+
+<div class="paragraph"> </div>
+
+<div class="code code-tight">
+[1;&nbsp;2]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;<span class="id" type="var">list</span>&nbsp;<span class="id" type="var">nat</span>
+<div class="paragraph"> </div>
+
+</div>
+ 
+<div class="paragraph"> </div>
+
+ If you want to see how notation is defined, here is how you do it in <span class="inlinecode"><span class="id" type="var">ssreflect</span></span>: 
+</div>
+<div class="code code-tight">
+
+<span class="id" type="var">Locate</span> "_ :: _".<br/>
+</div>
+
+<div class="doc">
+===&gt;
+
+<div class="paragraph"> </div>
+
+<div class="code code-tight">
+<span class="id" type="keyword">Notation</span><br/>
+"x :: y"&nbsp;:=&nbsp;<span class="id" type="var">cons</span>&nbsp;<span class="id" type="var">x</span>&nbsp;<span class="id" type="var">y</span>&nbsp;:&nbsp;<span class="id" type="var">list_scope</span>&nbsp;(<span class="id" type="var">default</span>&nbsp;<span class="id" type="var">interpretation</span>)
+<div class="paragraph"> </div>
+
+</div>
+ 
+<div class="paragraph"> </div>
+
+ Note the use of <span class="inlinecode"><span class="id" type="var">list_scope</span></span> 
+<div class="paragraph"> </div>
+
+ If you want to see a list of theorems, lemmas etc. using this notation, replace <span class="inlinecode"><span class="id" type="var">Locate</span></span> with <span class="inlinecode"><span class="id" type="var">Search</span></span> above. Warning: this is going to be a long list! 
+<div class="paragraph"> </div>
+
+<a name="lab49"></a><h2 class="section">Standard functions on lists</h2>
+
+<div class="paragraph"> </div>
+
+<a name="lab50"></a><h3 class="section">Repeat</h3>
+
+</div>
+<div class="code code-space">
+
+<br/>
+<span class="id" type="keyword">Print</span> <span class="id" type="tactic">repeat</span>.<br/>
+</div>
+
+<div class="doc">
+===&gt;
+
+<div class="paragraph"> </div>
+
+<div class="code code-tight">
+<span class="id" type="tactic">repeat</span>&nbsp;=&nbsp;<br/>
+<span class="id" type="keyword">fun</span>&nbsp;<span class="id" type="var">A</span>&nbsp;:&nbsp;<span class="id" type="keyword">Type</span>&nbsp;⇒<br/>
+<span class="id" type="var">fix</span>&nbsp;<span class="id" type="tactic">repeat</span>&nbsp;(<span class="id" type="var">x</span>&nbsp;:&nbsp;<span class="id" type="var">A</span>)&nbsp;(<span class="id" type="var">n</span>&nbsp;:&nbsp;<span class="id" type="var">nat</span>)&nbsp;{<span class="id" type="keyword">struct</span>&nbsp;<span class="id" type="var">n</span>}&nbsp;:&nbsp;<span class="id" type="var">list</span>&nbsp;<span class="id" type="var">A</span>&nbsp;:=&nbsp;<span class="id" type="keyword">match</span>&nbsp;<span class="id" type="var">n</span>&nbsp;<span class="id" type="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;0&nbsp;⇒&nbsp;[]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;<span class="id" type="var">S</span>&nbsp;<span class="id" type="var">k</span>&nbsp;⇒&nbsp;<span class="id" type="var">x</span>&nbsp;::&nbsp;<span class="id" type="tactic">repeat</span>&nbsp;<span class="id" type="var">x</span>&nbsp;<span class="id" type="var">k</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="keyword">end</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;<span style='font-size:120%;'>&forall;</span><span class="id" type="var">A</span>&nbsp;:&nbsp;<span class="id" type="keyword">Type</span>,&nbsp;<span class="id" type="var">A</span>&nbsp;→&nbsp;<span class="id" type="var">nat</span>&nbsp;→&nbsp;<span class="id" type="var">list</span>&nbsp;<span class="id" type="var">A</span><br/>
+<br/>
+<span class="id" type="var">Argument</span>&nbsp;<span class="id" type="var">A</span>&nbsp;<span class="id" type="var">is</span>&nbsp;<span class="id" type="var">implicit</span><br/>
+<span class="id" type="var">Argument</span>&nbsp;<span class="id" type="var">scopes</span>&nbsp;<span class="id" type="var">are</span>&nbsp;[<span class="id" type="var">type_scope</span>&nbsp;<span class="id" type="var">_</span>&nbsp;<span class="id" type="var">nat_scope</span>]
+<div class="paragraph"> </div>
+
+</div>
+
+<div class="paragraph"> </div>
+
+ Clear what it does? 
+<div class="paragraph"> </div>
+
+<a name="lab51"></a><h3 class="section">Append</h3>
+
+</div>
+<div class="code code-space">
+
+<br/>
+<span class="id" type="keyword">Print</span> <span class="id" type="var">app</span>.<br/>
+</div>
+
+<div class="doc">
+===&gt; 
+
+<div class="paragraph"> </div>
+
+<div class="code code-tight">
+<span class="id" type="var">app</span>&nbsp;=&nbsp;<br/>
+<span class="id" type="keyword">fun</span>&nbsp;<span class="id" type="var">A</span>&nbsp;:&nbsp;<span class="id" type="keyword">Type</span>&nbsp;⇒<br/>
+<span class="id" type="var">fix</span>&nbsp;<span class="id" type="var">app</span>&nbsp;(<span class="id" type="var">l</span>&nbsp;<span class="id" type="var">m</span>&nbsp;:&nbsp;<span class="id" type="var">list</span>&nbsp;<span class="id" type="var">A</span>)&nbsp;{<span class="id" type="keyword">struct</span>&nbsp;<span class="id" type="var">l</span>}&nbsp;:&nbsp;<span class="id" type="var">list</span>&nbsp;<span class="id" type="var">A</span>&nbsp;:=&nbsp;<span class="id" type="keyword">match</span>&nbsp;<span class="id" type="var">l</span>&nbsp;<span class="id" type="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;[]&nbsp;⇒&nbsp;<span class="id" type="var">m</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;<span class="id" type="var">a</span>&nbsp;::&nbsp;<span class="id" type="var">l<sub>1</sub></span>&nbsp;⇒&nbsp;<span class="id" type="var">a</span>&nbsp;::&nbsp;<span class="id" type="var">app</span>&nbsp;<span class="id" type="var">l<sub>1</sub></span>&nbsp;<span class="id" type="var">m</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="keyword">end</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;<span style='font-size:120%;'>&forall;</span><span class="id" type="var">A</span>&nbsp;:&nbsp;<span class="id" type="keyword">Type</span>,&nbsp;<span class="id" type="var">list</span>&nbsp;<span class="id" type="var">A</span>&nbsp;→&nbsp;<span class="id" type="var">list</span>&nbsp;<span class="id" type="var">A</span>&nbsp;→&nbsp;<span class="id" type="var">list</span>&nbsp;<span class="id" type="var">A</span>
+<div class="paragraph"> </div>
+
+</div>
+
+</div>
+<div class="code code-tight">
+
+<span class="id" type="var">Locate</span> "_ ++ _".<br/>
+</div>
+
+<div class="doc">
+===&gt;
+
+<div class="paragraph"> </div>
+
+<div class="code code-tight">
+<span class="id" type="keyword">Notation</span><br/>
+"x ++ y"&nbsp;:=&nbsp;<span class="id" type="var">app</span>&nbsp;<span class="id" type="var">x</span>&nbsp;<span class="id" type="var">y</span>&nbsp;:&nbsp;<span class="id" type="var">list_scope</span>&nbsp;(<span class="id" type="var">default</span>&nbsp;<span class="id" type="var">interpretation</span>)&nbsp;
+<div class="paragraph"> </div>
+
+</div>
+
+</div>
+<div class="code code-tight">
+
+<span class="id" type="var">Compute</span>  [1;2;3] ++ [4;5].<br/>
+</div>
+
+<div class="doc">
+<a name="lab52"></a><h3 class="section">Head (with default) and Tail</h3>
+
+</div>
+<div class="code code-space">
+
+<br/>
+<span class="id" type="keyword">Print</span> <span class="id" type="var">hd</span>.<br/>
+</div>
+
+<div class="doc">
+===&gt;
+
+<div class="paragraph"> </div>
+
+<div class="code code-tight">
+<span class="id" type="var">hd</span>&nbsp;=&nbsp;<br/>
+<span class="id" type="keyword">fun</span>&nbsp;(<span class="id" type="var">A</span>&nbsp;:&nbsp;<span class="id" type="keyword">Type</span>)&nbsp;(<span class="id" type="var">default</span>&nbsp;:&nbsp;<span class="id" type="var">A</span>)&nbsp;(<span class="id" type="var">l</span>&nbsp;:&nbsp;<span class="id" type="var">list</span>&nbsp;<span class="id" type="var">A</span>)&nbsp;⇒&nbsp;<span class="id" type="keyword">match</span>&nbsp;<span class="id" type="var">l</span>&nbsp;<span class="id" type="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;[]&nbsp;⇒&nbsp;<span class="id" type="var">default</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;<span class="id" type="var">x</span>&nbsp;::&nbsp;<span class="id" type="var">_</span>&nbsp;⇒&nbsp;<span class="id" type="var">x</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="keyword">end</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;<span style='font-size:120%;'>&forall;</span><span class="id" type="var">A</span>&nbsp;:&nbsp;<span class="id" type="keyword">Type</span>,&nbsp;<span class="id" type="var">A</span>&nbsp;→&nbsp;<span class="id" type="var">list</span>&nbsp;<span class="id" type="var">A</span>&nbsp;→&nbsp;<span class="id" type="var">A</span>
+<div class="paragraph"> </div>
+
+</div>
+
+<div class="paragraph"> </div>
+
+ As you can guess, not a very satisfying solution for the empty list. 
+<div class="paragraph"> </div>
+
+ Here is tail, for completness 
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Print</span> <span class="id" type="var">tl</span>.<br/>
+</div>
+
+<div class="doc">
+===&gt;
+
+<div class="paragraph"> </div>
+
+<div class="code code-tight">
+<span class="id" type="var">tl</span>&nbsp;=&nbsp;<br/>
+<span class="id" type="keyword">fun</span>&nbsp;(<span class="id" type="var">A</span>&nbsp;:&nbsp;<span class="id" type="keyword">Type</span>)&nbsp;(<span class="id" type="var">l</span>&nbsp;:&nbsp;<span class="id" type="var">list</span>&nbsp;<span class="id" type="var">A</span>)&nbsp;⇒&nbsp;<span class="id" type="keyword">match</span>&nbsp;<span class="id" type="var">l</span>&nbsp;<span class="id" type="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;[]&nbsp;⇒&nbsp;[]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;<span class="id" type="var">_</span>&nbsp;::&nbsp;<span class="id" type="var">m</span>&nbsp;⇒&nbsp;<span class="id" type="var">m</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="keyword">end</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;<span style='font-size:120%;'>&forall;</span><span class="id" type="var">A</span>&nbsp;:&nbsp;<span class="id" type="keyword">Type</span>,&nbsp;<span class="id" type="var">list</span>&nbsp;<span class="id" type="var">A</span>&nbsp;→&nbsp;<span class="id" type="var">list</span>&nbsp;<span class="id" type="var">A</span>
+<div class="paragraph"> </div>
+
+</div>
+
+<div class="paragraph"> </div>
+
+<a name="lab53"></a><h3 class="section">Option types</h3>
+
+<div class="paragraph"> </div>
+
+ An obvious improvement would be to use option types for head. Obviously, Coq defines them for us too. 
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Print</span> <span class="id" type="var">option</span>.<br/>
+</div>
+
+<div class="doc">
+====&gt;
+
+<div class="paragraph"> </div>
+
+<div class="code code-tight">
+<span class="id" type="keyword">Inductive</span>&nbsp;<span class="id" type="var">option</span>&nbsp;(<span class="id" type="var">A</span>&nbsp;:&nbsp;<span class="id" type="keyword">Type</span>)&nbsp;:&nbsp;<span class="id" type="keyword">Type</span>&nbsp;:=&nbsp;&nbsp;<span class="id" type="var">Some</span>&nbsp;:&nbsp;<span class="id" type="var">A</span>&nbsp;→&nbsp;<span class="id" type="var">option</span>&nbsp;<span class="id" type="var">A</span>&nbsp;|&nbsp;<span class="id" type="var">None</span>&nbsp;:&nbsp;<span class="id" type="var">option</span>&nbsp;<span class="id" type="var">A</span>
+<div class="paragraph"> </div>
+
+</div>
+
+<div class="paragraph"> </div>
+
+ Define the obvious <span class="inlinecode"><span class="id" type="var">option_hd</span></span> function. This is how you make an argument implicit, by the way. 
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Fixpoint</span> <span class="id" type="var">option_hd</span> {<span class="id" type="var">A</span> : <span class="id" type="keyword">Type</span>} (<span class="id" type="var">l</span>: <span class="id" type="var">list</span> <span class="id" type="var">A</span>) : <span class="id" type="var">option</span> <span class="id" type="var">A</span><br/>
+<span class="comment">(*&nbsp;REPLACE&nbsp;THIS&nbsp;LINE&nbsp;WITH&nbsp;":=&nbsp;_your_definition_&nbsp;."&nbsp;*)</span>. <span class="id" type="var">Admitted</span>.<br/><hr class='doublespaceincode'/>
+<span class="id" type="keyword">Example</span> <span class="id" type="var">test_hd<sub>1</sub></span>: <span class="id" type="var">option_hd</span> [1;2;3] = <span class="id" type="var">Some</span> 1.<br/>
+<span class="id" type="keyword">Proof</span>. <span class="comment">(*&nbsp;FILL&nbsp;IN&nbsp;HERE&nbsp;*)</span> <span class="id" type="var">Admitted</span>.<br/>
+<span class="id" type="keyword">Example</span> <span class="id" type="var">test_hd<sub>2</sub></span> (<span class="id" type="var">A</span>:<span class="id" type="keyword">Type</span>) : @<span class="id" type="var">option_hd</span> <span class="id" type="var">A</span> [] = <span class="id" type="var">None</span>.<br/>
+<span class="id" type="keyword">Proof</span>. <span class="comment">(*&nbsp;FILL&nbsp;IN&nbsp;HERE&nbsp;*)</span> <span class="id" type="var">Admitted</span>.<br/>
+</div>
+
+<div class="doc">
+<a name="lab54"></a><h3 class="section">First non-trivial proof for lists</h3>
+
+<div class="paragraph"> </div>
+
+ These work just by case analysis. 
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Theorem</span> <span class="id" type="var">hd_is_hd<sub>1</sub></span> : <span style='font-size:120%;'>&forall;</span>(<span class="id" type="var">A</span> : <span class="id" type="keyword">Type</span>) (<span class="id" type="var">l</span> : <span class="id" type="var">list</span> <span class="id" type="var">A</span>) (<span class="id" type="var">default</span> : <span class="id" type="var">A</span>), <span class="id" type="var">option_hd</span> <span class="id" type="var">l</span> = <span class="id" type="var">None</span> → <span class="id" type="var">hd</span> <span class="id" type="var">default</span> <span class="id" type="var">l</span> = <span class="id" type="var">default</span>.<br/>
+<span class="id" type="keyword">Proof</span>.<br/>
+<span class="comment">(*&nbsp;FILL&nbsp;IN&nbsp;HERE&nbsp;*)</span> <span class="id" type="var">Admitted</span>.<br/><hr class='doublespaceincode'/>
+<span class="id" type="keyword">Theorem</span> <span class="id" type="var">hd_is_hd<sub>2</sub></span> : <span style='font-size:120%;'>&forall;</span>(<span class="id" type="var">A</span> : <span class="id" type="keyword">Type</span>) (<span class="id" type="var">l</span> : <span class="id" type="var">list</span> <span class="id" type="var">A</span>) (<span class="id" type="var">default</span> : <span class="id" type="var">A</span>) (<span class="id" type="var">a</span>: <span class="id" type="var">A</span>), <span class="id" type="var">option_hd</span> <span class="id" type="var">l</span> = <span class="id" type="var">Some</span> <span class="id" type="var">a</span> → <span class="id" type="var">hd</span> <span class="id" type="var">default</span> <span class="id" type="var">l</span> = <span class="id" type="var">a</span>.<br/>
+<span class="id" type="keyword">Proof</span>.<br/>
+<span class="comment">(*&nbsp;FILL&nbsp;IN&nbsp;HERE&nbsp;*)</span> <span class="id" type="var">Admitted</span>.<br/>
+</div>
+
+<div class="doc">
+<a name="lab55"></a><h3 class="section">Length</h3>
+
+</div>
+<div class="code code-space">
+
+<br/>
+<span class="id" type="keyword">Print</span> <span class="id" type="var">length</span>.<br/>
+</div>
+
+<div class="doc">
+ ===&gt;
+
+<div class="paragraph"> </div>
+
+<div class="code code-tight">
+<span class="id" type="var">length</span>&nbsp;=&nbsp;<br/>
+<span class="id" type="keyword">fun</span>&nbsp;<span class="id" type="var">A</span>&nbsp;:&nbsp;<span class="id" type="keyword">Type</span>&nbsp;⇒&nbsp;<span class="id" type="var">fix</span>&nbsp;<span class="id" type="var">length</span>&nbsp;(<span class="id" type="var">l</span>&nbsp;:&nbsp;<span class="id" type="var">list</span>&nbsp;<span class="id" type="var">A</span>)&nbsp;:&nbsp;<span class="id" type="var">nat</span>&nbsp;:=&nbsp;<span class="id" type="keyword">match</span>&nbsp;<span class="id" type="var">l</span>&nbsp;<span class="id" type="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;[]&nbsp;⇒&nbsp;0<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;<span class="id" type="var">_</span>&nbsp;::&nbsp;<span class="id" type="var">l'</span>&nbsp;⇒&nbsp;<span class="id" type="var">S</span>&nbsp;(<span class="id" type="var">length</span>&nbsp;<span class="id" type="var">l'</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="keyword">end</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;<span style='font-size:120%;'>&forall;</span><span class="id" type="var">A</span>&nbsp;:&nbsp;<span class="id" type="keyword">Type</span>,&nbsp;<span class="id" type="var">list</span>&nbsp;<span class="id" type="var">A</span>&nbsp;→&nbsp;<span class="id" type="var">nat</span>
+<div class="paragraph"> </div>
+
+</div>
+
+<div class="paragraph"> </div>
+
+<a name="lab56"></a><h3 class="section">Reverse</h3>
+
+</div>
+<div class="code code-space">
+
+<br/>
+<span class="id" type="keyword">Print</span> <span class="id" type="var">rev</span>.<br/>
+</div>
+
+<div class="doc">
+ ===&gt;
+
+<div class="paragraph"> </div>
+
+<div class="code code-tight">
+<span class="id" type="var">rev</span>&nbsp;=&nbsp;<br/>
+<span class="id" type="keyword">fun</span>&nbsp;<span class="id" type="var">A</span>&nbsp;:&nbsp;<span class="id" type="keyword">Type</span>&nbsp;⇒&nbsp;<span class="id" type="var">fix</span>&nbsp;<span class="id" type="var">rev</span>&nbsp;(<span class="id" type="var">l</span>&nbsp;:&nbsp;<span class="id" type="var">list</span>&nbsp;<span class="id" type="var">A</span>)&nbsp;:&nbsp;<span class="id" type="var">list</span>&nbsp;<span class="id" type="var">A</span>&nbsp;:=&nbsp;<span class="id" type="keyword">match</span>&nbsp;<span class="id" type="var">l</span>&nbsp;<span class="id" type="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;[]&nbsp;⇒&nbsp;[]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;<span class="id" type="var">x</span>&nbsp;::&nbsp;<span class="id" type="var">l'</span>&nbsp;⇒&nbsp;<span class="id" type="var">rev</span>&nbsp;<span class="id" type="var">l'</span>&nbsp;++&nbsp;[<span class="id" type="var">x</span>]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="keyword">end</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;<span style='font-size:120%;'>&forall;</span><span class="id" type="var">A</span>&nbsp;:&nbsp;<span class="id" type="keyword">Type</span>,&nbsp;<span class="id" type="var">list</span>&nbsp;<span class="id" type="var">A</span>&nbsp;→&nbsp;<span class="id" type="var">list</span>&nbsp;<span class="id" type="var">A</span>
+<div class="paragraph"> </div>
+
+</div>
+
+<div class="paragraph"> </div>
+
+<a name="lab57"></a><h3 class="section">Exercises</h3>
+
+<div class="paragraph"> </div>
+
+ Complete the definitions of <span class="inlinecode"><span class="id" type="var">oddmembers</span></span> and
+    <span class="inlinecode"><span class="id" type="var">countoddmembers</span></span> below. Have a look at the tests to understand
+    what these functions should do. 
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Require</span> <span class="id" type="keyword">Import</span> <span class="id" type="var">Nat</span>.<br/>
+</div>
+
+<div class="doc">
+This gives us a function <span class="inlinecode"><span class="id" type="var">odd</span></span> ... 
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Fixpoint</span> <span class="id" type="var">oddmembers</span> (<span class="id" type="var">l</span>:<span class="id" type="var">list</span> <span class="id" type="var">nat</span>) : (<span class="id" type="var">list</span> <span class="id" type="var">nat</span>) <br/>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;REPLACE&nbsp;THIS&nbsp;LINE&nbsp;WITH&nbsp;":=&nbsp;_your_definition_&nbsp;."&nbsp;*)</span>. <span class="id" type="var">Admitted</span>.<br/><hr class='doublespaceincode'/>
+<span class="id" type="keyword">Example</span> <span class="id" type="var">test_oddmembers</span>:<br/>
+&nbsp;&nbsp;<span class="id" type="var">oddmembers</span> [0;1;0;2;3;0;0] = [1;3].<br/>
+<span class="comment">(*&nbsp;FILL&nbsp;IN&nbsp;HERE&nbsp;*)</span> <span class="id" type="var">Admitted</span>.<br/><hr class='doublespaceincode'/>
+<span class="id" type="keyword">Definition</span> <span class="id" type="var">countoddmembers</span> (<span class="id" type="var">l</span>:<span class="id" type="var">list</span> <span class="id" type="var">nat</span>) : <span class="id" type="var">nat</span> <br/>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;REPLACE&nbsp;THIS&nbsp;LINE&nbsp;WITH&nbsp;":=&nbsp;_your_definition_&nbsp;."&nbsp;*)</span>. <span class="id" type="var">Admitted</span>.<br/><hr class='doublespaceincode'/>
+<span class="id" type="keyword">Example</span> <span class="id" type="var">test_countoddmembers1</span>:<br/>
+&nbsp;&nbsp;<span class="id" type="var">countoddmembers</span> [1;0;3;1;4;5] = 4.<br/>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;FILL&nbsp;IN&nbsp;HERE&nbsp;*)</span> <span class="id" type="var">Admitted</span>.<br/><hr class='doublespaceincode'/>
+<span class="id" type="keyword">Example</span> <span class="id" type="var">test_countoddmembers2</span>:<br/>
+&nbsp;&nbsp;<span class="id" type="var">countoddmembers</span> [0;2;4] = 0.<br/>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;FILL&nbsp;IN&nbsp;HERE&nbsp;*)</span> <span class="id" type="var">Admitted</span>.<br/><hr class='doublespaceincode'/>
+<span class="id" type="keyword">Example</span> <span class="id" type="var">test_countoddmembers3</span>:<br/>
+&nbsp;&nbsp;<span class="id" type="var">countoddmembers</span> <span class="id" type="var">nil</span> = 0.<br/>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;FILL&nbsp;IN&nbsp;HERE&nbsp;*)</span> <span class="id" type="var">Admitted</span>.<br/>
+</div>
+
+<div class="doc">
+It seems we could think of a more general pattern here. 
+<div class="paragraph"> </div>
+
+ For example, we could define a function removing all zero elements from lists of natural numbers. Or keep only true values on a list of booleans. Or only lists of length one on a list of lists ... 
+</div>
+
+<div class="doc">
+<a name="lab58"></a><h2 class="section">Higher-Order Functions</h2>
+
+<div class="paragraph"> </div>
+
+ Functions that manipulate other functions are often called
+    <i>higher-order</i> functions. 
+<div class="paragraph"> </div>
+
+ Here is an useful higher-order function, taking a list
+    of <span class="inlinecode"><span class="id" type="var">X</span></span>s and a <i>predicate</i> on <span class="inlinecode"><span class="id" type="var">X</span></span> (a function from <span class="inlinecode"><span class="id" type="var">X</span></span> to <span class="inlinecode"><span class="id" type="var">bool</span></span>)
+    and "filtering" the list, returning a new list containing just
+    those elements for which the predicate returns <span class="inlinecode"><span class="id" type="var">true</span></span>. 
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Print</span> <span class="id" type="var">filter</span>.<br/>
+</div>
+
+<div class="doc">
+====&gt;
+
+<div class="paragraph"> </div>
+
+<div class="code code-tight">
+<span class="id" type="var">filter</span>&nbsp;=&nbsp;<br/>
+<span class="id" type="keyword">fun</span>&nbsp;(<span class="id" type="var">A</span>&nbsp;:&nbsp;<span class="id" type="keyword">Type</span>)&nbsp;(<span class="id" type="var">f</span>&nbsp;:&nbsp;<span class="id" type="var">A</span>&nbsp;→&nbsp;<span class="id" type="var">bool</span>)&nbsp;⇒<br/>
+<span class="id" type="var">fix</span>&nbsp;<span class="id" type="var">filter</span>&nbsp;(<span class="id" type="var">l</span>&nbsp;:&nbsp;<span class="id" type="var">list</span>&nbsp;<span class="id" type="var">A</span>)&nbsp;:&nbsp;<span class="id" type="var">list</span>&nbsp;<span class="id" type="var">A</span>&nbsp;:=<br/>
+&nbsp;&nbsp;<span class="id" type="keyword">match</span>&nbsp;<span class="id" type="var">l</span>&nbsp;<span class="id" type="keyword">with</span><br/>
+&nbsp;&nbsp;|&nbsp;[]&nbsp;⇒&nbsp;[]<br/>
+&nbsp;&nbsp;|&nbsp;<span class="id" type="var">x</span>&nbsp;::&nbsp;<span class="id" type="var">l<sub>0</sub></span>&nbsp;⇒&nbsp;<span class="id" type="keyword">if</span>&nbsp;<span class="id" type="var">f</span>&nbsp;<span class="id" type="var">x</span>&nbsp;<span class="id" type="keyword">then</span>&nbsp;<span class="id" type="var">x</span>&nbsp;::&nbsp;<span class="id" type="var">filter</span>&nbsp;<span class="id" type="var">l<sub>0</sub></span>&nbsp;<span class="id" type="keyword">else</span>&nbsp;<span class="id" type="var">filter</span>&nbsp;<span class="id" type="var">l<sub>0</sub></span><br/>
+&nbsp;&nbsp;<span class="id" type="keyword">end</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;<span style='font-size:120%;'>&forall;</span><span class="id" type="var">A</span>&nbsp;:&nbsp;<span class="id" type="keyword">Type</span>,&nbsp;(<span class="id" type="var">A</span>&nbsp;→&nbsp;<span class="id" type="var">bool</span>)&nbsp;→&nbsp;<span class="id" type="var">list</span>&nbsp;<span class="id" type="var">A</span>&nbsp;→&nbsp;<span class="id" type="var">list</span>&nbsp;<span class="id" type="var">A</span>
+<div class="paragraph"> </div>
+
+</div>
+
+<div class="paragraph"> </div>
+
+ For example, if we apply <span class="inlinecode"><span class="id" type="var">filter</span></span> to the predicate <span class="inlinecode"><span class="id" type="var">even</span></span>
+    (from the standard library) and a list of numbers <span class="inlinecode"><span class="id" type="var">l</span></span>, it returns
+    a list containing just the even members of <span class="inlinecode"><span class="id" type="var">l</span></span>. 
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Example</span> <span class="id" type="var">test_filter1</span>: <span class="id" type="var">filter</span> <span class="id" type="var">odd</span> [1;2;3;4] = [1;3].<br/>
+<span class="id" type="keyword">Proof</span>. <span class="id" type="tactic">by</span> []. <span class="id" type="keyword">Qed</span>.<br/>
+</div>
+
+<div class="doc">
+We now need our boolean equality on <span class="inlinecode"><span class="id" type="var">nat</span></span>. 
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Definition</span> <span class="id" type="var">length_is_1</span> {<span class="id" type="var">X</span> : <span class="id" type="keyword">Type</span>} (<span class="id" type="var">l</span> : <span class="id" type="var">list</span> <span class="id" type="var">X</span>) : <span class="id" type="var">bool</span> :=<br/>
+&nbsp;&nbsp;(<span class="id" type="var">length</span> <span class="id" type="var">l</span> =? 1).<br/><hr class='doublespaceincode'/>
+<span class="id" type="keyword">Example</span> <span class="id" type="var">test_filter2</span>:<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="var">filter</span> <span class="id" type="var">length_is_1</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[ [1; 2]; [3]; [4]; [5;6;7]; <span class="id" type="var">nil</span>; [8] ]<br/>
+&nbsp;&nbsp;= [ [3]; [4]; [8] ].<br/>
+<span class="id" type="keyword">Proof</span>. <span class="id" type="tactic">by</span> []. <span class="id" type="keyword">Qed</span>.<br/>
+</div>
+
+<div class="doc">
+<a name="lab59"></a><h2 class="section">Map</h2>
+
+<div class="paragraph"> </div>
+
+ Another handy higher-order function is <span class="inlinecode"><span class="id" type="var">map</span></span>. 
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Print</span> <span class="id" type="var">map</span>.<br/>
+</div>
+
+<div class="doc">
+===&gt;
+
+<div class="paragraph"> </div>
+
+<div class="code code-tight">
+<span class="id" type="var">map</span>&nbsp;=&nbsp;<br/>
+<span class="id" type="keyword">fun</span>&nbsp;(<span class="id" type="var">A</span>&nbsp;<span class="id" type="var">B</span>&nbsp;:&nbsp;<span class="id" type="keyword">Type</span>)&nbsp;(<span class="id" type="var">f</span>&nbsp;:&nbsp;<span class="id" type="var">A</span>&nbsp;→&nbsp;<span class="id" type="var">B</span>)&nbsp;⇒<br/>
+<span class="id" type="var">fix</span>&nbsp;<span class="id" type="var">map</span>&nbsp;(<span class="id" type="var">l</span>&nbsp;:&nbsp;<span class="id" type="var">list</span>&nbsp;<span class="id" type="var">A</span>)&nbsp;:&nbsp;<span class="id" type="var">list</span>&nbsp;<span class="id" type="var">B</span>&nbsp;:=&nbsp;<span class="id" type="keyword">match</span>&nbsp;<span class="id" type="var">l</span>&nbsp;<span class="id" type="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;[]&nbsp;⇒&nbsp;[]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;<span class="id" type="var">a</span>&nbsp;::&nbsp;<span class="id" type="var">t</span>&nbsp;⇒&nbsp;<span class="id" type="var">f</span>&nbsp;<span class="id" type="var">a</span>&nbsp;::&nbsp;<span class="id" type="var">map</span>&nbsp;<span class="id" type="var">t</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="keyword">end</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;<span style='font-size:120%;'>&forall;</span><span class="id" type="var">A</span>&nbsp;<span class="id" type="var">B</span>&nbsp;:&nbsp;<span class="id" type="keyword">Type</span>,&nbsp;(<span class="id" type="var">A</span>&nbsp;→&nbsp;<span class="id" type="var">B</span>)&nbsp;→&nbsp;<span class="id" type="var">list</span>&nbsp;<span class="id" type="var">A</span>&nbsp;→&nbsp;<span class="id" type="var">list</span>&nbsp;<span class="id" type="var">B</span>
+<div class="paragraph"> </div>
+
+</div>
+ 
+<div class="paragraph"> </div>
+
+<a name="lab60"></a><h3 class="section">Flat map</h3>
+
+</div>
+<div class="code code-space">
+
+<br/>
+<span class="id" type="keyword">Print</span> <span class="id" type="var">flat_map</span>.<br/>
+</div>
+
+<div class="doc">
+===&gt;
+
+<div class="paragraph"> </div>
+
+<div class="code code-tight">
+<span class="id" type="var">flat_map</span>&nbsp;=&nbsp;<br/>
+<span class="id" type="keyword">fun</span>&nbsp;(<span class="id" type="var">A</span>&nbsp;<span class="id" type="var">B</span>&nbsp;:&nbsp;<span class="id" type="keyword">Type</span>)&nbsp;(<span class="id" type="var">f</span>&nbsp;:&nbsp;<span class="id" type="var">A</span>&nbsp;→&nbsp;<span class="id" type="var">list</span>&nbsp;<span class="id" type="var">B</span>)&nbsp;⇒<br/>
+<span class="id" type="var">fix</span>&nbsp;<span class="id" type="var">flat_map</span>&nbsp;(<span class="id" type="var">l</span>&nbsp;:&nbsp;<span class="id" type="var">list</span>&nbsp;<span class="id" type="var">A</span>)&nbsp;:&nbsp;<span class="id" type="var">list</span>&nbsp;<span class="id" type="var">B</span>&nbsp;:=&nbsp;<span class="id" type="keyword">match</span>&nbsp;<span class="id" type="var">l</span>&nbsp;<span class="id" type="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;[]&nbsp;⇒&nbsp;[]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;<span class="id" type="var">x</span>&nbsp;::&nbsp;<span class="id" type="var">t</span>&nbsp;⇒&nbsp;<span class="id" type="var">f</span>&nbsp;<span class="id" type="var">x</span>&nbsp;++&nbsp;<span class="id" type="var">flat_map</span>&nbsp;<span class="id" type="var">t</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="keyword">end</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;<span style='font-size:120%;'>&forall;</span><span class="id" type="var">A</span>&nbsp;<span class="id" type="var">B</span>&nbsp;:&nbsp;<span class="id" type="keyword">Type</span>,&nbsp;(<span class="id" type="var">A</span>&nbsp;→&nbsp;<span class="id" type="var">list</span>&nbsp;<span class="id" type="var">B</span>)&nbsp;→&nbsp;<span class="id" type="var">list</span>&nbsp;<span class="id" type="var">A</span>&nbsp;→&nbsp;<span class="id" type="var">list</span>&nbsp;<span class="id" type="var">B</span>
+<div class="paragraph"> </div>
+
+</div>
+
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Example</span> <span class="id" type="var">testflatmap</span> : <span class="id" type="var">flat_map</span> (<span class="id" type="keyword">fun</span> <span class="id" type="var">n</span> ⇒ [<span class="id" type="var">n</span>;<span class="id" type="var">n</span>+1;<span class="id" type="var">n</span>+2]) [1;5;10]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= [1; 2; 3; 5; 6; 7; 10; 11; 12].<br/>
+<span class="id" type="keyword">Proof</span>. <span class="id" type="tactic">by</span> []. <span class="id" type="keyword">Qed</span>.<br/><hr class='doublespaceincode'/>
+<span class="id" type="keyword">Example</span> <span class="id" type="var">test_flat_map1</span>:<br/>
+&nbsp;&nbsp;<span class="id" type="var">flat_map</span> (<span class="id" type="keyword">fun</span> <span class="id" type="var">n</span> ⇒ [<span class="id" type="var">n</span>;<span class="id" type="var">n</span>;<span class="id" type="var">n</span>]) [1;5;4]<br/>
+&nbsp;&nbsp;= [1; 1; 1; 5; 5; 5; 4; 4; 4].<br/>
+<span class="id" type="keyword">Proof</span>. <span class="id" type="tactic">by</span> []. <span class="id" type="keyword">Qed</span>.<br/>
+</div>
+
+<div class="doc">
+Note how we use anonymous functions here? 
+<div class="paragraph"> </div>
+
+ A mapping function for <span class="inlinecode"><span class="id" type="var">option</span></span>s: 
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Print</span> <span class="id" type="var">option_map</span>.<br/>
+</div>
+
+<div class="doc">
+===&gt;
+
+<div class="paragraph"> </div>
+
+<div class="code code-tight">
+<span class="id" type="var">option_map</span>&nbsp;=&nbsp;<br/>
+<span class="id" type="keyword">fun</span>&nbsp;(<span class="id" type="var">A</span>&nbsp;<span class="id" type="var">B</span>&nbsp;:&nbsp;<span class="id" type="keyword">Type</span>)&nbsp;(<span class="id" type="var">f</span>&nbsp;:&nbsp;<span class="id" type="var">A</span>&nbsp;→&nbsp;<span class="id" type="var">B</span>)&nbsp;(<span class="id" type="var">o</span>&nbsp;:&nbsp;<span class="id" type="var">option</span>&nbsp;<span class="id" type="var">A</span>)&nbsp;⇒&nbsp;<span class="id" type="keyword">match</span>&nbsp;<span class="id" type="var">o</span>&nbsp;<span class="id" type="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;<span class="id" type="var">Some</span>&nbsp;<span class="id" type="var">a</span>&nbsp;⇒&nbsp;<span class="id" type="var">Some</span>&nbsp;(<span class="id" type="var">f</span>&nbsp;<span class="id" type="var">a</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;<span class="id" type="var">None</span>&nbsp;⇒&nbsp;<span class="id" type="var">None</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="keyword">end</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;<span style='font-size:120%;'>&forall;</span><span class="id" type="var">A</span>&nbsp;<span class="id" type="var">B</span>&nbsp;:&nbsp;<span class="id" type="keyword">Type</span>,&nbsp;(<span class="id" type="var">A</span>&nbsp;→&nbsp;<span class="id" type="var">B</span>)&nbsp;→&nbsp;<span class="id" type="var">option</span>&nbsp;<span class="id" type="var">A</span>&nbsp;→&nbsp;<span class="id" type="var">option</span>&nbsp;<span class="id" type="var">B</span>
+<div class="paragraph"> </div>
+
+</div>
+
+</div>
+
+<div class="doc">
+<a name="lab61"></a><h2 class="section">Fold</h2>
+
+<div class="paragraph"> </div>
+
+ An even more powerful higher-order function is called
+    <span class="inlinecode"><span class="id" type="var">fold</span></span>.  This function is the inspiration for the "<span class="inlinecode"><span class="id" type="var">reduce</span></span>"
+    operation that lies at the heart of Google's map/reduce
+    distributed programming framework. 
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Fixpoint</span> <span class="id" type="var">fold</span> {<span class="id" type="var">X</span> <span class="id" type="var">Y</span>:<span class="id" type="keyword">Type</span>} (<span class="id" type="var">f</span>: <span class="id" type="var">X</span>→<span class="id" type="var">Y</span>→<span class="id" type="var">Y</span>) (<span class="id" type="var">l</span>:<span class="id" type="var">list</span> <span class="id" type="var">X</span>) (<span class="id" type="var">b</span>:<span class="id" type="var">Y</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: <span class="id" type="var">Y</span> :=<br/>
+&nbsp;&nbsp;<span class="id" type="keyword">match</span> <span class="id" type="var">l</span> <span class="id" type="keyword">with</span><br/>
+&nbsp;&nbsp;| <span class="id" type="var">nil</span> ⇒ <span class="id" type="var">b</span><br/>
+&nbsp;&nbsp;| <span class="id" type="var">h</span> :: <span class="id" type="var">t</span> ⇒ <span class="id" type="var">f</span> <span class="id" type="var">h</span> (<span class="id" type="var">fold</span> <span class="id" type="var">f</span> <span class="id" type="var">t</span> <span class="id" type="var">b</span>)<br/>
+&nbsp;&nbsp;<span class="id" type="keyword">end</span>.<br/>
+</div>
+
+<div class="doc">
+Intuitively, the behavior of the <span class="inlinecode"><span class="id" type="var">fold</span></span> operation is to
+    insert a given binary operator <span class="inlinecode"><span class="id" type="var">f</span></span> between every pair of elements
+    in a given list.  For example, <span class="inlinecode"></span> <span class="inlinecode"><span class="id" type="var">fold</span></span> <span class="inlinecode"><span class="id" type="var">plus</span></span> <span class="inlinecode">[1;2;3;4]</span> <span class="inlinecode"></span> intuitively
+    means <span class="inlinecode">1+2+3+4</span>.  To make this precise, we also need a "starting
+    element" that serves as the initial second input to <span class="inlinecode"><span class="id" type="var">f</span></span>.  So, for
+    example,
+
+<div class="paragraph"> </div>
+
+<div class="code code-tight">
+&nbsp;&nbsp;&nbsp;<span class="id" type="var">fold</span>&nbsp;<span class="id" type="var">plus</span>&nbsp;[1;2;3;4]&nbsp;0
+<div class="paragraph"> </div>
+
+</div>
+    yields
+
+<div class="paragraph"> </div>
+
+<div class="code code-tight">
+&nbsp;&nbsp;&nbsp;1&nbsp;+&nbsp;(2&nbsp;+&nbsp;(3&nbsp;+&nbsp;(4&nbsp;+&nbsp;0))).
+<div class="paragraph"> </div>
+
+</div>
+    Some more examples:
+
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Check</span> (<span class="id" type="var">fold</span> <span class="id" type="var">andb</span>).<br/>
+<span class="comment">(*&nbsp;===&gt;&nbsp;fold&nbsp;andb&nbsp;:&nbsp;list&nbsp;bool&nbsp;<span class="nowrap"><span style='font-size:85%;'><span style='vertical-align:5%;'><span style='letter-spacing:-.2em;'>-</span></span>&gt;</span></span>&nbsp;bool&nbsp;<span class="nowrap"><span style='font-size:85%;'><span style='vertical-align:5%;'><span style='letter-spacing:-.2em;'>-</span></span>&gt;</span></span>&nbsp;bool&nbsp;*)</span><br/><hr class='doublespaceincode'/>
+<span class="id" type="keyword">Example</span> <span class="id" type="var">fold_example1</span> :<br/>
+&nbsp;&nbsp;<span class="id" type="var">fold</span> <span class="id" type="var">mult</span> [1;2;3;4] 1 = 24.<br/>
+<div class="togglescript" id="proofcontrol1" onclick="toggleDisplay('proof1');toggleDisplay('proofcontrol1')"><span class="show"></span></div>
+<div class="proofscript" id="proof1" onclick="toggleDisplay('proof1');toggleDisplay('proofcontrol1')">
+<span class="id" type="keyword">Proof</span>. <span class="id" type="tactic">by</span> []. <span class="id" type="keyword">Qed</span>.<br/>
+</div>
+
+<br/>
+<span class="id" type="keyword">Example</span> <span class="id" type="var">fold_example2</span> :<br/>
+&nbsp;&nbsp;<span class="id" type="var">fold</span> <span class="id" type="var">andb</span> [<span class="id" type="var">true</span>;<span class="id" type="var">true</span>;<span class="id" type="var">false</span>;<span class="id" type="var">true</span>] <span class="id" type="var">true</span> = <span class="id" type="var">false</span>.<br/>
+<div class="togglescript" id="proofcontrol2" onclick="toggleDisplay('proof2');toggleDisplay('proofcontrol2')"><span class="show"></span></div>
+<div class="proofscript" id="proof2" onclick="toggleDisplay('proof2');toggleDisplay('proofcontrol2')">
+<span class="id" type="keyword">Proof</span>. <span class="id" type="tactic">by</span> []. <span class="id" type="keyword">Qed</span>.<br/>
+</div>
+</div>
+
+<div class="doc">
+Note we have to be careful with polymorphism in the next example 
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Check</span> @<span class="id" type="var">fold</span> (<span class="id" type="var">list</span> <span class="id" type="var">nat</span>).<br/><hr class='doublespaceincode'/>
+<span class="id" type="keyword">Example</span> <span class="id" type="var">fold_example3</span> :<br/>
+&nbsp;&nbsp;@<span class="id" type="var">fold</span> (<span class="id" type="var">list</span> <span class="id" type="var">nat</span>) (<span class="id" type="var">list</span> <span class="id" type="var">nat</span>) (@<span class="id" type="var">app</span> <span class="id" type="var">nat</span>) [[1];<span class="id" type="var">nil</span>;[2;3];[4]] <span class="id" type="var">nil</span> = [1;2;3;4].<br/>
+<div class="togglescript" id="proofcontrol3" onclick="toggleDisplay('proof3');toggleDisplay('proofcontrol3')"><span class="show"></span></div>
+<div class="proofscript" id="proof3" onclick="toggleDisplay('proof3');toggleDisplay('proofcontrol3')">
+<span class="id" type="keyword">Proof</span>. <span class="id" type="tactic">by</span> []. <span class="id" type="keyword">Qed</span>.<br/>
+</div>
+</div>
+
+<div class="doc">
+Many common functions on lists can be implemented in terms of
+   <span class="inlinecode"><span class="id" type="var">fold</span></span>.  For example, here is an alternative definition of <span class="inlinecode"><span class="id" type="var">length</span></span>: 
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Definition</span> <span class="id" type="var">fold_length</span> (<span class="id" type="var">X</span> : <span class="id" type="keyword">Type</span>) (<span class="id" type="var">l</span> : <span class="id" type="var">list</span> <span class="id" type="var">X</span>) : <span class="id" type="var">nat</span> :=<br/>
+&nbsp;&nbsp;<span class="id" type="var">fold</span> (<span class="id" type="keyword">fun</span> <span class="id" type="var">_</span> <span class="id" type="var">n</span> ⇒ <span class="id" type="var">S</span> <span class="id" type="var">n</span>) <span class="id" type="var">l</span> 0.<br/>
+</div>
+
+<div class="doc">
+Note it is quite useful here that the function f in the definition of <span class="inlinecode"><span class="id" type="var">fold</span></span> can take arguments of mixed type. 
+</div>
+<div class="code code-tight">
+
+<span class="id" type="var">Arguments</span> <span class="id" type="var">fold_length</span> {<span class="id" type="var">X</span>}.<br/>
+</div>
+
+<div class="doc">
+This is an alternative way of making arguments implicit, by the way. Sometimes it might make sense: e.g., you want to make constructors of a polymorphic type easier to write, but the type to remain explicitly polymorphic. 
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Example</span> <span class="id" type="var">test_fold_length1</span> : <span class="id" type="var">fold_length</span> [4;7;0] = 3.<br/>
+<span class="id" type="keyword">Proof</span>. <span class="id" type="tactic">by</span> []. <span class="id" type="keyword">Qed</span>.<br/>
+</div>
+
+<div class="doc">
+Prove the correctness of <span class="inlinecode"><span class="id" type="var">fold_length</span></span>. This is our first encounter with induction on lists. 
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Theorem</span> <span class="id" type="var">fold_length_correct</span> : <span style='font-size:120%;'>&forall;</span><span class="id" type="var">X</span> (<span class="id" type="var">l</span> : <span class="id" type="var">list</span> <span class="id" type="var">X</span>),<br/>
+&nbsp;&nbsp;<span class="id" type="var">fold_length</span> <span class="id" type="var">l</span> = <span class="id" type="var">length</span> <span class="id" type="var">l</span>.<br/>
+<span class="comment">(*&nbsp;WORKED&nbsp;IN&nbsp;CLASS&nbsp;*)</span><br/>
+<span class="id" type="keyword">Proof</span>.<br/>
+&nbsp;&nbsp;<span class="id" type="tactic">move</span> ⇒ ?.<br/>
+&nbsp;&nbsp;<span class="id" type="tactic">elim</span> ⇒ [|<span class="id" type="var">hl</span> <span class="id" type="var">tl</span> <span class="id" type="var">IHl</span>] /= //.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="tactic">by</span> <span class="id" type="tactic">rewrite</span> -<span class="id" type="var">IHl</span>.<br/>
+<span class="id" type="keyword">Qed</span>.<br/>
+</div>
+
+<div class="doc">
+We can do the same thing with <span class="inlinecode"><span class="id" type="var">map</span></span>, i.e., define it using <span class="inlinecode"><span class="id" type="var">fold</span></span>. Can you see how?  
+<div class="paragraph"> </div>
+
+<a name="lab62"></a><h3 class="section">An example of a more complicated proof</h3>
+
+<div class="paragraph"> </div>
+
+ The strandard library has a lot of useful theorems about list programs and transformations we have seen.  One example: 
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Check</span> <span class="id" type="var">rev_length</span>.<br/>
+</div>
+
+<div class="doc">
+====&gt;
+
+<div class="paragraph"> </div>
+
+<div class="code code-tight">
+<span class="id" type="var">rev_length</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;<span style='font-size:120%;'>&forall;</span>(<span class="id" type="var">A</span>&nbsp;:&nbsp;<span class="id" type="keyword">Type</span>)&nbsp;(<span class="id" type="var">l</span>&nbsp;:&nbsp;<span class="id" type="var">list</span>&nbsp;<span class="id" type="var">A</span>),&nbsp;<span class="id" type="var">length</span>&nbsp;(<span class="id" type="var">rev</span>&nbsp;<span class="id" type="var">l</span>)&nbsp;=&nbsp;<span class="id" type="var">length</span>&nbsp;<span class="id" type="var">l</span>
+<div class="paragraph"> </div>
+
+</div>
+ 
+<div class="paragraph"> </div>
+
+ How do we prove it? 
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Theorem</span> <span class="id" type="var">rev_length_firsttry</span> : <span style='font-size:120%;'>&forall;</span><span class="id" type="var">X</span> (<span class="id" type="var">l</span> : <span class="id" type="var">list</span> <span class="id" type="var">X</span>),<br/>
+&nbsp;&nbsp;<span class="id" type="var">length</span> (<span class="id" type="var">rev</span> <span class="id" type="var">l</span>) = <span class="id" type="var">length</span> <span class="id" type="var">l</span>.<br/>
+<span class="id" type="keyword">Proof</span>.<br/>
+&nbsp;&nbsp;<span class="id" type="tactic">intros</span> <span class="id" type="var">X</span> <span class="id" type="var">l</span>. <span class="id" type="tactic">induction</span> <span class="id" type="var">l</span> <span class="id" type="keyword">as</span> [| <span class="id" type="var">n</span> <span class="id" type="var">l'</span> <span class="id" type="var">IHl'</span>].<br/>
+&nbsp;&nbsp;- <span class="comment">(**&nbsp;l&nbsp;=&nbsp;<span class="inlinecode"></span>&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="tactic">reflexivity</span>. <span class="comment">(*&nbsp;So&nbsp;far,&nbsp;so&nbsp;good,&nbsp;obviously...&nbsp;*)</span><br/>
+</div>
+
+<div class="doc">
+<a name="lab63"></a><h3 class="section"> </h3>
+
+</div>
+<div class="code code-space">
+
+<br/>
+&nbsp;&nbsp;- <span class="comment">(**&nbsp;l&nbsp;=&nbsp;n&nbsp;::&nbsp;l'&nbsp;*)</span><br/>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(**&nbsp;This&nbsp;is&nbsp;the&nbsp;tricky&nbsp;case.&nbsp;&nbsp;Let's&nbsp;begin&nbsp;as&nbsp;usual<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;by&nbsp;simplifying.&nbsp;*)</span><br/>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="tactic">simpl</span>.<br/>
+</div>
+
+<div class="doc">
+Now we seem to be stuck: the goal is an equality
+       involving <span class="inlinecode">++</span>, but we don't have any useful equations
+       in either the immediate context or in the global
+       environment!  We can make a little progress by using
+       the IH to rewrite the goal... 
+</div>
+<div class="code code-tight">
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="tactic">rewrite</span> &lt;- <span class="id" type="var">IHl'</span>.<br/>
+</div>
+
+<div class="doc">
+... but now we can't seem to go any further. 
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Abort</span>.<br/>
+</div>
+
+<div class="doc">
+<a name="lab64"></a><h3 class="section">With a little help from a lemma</h3>
+
+<div class="paragraph"> </div>
+
+ So let's take the equation relating <span class="inlinecode">++</span> and <span class="inlinecode"><span class="id" type="var">length</span></span> that
+    would have enabled us to make progress and prove it as a separate
+    lemma.
+
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Theorem</span> <span class="id" type="var">app_len</span> : <span style='font-size:120%;'>&forall;</span><span class="id" type="var">X</span> (<span class="id" type="var">l<sub>1</sub></span> <span class="id" type="var">l<sub>2</sub></span> : <span class="id" type="var">list</span> <span class="id" type="var">X</span>),<br/>
+&nbsp;&nbsp;<span class="id" type="var">length</span> (<span class="id" type="var">l<sub>1</sub></span> ++ <span class="id" type="var">l<sub>2</sub></span>) = (<span class="id" type="var">length</span> <span class="id" type="var">l<sub>1</sub></span>) + (<span class="id" type="var">length</span> <span class="id" type="var">l<sub>2</sub></span>).<br/>
+<span class="id" type="keyword">Proof</span>.<br/>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;WORKED&nbsp;IN&nbsp;CLASS&nbsp;*)</span><br/>
+&nbsp;&nbsp;<span class="id" type="tactic">move</span> ⇒ ?.<br/>
+&nbsp;&nbsp;<span class="id" type="tactic">elim</span> ⇒ [| <span class="id" type="var">n</span> <span class="id" type="var">l<sub>1</sub>'</span> <span class="id" type="var">IHl1'</span>] /= .<br/>
+&nbsp;&nbsp;- <span class="id" type="tactic">by</span> [].<br/>
+&nbsp;&nbsp;- <span class="id" type="tactic">move</span> ⇒ ?. <span class="id" type="tactic">by</span> <span class="id" type="tactic">rewrite</span> <span class="id" type="var">IHl1'</span>. <span class="id" type="keyword">Qed</span>.<br/>
+</div>
+
+<div class="doc">
+Note that, to make the lemma as general as possible, we
+    quantify over <i>all</i> <span class="inlinecode"><span class="id" type="var">natlist</span></span>s, not just those that result from an
+    application of <span class="inlinecode"><span class="id" type="var">rev</span></span>.  This should seem natural, because the truth
+    of the goal clearly doesn't depend on the list having been
+    reversed.  Moreover, it is easier to prove the more general
+    property. 
+<div class="paragraph"> </div>
+
+ The same thing is in the standard library as <span class="inlinecode"><span class="id" type="var">app_length</span></span>. 
+<div class="paragraph"> </div>
+
+ Something else we are missing: commutativity of addition. We have proved it though. 
+</div>
+<div class="code code-tight">
+
+<span class="id" type="var">From</span> <span class="id" type="var">LF<sub>19</sub></span> <span class="id" type="keyword">Require</span> <span class="id" type="keyword">Import</span> <span class="id" type="var">FirstProofs19</span>.<br/>
+</div>
+
+<div class="doc">
+Now we can complete the original proof. 
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Theorem</span> <span class="id" type="var">rev_len</span> : <span style='font-size:120%;'>&forall;</span><span class="id" type="var">X</span> (<span class="id" type="var">l</span> : <span class="id" type="var">list</span> <span class="id" type="var">X</span>),<br/>
+&nbsp;&nbsp;<span class="id" type="var">length</span> (<span class="id" type="var">rev</span> <span class="id" type="var">l</span>) = <span class="id" type="var">length</span> <span class="id" type="var">l</span>.<br/>
+<span class="id" type="keyword">Proof</span>.<br/>
+&nbsp;&nbsp;<span class="id" type="tactic">move</span> ⇒ ?.<br/>
+&nbsp;&nbsp;<span class="id" type="tactic">elim</span> ⇒ [| <span class="id" type="var">n</span> <span class="id" type="var">l'</span> <span class="id" type="var">IHl'</span>] /=.<br/>
+&nbsp;&nbsp;- <span class="comment">(*&nbsp;l&nbsp;=&nbsp;nil&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="tactic">by</span> [].<br/>
+&nbsp;&nbsp;- <span class="comment">(*&nbsp;l&nbsp;=&nbsp;cons&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;WORKED&nbsp;IN&nbsp;CLASS&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="tactic">by</span> <span class="id" type="tactic">rewrite</span> <span class="id" type="var">app_len</span> <span class="id" type="var">plus_comm</span> <span class="id" type="var">IHl'</span>.<br/>
+<span class="id" type="keyword">Qed</span>.<br/>
+</div>
+
+<div class="doc">
+<a name="lab65"></a><h2 class="section">More polymorphic types</h2>
+
+</div>
+<div class="code code-space">
+
+<br/>
+<span class="id" type="keyword">Print</span> <span class="id" type="var">prod</span>.<br/>
+</div>
+
+<div class="doc">
+===&gt;
+
+<div class="paragraph"> </div>
+
+<div class="code code-tight">
+<span class="id" type="keyword">Inductive</span>&nbsp;<span class="id" type="var">prod</span>&nbsp;(<span class="id" type="var">A</span>&nbsp;<span class="id" type="var">B</span>&nbsp;:&nbsp;<span class="id" type="keyword">Type</span>)&nbsp;:&nbsp;<span class="id" type="keyword">Type</span>&nbsp;:=&nbsp;&nbsp;<span class="id" type="var">pair</span>&nbsp;:&nbsp;<span class="id" type="var">A</span>&nbsp;→&nbsp;<span class="id" type="var">B</span>&nbsp;→&nbsp;<span class="id" type="var">A</span>&nbsp;*&nbsp;<span class="id" type="var">B</span><br/>
+<br/>
+<span class="id" type="var">For</span>&nbsp;<span class="id" type="var">pair</span>:&nbsp;<span class="id" type="var">Arguments</span>&nbsp;<span class="id" type="var">A</span>,&nbsp;<span class="id" type="var">B</span>&nbsp;<span class="id" type="var">are</span>&nbsp;<span class="id" type="var">implicit</span>&nbsp;<span class="id" type="var">and</span>&nbsp;<span class="id" type="var">maximally</span>&nbsp;<span class="id" type="var">inserted</span>
+<div class="paragraph"> </div>
+
+</div>
+ 
+<div class="paragraph"> </div>
+
+ You see the notation for products here. Here are projections: 
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Print</span> <span class="id" type="var">fst</span>.<br/>
+<span class="id" type="keyword">Print</span> <span class="id" type="var">snd</span>.<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+<div class="code code-tight">
+<span class="id" type="var">fst</span>&nbsp;=&nbsp;<span class="id" type="keyword">fun</span>&nbsp;(<span class="id" type="var">A</span>&nbsp;<span class="id" type="var">B</span>&nbsp;:&nbsp;<span class="id" type="keyword">Type</span>)&nbsp;(<span class="id" type="var">p</span>&nbsp;:&nbsp;<span class="id" type="var">A</span>&nbsp;*&nbsp;<span class="id" type="var">B</span>)&nbsp;⇒&nbsp;<span class="id" type="keyword">let</span>&nbsp;(<span class="id" type="var">x</span>,&nbsp;<span class="id" type="var">_</span>)&nbsp;:=&nbsp;<span class="id" type="var">p</span>&nbsp;<span class="id" type="keyword">in</span>&nbsp;<span class="id" type="var">x</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;<span style='font-size:120%;'>&forall;</span><span class="id" type="var">A</span>&nbsp;<span class="id" type="var">B</span>&nbsp;:&nbsp;<span class="id" type="keyword">Type</span>,&nbsp;<span class="id" type="var">A</span>&nbsp;*&nbsp;<span class="id" type="var">B</span>&nbsp;→&nbsp;<span class="id" type="var">A</span><br/>
+<span class="id" type="var">snd</span>&nbsp;=&nbsp;<span class="id" type="keyword">fun</span>&nbsp;(<span class="id" type="var">A</span>&nbsp;<span class="id" type="var">B</span>&nbsp;:&nbsp;<span class="id" type="keyword">Type</span>)&nbsp;(<span class="id" type="var">p</span>&nbsp;:&nbsp;<span class="id" type="var">A</span>&nbsp;*&nbsp;<span class="id" type="var">B</span>)&nbsp;⇒&nbsp;<span class="id" type="keyword">let</span>&nbsp;(<span class="id" type="var">_</span>,&nbsp;<span class="id" type="var">y</span>)&nbsp;:=&nbsp;<span class="id" type="var">p</span>&nbsp;<span class="id" type="keyword">in</span>&nbsp;<span class="id" type="var">y</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;<span style='font-size:120%;'>&forall;</span><span class="id" type="var">A</span>&nbsp;<span class="id" type="var">B</span>&nbsp;:&nbsp;<span class="id" type="keyword">Type</span>,&nbsp;<span class="id" type="var">A</span>&nbsp;*&nbsp;<span class="id" type="var">B</span>&nbsp;→&nbsp;<span class="id" type="var">B</span>
+<div class="paragraph"> </div>
+
+</div>
+ 
+<div class="paragraph"> </div>
+
+<a name="lab66"></a><h3 class="section">Zipping and unzipping</h3>
+
+<div class="paragraph"> </div>
+
+ Here are some standard functions that combine products and lists 
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Print</span> <span class="id" type="var">combine</span>.<br/>
+<span class="id" type="keyword">Print</span> <span class="id" type="tactic">split</span>.<br/>
+</div>
+
+<div class="doc">
+Are those two functions inverses of each other? 
+</div>
+<div class="code code-tight">
+
+<span class="id" type="keyword">Example</span> <span class="id" type="var">test_split</span>:<br/>
+&nbsp;&nbsp;<span class="id" type="tactic">split</span> [(1,<span class="id" type="var">false</span>);(2,<span class="id" type="var">false</span>)] = ([1;2],[<span class="id" type="var">false</span>;<span class="id" type="var">false</span>]).<br/>
+<span class="id" type="keyword">Proof</span>.<br/>
+&nbsp;&nbsp;<span class="id" type="tactic">reflexivity</span>.<br/>
+<span class="id" type="keyword">Qed</span>.<br/><hr class='doublespaceincode'/>
+<span class="comment">(*&nbsp;Sun&nbsp;Jul&nbsp;14&nbsp;22:07:53&nbsp;MSK&nbsp;2019&nbsp;*)</span><br/>
+</div>
+</div>
+
+
+
+</div>
+
+</body>
+</html>

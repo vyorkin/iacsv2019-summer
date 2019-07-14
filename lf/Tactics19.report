@@ -1,0 +1,33 @@
+rev_exercise1 (standard, automatically graded)
+Score: 0.0 / 3.0
+Reason: Admitted proof.
+
+beq_nat_true (standard, automatically graded)
+Score: 0.0 / 2.0
+Reason: Admitted proof.
+
+bool_fn_applied_thrice (standard, automatically graded)
+Score: 0.0 / 2.0
+Reason: Admitted proof.
+
+beq_nat_sym (standard, automatically graded)
+Score: 0.0 / 3.0
+Reason: Admitted proof.
+
+filter_exercise (advanced, automatically graded)
+Score: 0.0 / 3.0
+Reason: Admitted proof.
+
+Points possible - standard: 10
+Points possible - advanced: 13
+
+   ###########################
+   ##### Grading Results #####
+   ###########################
+
+   Standard:  0.0 / 10.0 so far
+                and  0.0 ungraded
+
+   Advanced:  0.0 / 13.0 so far
+                and  0.0 ungraded
+
