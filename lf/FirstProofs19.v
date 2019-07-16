@@ -2,15 +2,15 @@
 
 (** Adapted from the Software Foundations for SemProg@FAU 2013--2019 *)
 
-(** Here is how you load material from the previous lecture. 
+(** Here is how you load material from the previous lecture.
  For the more sophisticated route we follow here, you first need following steps:
   - download the [_CoqProject] file that I posted on StudOn and save it in the same folder
-  - write in console 
+  - write in console
 
     coq_makefile -Q . LF19 Basics19.v FirstProofs19.v -o Makefile; make
 
-  
-Did not work? A fallback dirty option is to "make clean", rename the "[_CoqProject]" file to something dummy, kill "From LF19" in front of Require, and compile Basics19 manually with coqc. But it's absolute last resort.   
+
+Did not work? A fallback dirty option is to "make clean", rename the "[_CoqProject]" file to something dummy, kill "From LF19" in front of Require, and compile Basics19 manually with coqc. But it's absolute last resort.
   *)
 
 From LF19 Require Export Basics19.
@@ -29,7 +29,7 @@ From Coq Require Import ssreflect ssrfun ssrbool.
     turn to stating and proving properties of their behavior.
     Actually, we've already started doing this: each [Example] in the
     previous sections makes a precise claim about the behavior of some
-    function on some particular inputs.  
+    function on some particular inputs.
 
     The same sort of "proof by simplification" can be used to prove
     more interesting properties as well.  For example, the fact that
@@ -39,7 +39,7 @@ From Coq Require Import ssreflect ssrfun ssrbool.
 
 Theorem plus_O_n : forall n : nat, 0 + n = n.
 Proof.
-  reflexivity.  Qed. 
+  reflexivity.  Qed.
 
 (** (You may notice that the above statement looks different in
     the [.v] file in your IDE than it does in the HTML rendition in
@@ -93,7 +93,7 @@ Theorem mult_0_l : forall n:nat, 0 * n = 0. reflexivity . Qed.
 (** The [_l] suffix in the names of these theorems is
     pronounced "on the left." *)
 
-(** 
+(**
     Although simplification is powerful enough to prove some fairly
     general facts, there are many statements that cannot be handled by
     simplification alone.  For instance, we cannot use it to prove
@@ -108,7 +108,7 @@ Proof.
   (** We can finish it in the [ssreflect] way though... *)
 
   by [].
-  
+
 Qed.
 
 (** We will see another way to deal with this later. *)
@@ -141,7 +141,7 @@ Theorem plus_id_example : forall n m:nat,
 
 Proof.
   (* move both quantifiers and the hypothesis into the context: *)
-  intros n m H. 
+  intros n m H.
   (* rewrite the goal using the hypothesis: *)
   rewrite -> H.
   reflexivity. Qed.
@@ -166,23 +166,20 @@ Theorem plus_id_example' : forall n m:nat,
   n + n = m + m.
 
 Proof.
-  by
-    move=> n m H;
-            rewrite H. Qed.
+    by
+      move => n m H;
+               rewrite H. Qed.
 
-(** The use of [move =>] has its advantages, especially regarding naming conventions. Will discuss it in more detail when we have a better background later. *) 
+(** The use of [move =>] has its advantages, especially regarding
+naming conventions. Will discuss it in more detail when we have
+a better background later. *)
 
 
-Theorem plus_id_exercise : forall n m o : nat,
+Theorem plus_id_exercise n m o :
   n = m -> m = o -> n + m = m + o.
-Proof.  
-  (* WORKED IN CLASS *)
-   intros m n o EQmn EQno. 
-     rewrite -> EQmn. 
-     rewrite -> EQno. 
-  reflexivity.  Qed. 
-  (* by move=> n m o EQmn EQno; rewrite EQmn EQno. Qed.*)
-
+Proof.
+  (* by move => -> -> . Qed. *)
+  by move => EQmn EQno; rewrite EQmn EQno. Qed.
 
 (** We can also use the [rewrite] tactic with a previously proved
     theorem instead of a hypothesis from the context. If the statement
@@ -193,7 +190,7 @@ Proof.
 Theorem mult_double : forall p q : nat,
   p = q -> (p + p) * q = (q + q) * q.
 Proof.
-  by move=> p q EQpq; rewrite EQpq.
+  by move => p q EQpq; rewrite EQpq.
 Qed.
 
 (** **** Exercise: 2 stars, standard (mult_S_1)  *)
@@ -201,10 +198,13 @@ Theorem mult_S_1 : forall n m : nat,
   m = S n ->
   m * (1 + n) = m * m.
 Proof.
-  (* FILL IN HERE *) Admitted.
+    by move => n m H;
+                rewrite H;
+                reflexivity.
+                Qed.
 
 (* (N.b. This proof can actually be completed without using [rewrite],
-   but please do use [rewrite] for the sake of the exercise.) 
+   but please do use [rewrite] for the sake of the exercise.)
 
     [] *)
 
@@ -230,14 +230,14 @@ Abort.
 Theorem plus_1_neq_0_firsttry' : forall n : nat,
   (n + 1 =? 0) = false.
 Proof.
-  
-  move=> n.
+
+  move => n.
 
   Fail by [].
 
 Abort.
 
-    
+
 (** The reason for this is that the definitions of both
     [beq_nat] and [+] begin by performing a [match] on their first
     argument.  But here, the first argument to [+] is the unknown
@@ -258,9 +258,9 @@ Abort.
 Theorem plus_1_neq_0 : forall n : nat,
   (n + 1 =? 0) = false.
 Proof.
-  intros n. destruct n as [| n']. 
-  - reflexivity. 
-  - reflexivity. 
+  intros n. destruct n as [| n'].
+  - reflexivity.
+  - reflexivity.
 Qed.
 
 
@@ -269,9 +269,9 @@ Qed.
 Theorem plus_1_neq_0' : forall n : nat,
   beq_nat (n + 1) 0 = false.
 Proof.
-  intros [| n']. 
-   - reflexivity. 
-   - reflexivity.   
+  intros [| n'].
+   - reflexivity.
+   - reflexivity.
 Qed.
 
 (** The [destruct] generates _two_ subgoals, which we must then
@@ -326,7 +326,7 @@ Qed.
 Theorem plus_1_neq_0'' : forall n : nat,
   beq_nat (n + 1) 0 = false.
 Proof.
-  intros [| n'];  reflexivity.    
+  intros [| n'];  reflexivity.
 Qed.
 
 (* ----------------------------------------------------------------- *)
@@ -378,13 +378,13 @@ Qed.
 
 Theorem andb_commutative_boring : forall b c, b && c = c && b.
   destruct b.
-  - destruct c. 
-     + reflexivity. 
-     + reflexivity. 
   - destruct c.
-     + reflexivity. 
      + reflexivity.
-Qed. 
+     + reflexivity.
+  - destruct c.
+     + reflexivity.
+     + reflexivity.
+Qed.
 
 (** Better... *)
 
@@ -417,7 +417,7 @@ Qed.
 (* ################################################################# *)
 (** * More Exercises *)
 
-(** **** Exercise: 2 stars, standard (identity_fn_applied_twice)  
+(** **** Exercise: 2 stars, standard (identity_fn_applied_twice)
 
     Use the tactics you have learned so far to prove the following
     theorem about boolean functions. *)
@@ -427,15 +427,36 @@ Theorem identity_fn_applied_twice :
   (forall (x : bool), f x = x) ->
   forall (b : bool), f (f b) = b.
 Proof.
-  (* FILL IN HERE *) Admitted.
-
-
+    by move => f H x; rewrite H. Qed.
 
 (** Now state and prove a theorem [negation_fn_applied_twice] similar
     to the previous one but where the second hypothesis says that the
     function [f] has the property that [f x = negb x].*)
 
-(* FILL IN HERE *)
+
+Theorem nagation_fn_applied_twice' :
+  forall (f : bool -> bool),
+    (forall (x: bool), f x = negb x) ->
+    forall (b : bool), f (f b) = b.
+Proof.
+  intros f h x.
+  rewrite -> h. rewrite -> h.
+  rewrite -> negb_involutive.
+  reflexivity.
+Qed.
+
+(* With ssreflect *)
+
+Theorem negation_fn_applied_twice :
+  forall (f : bool -> bool),
+    (forall (x : bool), f x = negb x) ->
+    forall (b : bool), f (f b) = b.
+Proof.
+    by move => f H x;
+                rewrite H;
+                rewrite H;
+                rewrite negb_involutive.
+Qed.
 
 (** [] *)
 
@@ -457,7 +478,7 @@ Abort.
 
 
 (** [ssreflect] also cannot handle examples such as this one using tactics we've learned so far: *)
-  
+
 Theorem plus_1_r_ssr_attempt : forall n, S n = n + 1.
 Proof.
   Fail by [].
@@ -472,7 +493,7 @@ Theorem minus_diag : forall n,
 Proof.
   Fail by [].
   Fail by case.
-Abort.  
+Abort.
 
 (** So we're gonna need a bigger boat. *)
 
@@ -530,33 +551,33 @@ Qed.
 
 Theorem plus_1_r : forall n, S n = n + 1.
 Proof.
-  elim=> [| n IHn] /=.
+  elim => [| n IHn] /=.
   - (* n = 0 *)    by [].
-  - (* n = S n' *) move=> /=. by rewrite IHn.
+  - (* n = S n' *) move => /=. by rewrite IHn.
 Qed.
 
 
 (** We see here how on-the-fly simplification is done in
-    [ssreflect] (using the switch [/=]). *) 
+    [ssreflect] (using the switch [/=]). *)
 
 
 Theorem minus_diag : forall n,
   minus n n = 0.
 Proof.
-  (* WORKED IN CLASS *) 
-  by elim. 
-Qed.  
+  (* WORKED IN CLASS *)
+  by elim.
+Qed.
 
 Theorem minus_diag_with_ltac : forall n,
   minus n n = 0.
-Proof.  
+Proof.
   intros n. induction n as [| n' IHn'].
   - (* n = 0 *)
     simpl. reflexivity.
   - (* n = S n' *)
     simpl. rewrite -> IHn'. reflexivity.  Qed.
 
-(** 
+(**
     The use of the [intros] tactic in these proofs is actually redundant.
     When applied to a goal that contains quantified variables,
     the [induction] tactic moves them into the context as needed. *)
@@ -571,10 +592,10 @@ Theorem mult_0_r : forall n:nat,
 Proof.
   (* WORKED IN CLASS *)
     by  elim.
-Qed.    
-(** 
+Qed.
+(**
 Standard Ltac:
-[   
+[
   intros n. induction n as [| n' IHn'].
   - (* n = 0 *)
     reflexivity.
@@ -625,7 +646,7 @@ Proof.
   - by rewrite -plus_n_O.
   - by rewrite -IHm' plus_n_Sm.
 Qed.
-(** 
+(**
 Standard Ltac:
 
   intros n m. induction m as [| m' IHm'].
@@ -640,7 +661,7 @@ Standard Ltac:
 
 
 
-(** **** Exercise: 2 stars, standard, optional (evenb_S)  
+(** **** Exercise: 2 stars, standard, optional (evenb_S)
 
     One inconveninent aspect of our definition of [evenb n] is that it
     may need to perform a recursive call on [n - 2]. This makes proofs
@@ -822,7 +843,7 @@ Example test_bin_incr5 :
         bin_to_nat (incr (incr (B Z))) = 2 + bin_to_nat (B Z).
   (* FILL IN HERE *) Admitted.
 
-Theorem incr_is_S: forall m:bin, bin_to_nat (incr m) = S (bin_to_nat m). 
+Theorem incr_is_S: forall m:bin, bin_to_nat (incr m) = S (bin_to_nat m).
   (* FILL IN HERE *) Admitted.
 
 (* Sun Jul 14 22:07:53 MSK 2019 *)

@@ -2,13 +2,13 @@
 
 (** A loose and enriched adaptation of _Software Foundations_ (Benjamin C. Pierce with numerous coauthors) for Tadeusz Litak for SemProg @FAU Erlangen-Nuremberg 2013--2019. Edition 2017 jointly with Christoph Rauch, edition 2013 jointly with Daniel Gorin. *)
 
-(** Other materials used occasionally in preparation: 
+(** Other materials used occasionally in preparation:
 - documentation of Coq  (obviously) and of [ssreflect]
-- books of Adam Chlipala (CPDT and FRAP), 
-- later for some more advanced topics also Pierce's "Types and Programming Languages" 
-- and possibly literature on separation logic (discussed if needed). 
+- books of Adam Chlipala (CPDT and FRAP),
+- later for some more advanced topics also Pierce's "Types and Programming Languages"
+- and possibly literature on separation logic (discussed if needed).
 
-But the material is going to be self-contained: no materials other than those provided on StudOn will be needed either for HA or for the final exam.  *) 
+But the material is going to be self-contained: no materials other than those provided on StudOn will be needed either for HA or for the final exam.  *)
 
 (* REMINDER:
 
@@ -75,15 +75,15 @@ But the material is going to be self-contained: no materials other than those pr
     we are defining a new set of data values -- a _type_. *)
 
 Inductive day : Type :=
-  | monday 
-  | tuesday 
-  | wednesday 
-  | thursday 
+  | monday
+  | tuesday
+  | wednesday
+  | thursday
   | friday
-  | saturday 
+  | saturday
   | sunday.
 
-(** A more verbose way of doing the same thing ... 
+(** A more verbose way of doing the same thing ...
 
 Inductive day' : Type :=
   | monday : day'
@@ -132,7 +132,7 @@ Definition next_weekday (d:day) : day :=
 
 (** Having defined a function, we should check that it works, at least on
     some examples.  There are actually three different ways to do this
-    in Coq:  
+    in Coq:
 
         - _execute/evaluate_ it inside Coq by, e.g., using [Compute]
         - _prove_ that it does what it is supposed to do (either on concrete examples or an arbitrary -- universally quantified -- input)
@@ -159,9 +159,9 @@ Eval cbn in (next_weekday (next_weekday saturday)).
 Eval lazy in (next_weekday (next_weekday saturday)).
 Eval cbv in (next_weekday (next_weekday saturday)).
 
-(** 
-- Those of you who have seen some FP before probably imagine what the differences between [cbn], [lazy] and [cbv] are. 
-- If not, no worries: this is something we may return to much later. You don't have to understand it right now. 
+(**
+- Those of you who have seen some FP before probably imagine what the differences between [cbn], [lazy] and [cbv] are.
+- If not, no worries: this is something we may return to much later. You don't have to understand it right now.
 - And in such trivial examples, differences do not really matter. *)
 
 (** For completeness, some information from Coq's reference manual:
@@ -181,15 +181,15 @@ Eval cbv in (next_weekday (next_weekday saturday)).
 Example test_next_weekday:
   (next_weekday (next_weekday saturday)) = tuesday.
 
-(** Such a declaration does two things: 
+(** Such a declaration does two things:
     - makes an assertion: _the second weekday after_ [saturday] _is_ [tuesday]
     - and it gives the assertion a name that can be used to refer to it later.   *)
 
 (** Notice what happened now in the goals window? This is Coq's way of asking us to finish the job. We have to prove the statement we made. *)
 
-(** 
- - The keyword [Example] could be also [Theorem], [Lemma], [Proposition], [Fact], [Remark] or [Corollary]. 
- - The choice is for our convenience, and doesn't matter from Coq's point of view. 
+(**
+ - The keyword [Example] could be also [Theorem], [Lemma], [Proposition], [Fact], [Remark] or [Corollary].
+ - The choice is for our convenience, and doesn't matter from Coq's point of view.
  - It would be a bit stupid though to use a more pompous word than [Example] for something so trivial. *)
 
 
@@ -228,6 +228,8 @@ Qed.
 
 (** Actually, [reflexivity] does such simplifications on its own: we only included this step for illustration purposes and can safely skip it. *)
 
+(* Set Printing All. *)
+
 Theorem test_next_weekday_final:
   (next_weekday (next_weekday (next_weekday saturday))) = wednesday.
 Proof. reflexivity.
@@ -252,7 +254,7 @@ Remark test_next_weekday_wrong:
 Proof.
 
   (** We are trying to prove something false, so let us just see that reflexivity fails. *)
-  
+
   Fail reflexivity.
 
   (** If you don't see the reply in the [goals] window, check the one for [response]... *)
@@ -264,10 +266,10 @@ Abort.
 (* ----------------------------------------------------------------- *)
 (** *** Tactics *)
 
-(** 
+(**
 - The things found between [Proof] and [Qed] are _tactics_.
 - They are neither parts of Coq's core FP language (Gallina), nor vernacular commands.
-- Rather, they gradually guide Coq through the construction of a _proof term_, which lives in Gallina in the same way ordinary programs or type inhabitants do. 
+- Rather, they gradually guide Coq through the construction of a _proof term_, which lives in Gallina in the same way ordinary programs or type inhabitants do.
 - Writing [Qed] is a signal for Coq to type check the term. And we can ourselves see this proof term whenever we want to (we almost never do, especially now it wouldn't be too informative). *)
 
 Print  test_next_weekday_final.
@@ -297,13 +299,19 @@ Fail Print test_next_weekday_wrong.
 (* ----------------------------------------------------------------- *)
 (** *** Beyond [Ltac]: [ssreflect] *)
 
-(** 
-- Coq's basic tactic language is called [Ltac]. 
-- There are ways to extend it. As already mentioned, in this lecture (unlike the SF book) we will often use [ssreflect], originating in  the proof of the Four Color theorem (Georges Gonthier, Microsoft Research Cambridge, and collaborators). 
-- Very suitable also for our purposes, even though we will only do very modest things. 
-- This is how you call it: *)
+(**
+- Coq's basic tactic language is called [Ltac].
 
-Require Import ssreflect ssrbool. 
+- There are ways to extend it. As already mentioned, in this
+  lecture (unlike the SF book) we will often use [ssreflect],
+  originating in the proof of the Four Color theorem (Georges
+  Gonthier, Microsoft Research Cambridge, and collaborators).
+
+- Very suitable also for our purposes, even though we will only
+- do very modest things. This is how you call it:
+*)
+
+Require Import ssreflect ssrbool.
 
 Theorem test_next_weekday_with_ss_reflect:
   (next_weekday (next_weekday saturday)) = tuesday.
@@ -319,27 +327,33 @@ exactly happens here. **)
 (* ----------------------------------------------------------------- *)
 (** *** Aside on program extraction *)
 
-(** 
+(**
 -   We mentioned we can ask Coq to _extract_, from our [Definition], a
     program in some other programming language (OCaml, Scheme, or Haskell) with a high-performance
-    compiler. 
+    compiler.
+
 -   This takes us from _proved-correct algorithms_ written in Gallina to
-    _efficient machine code_.  
+    _efficient machine code_.
+
 -   (Of course, we are trusting the
     correctness of the OCaml/Haskell/Scheme compiler, and of Coq's
     extraction facility itself, but this is still a big step forward
-    from the way most software is developed today.) 
+    from the way most software is developed today.)
+
 -   Indeed, this is
     one of the main uses for which Coq was developed.  We may come back
-    to this topic in later chapters. *)
+    to this topic in later chapters.
+*)
 
 (* ================================================================= *)
 (** ** Booleans *)
 
 (** In a similar way, we could define the standard type [bool] of
-    booleans, with members [true] and [false]. But the standard library has already done this for us. *)
+booleans, with members [true] and [false]. But the standard
+library has already done this for us. *)
 
-(** We could redefine them and override these definitions, but this would cause unnecessary problems later on. *)
+(** We could redefine them and override these definitions, but
+this would cause unnecessary problems later on. *)
 
 Print bool.
 
@@ -380,9 +394,9 @@ Print negb.
 (* ==> negb = fun b : bool => if b then false else true
      : bool -> bool *)
 
-(** 
- - Note [if ... then... else] instead of the more general [match... with...]. 
- - Can be used with any datatypes with _exactly two constructors_. 
+(**
+ - Note [if ... then... else] instead of the more general [match... with...].
+ - Can be used with any datatypes with _exactly two constructors_.
  - Note also the lambda abstraction keyword [fun]. *)
 
 
@@ -405,7 +419,7 @@ Print negb.
 Module BoolPlayground.
 
 Inductive bool : Type :=
-  | true 
+  | true
   | false.
 
 Print bool.
@@ -445,7 +459,7 @@ Print andb.
 (** *** Unit tests of boolean functions. *)
 
 Example test_orb1:  (orb true  false) = true.
-Proof. simpl. reflexivity.  Qed. 
+Proof. simpl. reflexivity.  Qed.
 
 (** Of course, we don't need [simpl]. *)
 
@@ -495,7 +509,7 @@ Example test_orb5:  false || false || true = true. by []. Qed.
 
 
 
-(** **** Exercise: 1 star, standard (nandb)  
+(** **** Exercise: 1 star, standard (nandb)
 
     Remove "[Admitted.]" and complete the definition of the following
     function; then make sure that the [Example] assertions below can
@@ -506,36 +520,39 @@ Example test_orb5:  false || false || true = true. by []. Qed.
 
 
 
-Definition nandb (b1:bool) (b2:bool) : bool
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+Definition nandb (b1:bool) (b2:bool) : bool :=
+  if b1 is false then true else negb b2.
 
 Example test_nandb1:               (nandb true false) = true.
-(* FILL IN HERE *) Admitted.
+Proof. by []. Qed.
 Example test_nandb2:               (nandb false false) = true.
-(* FILL IN HERE *) Admitted.
+Proof. by []. Qed.
 Example test_nandb3:               (nandb false true) = true.
-(* FILL IN HERE *) Admitted.
+Proof. by []. Qed.
 Example test_nandb4:               (nandb true true) = false.
-(* FILL IN HERE *) Admitted.
+Proof. by []. Qed.
 (** [] *)
 
-(** **** Exercise: 1 star, standard (andb3)  
+(** **** Exercise: 1 star, standard (andb3)
 
     Do the same for the [andb3] function below. This function should
     return [true] when all of its inputs are [true], and [false]
     otherwise. *)
 
-Definition andb3 (b1:bool) (b2:bool) (b3:bool) : bool
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+Definition andb3 (b1:bool) (b2:bool) (b3:bool) : bool :=
+  match b1 with
+    | false => false
+    | true => b2 && b3
+  end.
 
 Example test_andb31:                 (andb3 true true true) = true.
-(* FILL IN HERE *) Admitted.
+Proof. by []. Qed.
 Example test_andb32:                 (andb3 false true true) = false.
-(* FILL IN HERE *) Admitted.
+Proof. by []. Qed.
 Example test_andb33:                 (andb3 true false true) = false.
-(* FILL IN HERE *) Admitted.
+Proof. by []. Qed.
 Example test_andb34:                 (andb3 true true false) = false.
-(* FILL IN HERE *) Admitted.
+Proof. by []. Qed.
 (** [] *)
 
 
@@ -561,7 +578,7 @@ Check BoolPlayground.nandb.
 (* ==> BoolPlayground.nandb
      : BoolPlayground.bool -> BoolPlayground.bool -> BoolPlayground.bool *)
 
-(** You see this definition operates on the playground booleans, not on the standard ones. *) 
+(** You see this definition operates on the playground booleans, not on the standard ones. *)
 
 (** On the other hand, the obvious functions are available and look just the way we defined them before. *)
 
@@ -576,9 +593,9 @@ Print orb.
      : bool -> bool -> bool] *)
 
 (** In general, if you want to get Coq to check what has been defined for a given datatype, check [SearchAbout], like  [SearchAbout bool].
-    In Proof General, also achieved by ^C ^A ^A. 
+    In Proof General, also achieved by ^C ^A ^A.
 
-- IMPORTANT: please do not leave [Search About ...] in the proof scripts you are submitting for HA! 
+- IMPORTANT: please do not leave [Search About ...] in the proof scripts you are submitting for HA!
 - This blows up entire output, as you can easily check.
 - In CoqIDE, there is a separate window to play such games. *)
 
@@ -823,7 +840,7 @@ Example test_oddb2:    oddb 4 = false. by []. Qed.
 (* ----------------------------------------------------------------- *)
 (** *** Multi-argument recursive functions. *)
 
-(** Addition and multiplication provide  examples of multi-argument recursive functions. 
+(** Addition and multiplication provide  examples of multi-argument recursive functions.
 
 It is instructive to develop them on our own. As you can already guess, they will duplicate those in the standard library, so we need to wrap things up in a [Module] again. *)
 
@@ -922,18 +939,24 @@ Fixpoint beq_nat' (n m : nat) : bool :=
   else
     if m is S m' then false else true.
 
-(** With [ssreflect] as in [mathcomp],  one used a different treatment of [nat] ... *)
+(** With [ssreflect] as in [mathcomp], one used a different
+treatment of [nat] ... *)
 
-(** In fact,  [ssreflect] relies very much on boolean functions. We will learn more about this in the weeks to follow, but already in this lecture this is going to be a constant theme. *)
+(** In fact, [ssreflect] relies very much on boolean functions.
+We will learn more about this in the weeks to follow, but
+already in this lecture this is going to be a constant theme. *)
 
-(** For the time being, as a trivial exercise, remove [Admitted] and fill in the proof of this unit test. *)
+(** For the time being, as a trivial exercise, remove [Admitted]
+and fill in the proof of this unit test. *)
 
 Example beqnatid_unit : beq_nat 1 1 = beq_nat' 1 1.
 Proof.
   (* WORKED IN CLASS *)
     by []. Qed.
 
-(** Could we show this in full generality? Yes, but this requires induction, and we will only start with induction next week (or next lecture). *)              
+(** Could we show this in full generality? Yes, but this
+requires induction, and we will only start with induction next
+week (or next lecture). *)
 
 
 
@@ -954,9 +977,27 @@ Fixpoint leb (n m : nat) : bool :=
 
 (** **** Exercise: 1 star, standard (leb')  *)
 
-(** Rewrite this definition in a more compact way, possibly using [ssreflect] syntax. *)
+(** Rewrite this definition in a more compact way, possibly
+using [ssreflect] syntax. *)
 
-Fixpoint leb' (n m : nat) : bool (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+Fixpoint leb'' (n m : nat) : bool :=
+  match n with
+  | O => true
+  | S n' =>
+      match m with
+      | O => false
+      | S m' => leb n' m'
+      end
+  end.
+
+Fixpoint leb' (n m : nat) : bool :=
+  if n is (S n') then
+    if m is (S m') then
+      leb' n' m'
+    else
+      false
+  else
+    true.
 
 Example test_leb1:             (leb 2 4) = true.
 Proof. (* WORKED IN CLASS *) by []. Qed. Example test_leb2:             (leb 4 2) = (beq_nat 4 2).
@@ -987,7 +1028,7 @@ Each notation symbol is also associated with a _notation scope_. Occasionally, i
 Example test_leb3':             (4 <=? 2) = false.
 Proof. simpl. reflexivity.  Qed.
 
-(** **** Exercise: 1 star, standard (ltb)  
+(** **** Exercise: 1 star, standard (ltb)
 
     The [ltb] function tests natural numbers for [l]ess-[t]han,
     yielding a [b]oolean.  Instead of making up a new [Fixpoint] for
@@ -995,17 +1036,16 @@ Proof. simpl. reflexivity.  Qed.
     function.  (It can be done with just one previously defined
     function, but you can use two if you need to.) *)
 
-Definition ltb (n m : nat) : bool
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+Definition ltb (n m : nat) : bool := ((n <=? m) && (negb (n =? m))).
 
 Notation "x <? y" := (ltb x y) (at level 70) : nat_scope.
 
 Example test_ltb1:             (ltb 2 2) = false.
-(* FILL IN HERE *) Admitted.
+Proof. by []. Qed.
 Example test_ltb2:             (ltb 2 4) = true.
-(* FILL IN HERE *) Admitted.
+Proof. by []. Qed.
 Example test_ltb3:             (ltb 4 2) = false.
-(* FILL IN HERE *) Admitted.
+Proof. by []. Qed.
 (** [] *)
 
 (* Sun Jul 14 22:07:53 MSK 2019 *)
