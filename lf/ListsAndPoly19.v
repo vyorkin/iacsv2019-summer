@@ -107,7 +107,7 @@ From LF19 Require Export Basics19.
     list or else a pair of a number and another list." *)
 
 Inductive natlist : Type :=
-  | nil_nat  : natlist
+  | nil_nat : natlist
   | con_nat : nat -> natlist -> natlist.
 
 (** Of course, this is something you have seen in functional programming and all of you expect to see a polymorphic definition. This is how it looks like in the standard library: *)
@@ -129,7 +129,7 @@ For cons: Argument A is implicit and maximally inserted
 *)
 
 Check nil.
-(** ===> 
+(** ===>
 
 nil
      : list ?A
@@ -162,7 +162,7 @@ Check @nil.
 Require Export Coq.Lists.List.
 Export ListNotations.
 
-Check (1::2::nil).
+Check (1 :: 2 :: nil).
 
 (** ===>
 
@@ -194,7 +194,7 @@ Print repeat.
 
 (** ===>
 
-repeat = 
+repeat =
 fun A : Type =>
 fix repeat (x : A) (n : nat) {struct n} : list A := match n with
                                                     | 0 => []
@@ -214,9 +214,9 @@ Argument scopes are [type_scope _ nat_scope]
 
 Print app.
 
-(** ===> 
+(** ===>
 
-app = 
+app =
 fun A : Type =>
 fix app (l m : list A) {struct l} : list A := match l with
                                               | [] => m
@@ -230,7 +230,7 @@ Locate "_ ++ _".
 (** ===>
 
 Notation
-"x ++ y" := app x y : list_scope (default interpretation) 
+"x ++ y" := app x y : list_scope (default interpretation)
 *)
 
 Compute  [1;2;3] ++ [4;5].
@@ -243,7 +243,7 @@ Print hd.
 
 (** ===>
 
-hd = 
+hd =
 fun (A : Type) (default : A) (l : list A) => match l with
                                              | [] => default
                                              | x :: _ => x
@@ -253,13 +253,13 @@ fun (A : Type) (default : A) (l : list A) => match l with
 
 (** As you can guess, not a very satisfying solution for the empty list. *)
 
-(** Here is tail, for completness *) 
+(** Here is tail, for completness *)
 
 Print tl.
 
 (** ===>
 
-tl = 
+tl =
 fun (A : Type) (l : list A) => match l with
                                | [] => []
                                | _ :: m => m
@@ -296,11 +296,11 @@ Proof. (* FILL IN HERE *) Admitted.
 
 Theorem hd_is_hd1 : forall (A : Type) (l : list A) (default : A), option_hd l = None -> hd default l = default.
 Proof.
-(* FILL IN HERE *) Admitted.  
+(* FILL IN HERE *) Admitted.
 
 Theorem hd_is_hd2 : forall (A : Type) (l : list A) (default : A) (a: A), option_hd l = Some a -> hd default l = a.
 Proof.
-(* FILL IN HERE *) Admitted. 
+(* FILL IN HERE *) Admitted.
 
 (* ----------------------------------------------------------------- *)
 (** *** Length  *)
@@ -309,7 +309,7 @@ Print length.
 
 (**  ===>
 
-length = 
+length =
 fun A : Type => fix length (l : list A) : nat := match l with
                                                  | [] => 0
                                                  | _ :: l' => S (length l')
@@ -324,7 +324,7 @@ Print rev.
 
 (**  ===>
 
-rev = 
+rev =
 fun A : Type => fix rev (l : list A) : list A := match l with
                                                  | [] => []
                                                  | x :: l' => rev l' ++ [x]
@@ -345,14 +345,14 @@ Require Import Nat.
 (** This gives us a function [odd] ... *)
 
 
-Fixpoint oddmembers (l:list nat) : (list nat) 
+Fixpoint oddmembers (l:list nat) : (list nat)
   (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
 
 Example test_oddmembers:
   oddmembers [0;1;0;2;3;0;0] = [1;3].
 (* FILL IN HERE *) Admitted.
 
-Definition countoddmembers (l:list nat) : nat 
+Definition countoddmembers (l:list nat) : nat
   (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
 
 Example test_countoddmembers1:
@@ -388,7 +388,7 @@ Print filter.
 
 (** ====>
 
-filter = 
+filter =
 fun (A : Type) (f : A -> bool) =>
 fix filter (l : list A) : list A :=
   match l with
@@ -427,7 +427,7 @@ Print map.
 
 (** ===>
 
-map = 
+map =
 fun (A B : Type) (f : A -> B) =>
 fix map (l : list A) : list B := match l with
                                  | [] => []
@@ -443,7 +443,7 @@ Print flat_map.
 
 (** ===>
 
-flat_map = 
+flat_map =
 fun (A B : Type) (f : A -> list B) =>
 fix flat_map (l : list A) : list B := match l with
                                       | [] => []
@@ -469,7 +469,7 @@ Print option_map.
 
 (** ===>
 
-option_map = 
+option_map =
 fun (A B : Type) (f : A -> B) (o : option A) => match o with
                                                 | Some a => Some (f a)
                                                 | None => None
@@ -555,7 +555,7 @@ Proof.
   move => ?.
   elim => [|hl tl IHl] /= //.
     by rewrite -IHl.
-Qed.    
+Qed.
 
 
 (** We can do the same thing with [map], i.e., define it using [fold]. Can you see how?  *)
@@ -582,10 +582,10 @@ Theorem rev_length_firsttry : forall X (l : list X),
 Proof.
   intros X l. induction l as [| n l' IHl'].
   - (** l = [] *)
-    
+
     reflexivity. (* So far, so good, obviously... *)
 
-    
+
   - (** l = n :: l' *)
 
     (** This is the tricky case.  Let's begin as usual

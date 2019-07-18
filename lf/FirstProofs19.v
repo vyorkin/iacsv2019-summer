@@ -178,8 +178,8 @@ a better background later. *)
 Theorem plus_id_exercise n m o :
   n = m -> m = o -> n + m = m + o.
 Proof.
-  (* by move => -> -> . Qed. *)
-  by move => EQmn EQno; rewrite EQmn EQno. Qed.
+  by move=> -> ->. Qed.
+  (* by move => EQmn EQno; rewrite EQmn EQno. Qed. *)
 
 (** We can also use the [rewrite] tactic with a previously proved
     theorem instead of a hypothesis from the context. If the statement
@@ -258,9 +258,9 @@ Abort.
 Theorem plus_1_neq_0 : forall n : nat,
   (n + 1 =? 0) = false.
 Proof.
-  intros n. destruct n as [| n'].
+  intros n. Show Proof. destruct n as [| n']. Show Proof.
   - reflexivity.
-  - reflexivity.
+  - Show Proof. reflexivity.
 Qed.
 
 
@@ -397,6 +397,14 @@ Qed.
 
 Theorem andb_commutative' : forall b c, b && c = c && b.
   by do 2! case.
+Qed.
+
+Theorem andb_commutative'' : forall b c, b && c = c && b.
+  by case; case.
+Qed.
+
+Theorem andb_commutative''' b c: b && c = c && b.
+  move: b c; by do 2! case.
 Qed.
 
 (** Similarly... *)
@@ -549,11 +557,9 @@ Qed.
    Instead, the more basic induction tactic [elim] is preferred. *)
 
 
-Theorem plus_1_r : forall n, S n = n + 1.
+Theorem plus_1_r n : S n = n + 1.
 Proof.
-  elim => [| n IHn] /=.
-  - (* n = 0 *)    by [].
-  - (* n = S n' *) move => /=. by rewrite IHn.
+  by elim: n => [| n' /= ->].
 Qed.
 
 
@@ -564,9 +570,12 @@ Qed.
 Theorem minus_diag : forall n,
   minus n n = 0.
 Proof.
-  (* WORKED IN CLASS *)
-  by elim.
+    by elim.
 Qed.
+
+  (* elim => [//| n] /=. *)
+  (* - by []. *)
+  (* Qed. *)
 
 Theorem minus_diag_with_ltac : forall n,
   minus n n = 0.
@@ -591,7 +600,7 @@ Theorem mult_0_r : forall n:nat,
   n * 0 = 0.
 Proof.
   (* WORKED IN CLASS *)
-    by  elim.
+    by elim.
 Qed.
 (**
 Standard Ltac:
@@ -604,7 +613,8 @@ Standard Ltac:
 ]
 *)
 
-(** Now it's time for associativity. It's slightly more complicated, but really only slightly so. *)
+(** Now it's time for associativity. It's slightly more
+complicated, but really only slightly so. *)
 
 Theorem plus_assoc : forall n m p : nat,
   n + (m + p) = (n + m) + p.
@@ -615,6 +625,7 @@ Proof.
   - by [].
   - by rewrite Hn'.
 Qed.
+
 (** Standard Ltac:
 
     intros n m p. induction n as [| n' IHn'].
@@ -819,31 +830,47 @@ Fixpoint bin_to_nat (m:bin) : nat :=
   | B m' => 1 + 2 * bin_to_nat m'
   end.
 
+Compute (bin_to_nat Z).
+Compute (bin_to_nat (A Z)).
+Compute (bin_to_nat (B Z)).
+Compute (bin_to_nat (A (B Z))).
+Compute (bin_to_nat (B (A (B Z)))).
+Compute (bin_to_nat (A (A (B Z)))).
+Compute (bin_to_nat (B (A (A (B Z))))).
+Compute (bin_to_nat (A (B (A (B Z))))).
+
 (** (a) Complete the definition below of an increment function [incr]
         for binary numbers. *)
 
-Fixpoint incr (m:bin) : bin
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
-
+Fixpoint incr (m:bin) : bin :=
+  match m with
+    | Z   => B Z
+    | A x => B x
+    | B x => A (incr x)
+  end.
 
 Example test_bin_incr1 : (incr (B Z)) = A (B Z).
-  (* FILL IN HERE *) Admitted.
-
+by []. Qed.
 Example test_bin_incr2 : (incr (A (B Z))) = B (B Z).
-  (* FILL IN HERE *) Admitted.
-
+by []. Qed.
 Example test_bin_incr3 : bin_to_nat (A (B Z)) = 2.
-  (* FILL IN HERE *) Admitted.
-
+by []. Qed.
 Example test_bin_incr4 :
-        bin_to_nat (incr (B Z)) = 1 + bin_to_nat (B Z).
-  (* FILL IN HERE *) Admitted.
-
+  bin_to_nat (incr (B Z)) = 1 + bin_to_nat (B Z).
+by []. Qed.
 Example test_bin_incr5 :
-        bin_to_nat (incr (incr (B Z))) = 2 + bin_to_nat (B Z).
-  (* FILL IN HERE *) Admitted.
+  bin_to_nat (incr (incr (B Z))) = 2 + bin_to_nat (B Z).
+by []. Qed.
 
-Theorem incr_is_S: forall m:bin, bin_to_nat (incr m) = S (bin_to_nat m).
-  (* FILL IN HERE *) Admitted.
+
+Theorem incr_is_S m: bin_to_nat (incr m) = S (bin_to_nat m).
+Proof.
+  elim:m => [//| IHn] /=.
+  - by [].
+  - move => n ->. by rewrite plus_n_Sm.
+Qed.
+
+Print incr_is_S.
+Print erefl.
 
 (* Sun Jul 14 22:07:53 MSK 2019 *)

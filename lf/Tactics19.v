@@ -81,10 +81,10 @@ Theorem silly2' : forall (n m o p : nat),
      (forall (q r : nat), q = r -> [q;o] = [r;p]) ->
      [n;o] = [m;p].
 Proof.
-  
+
 
   (** ... see these confusing names below btw? Before we get here with CoqIDE/Proof General, do you see what they refer to? *)
-  
+
   intros. apply H0. apply H. Qed.
 
 
@@ -115,6 +115,7 @@ Proof.
     will not work if the left and right sides of the equality are
     swapped. *)
 
+(* Set Printing All. *)
 Theorem silly3_firsttry : forall (n : nat),
      true = (n =? 5)  ->
      (S (S n) =? 7) = true.
@@ -131,7 +132,7 @@ Proof.
 
   symmetry. apply: H. Qed.
 
-(** **** Exercise: 3 stars, standard (rev_exercise1)  
+(** **** Exercise: 3 stars, standard (rev_exercise1)
 
     (_Hint_: You can use [apply] with previously defined lemmas, not
     just hypotheses in the context.  Remember that [Search] is
@@ -169,7 +170,7 @@ Proof.
   intros a b c d e f eq1 eq2.
 
   Fail apply trans_eq.
-  
+
 
 (** If we simply tell Coq [apply trans_eq] at this point, it can
     tell (by matching the goal against the conclusion of the lemma)
@@ -178,6 +179,7 @@ Proof.
     an instantiation for [m]: we have to supply one explicitly by
     adding [with (m:=[c,d])] to the invocation of [apply]. *)
 
+  (* eapply trans_eq. *)
   apply trans_eq with (y:=[c;d]).
   apply eq1. apply eq2.   Qed.
 
@@ -201,7 +203,7 @@ Proof.
   apply: eq1.
 
   (* ... aaaand we're done *)
-  
+
     by apply: eq2.   Qed.
 
 (** In fact, we can make it even more compact: *)
@@ -278,15 +280,15 @@ Proof.
 
   injection H.
 
-  (* At this state, we're essentially done. 
+  (* At this state, we're essentially done.
    But for the sake of hygiene, let us remove used hypothesis ... *)
-  
+
   clear H.
 
   (* ... and say goodbye. *)
 
     by [].
-    
+
 Qed.
 
 (** Here's a more interesting example that shows how multiple
@@ -365,7 +367,7 @@ Proof. by []. Qed.
       considered at all. In this case, [by []] marks the current goal
       as completed. *)
 
-(** [Ltac] has another powerful tactic incorporating these principles. It is called [inversion]. It goes completely against the philosophy you've been seeing in [ssreflect], it's quite messy and can moreover slow down significantly larger proofs. We will avoid it... when we can. But sometimes this big hammer comes really handy. *) 
+(** [Ltac] has another powerful tactic incorporating these principles. It is called [inversion]. It goes completely against the philosophy you've been seeing in [ssreflect], it's quite messy and can moreover slow down significantly larger proofs. We will avoid it... when we can. But sometimes this big hammer comes really handy. *)
 
 (** The injectivity of constructors allows us to reason that
     [forall (n m : nat), S n = S m -> n = m].  The converse of this
@@ -403,13 +405,13 @@ Theorem S_inj' : forall (n m : nat) (b : bool),
 Proof.
   intros. simpl in H. apply H. Qed.
 
-(**  
+(**
   - The ordinary [apply] tactic is a form of "backward
-    reasoning" 
+    reasoning"
   - it says "We're trying to prove [X] and we know [Y->X],
-    so if we can prove [Y] we'll be done." 
+    so if we can prove [Y] we'll be done."
   - We can apply hypotheses to
-    other hypotheses to obtain a form of "forward reasoning" 
+    other hypotheses to obtain a form of "forward reasoning"
   - "We know
     [Y] and we know [Y->X], so we can deduce [X]." *)
 
@@ -664,7 +666,7 @@ Proof.
   (* Now [m] and [n] are back in the goal and we can do induction on
      [m] and get a sufficiently general IH. *)
   elim=> [| m' IH].
-  - (* m = O *) by case. 
+  - (* m = O *) by case.
   - (* m = S m' *) case.
     + (* n = O *) by [].
     + (* n = S n' *) move=> n' eq. apply: f_equal.
@@ -757,7 +759,7 @@ Proof.
     it is commutative and associative, and from these facts it is not
     hard to finish the proof. *)
 
-  rewrite -!mult_assoc. (* This is from [Nat] library ... *) 
+  rewrite -!mult_assoc. (* This is from [Nat] library ... *)
   rewrite [m*(n*m)]mult_comm.
   by rewrite !mult_assoc.
 Qed.
@@ -797,16 +799,16 @@ Proof.
   Fail by []. (* Does nothing! *)
 Abort.
 
-(** 
- -  Why [by] doesn't make progress here? 
+(**
+ -  Why [by] doesn't make progress here?
  -  After tentatively unfolding [bar m], it is left with a match
-    whose scrutinee, [m], is a variable... 
+    whose scrutinee, [m], is a variable...
  -  so the [match] cannot be
-    simplified further. 
+    simplified further.
  -  (It is not smart enough to notice that the two
-    branches of the [match] are identical.) 
+    branches of the [match] are identical.)
  -  So it gives up on
-    unfolding [bar m] and leaves it alone. 
+    unfolding [bar m] and leaves it alone.
  -  Similarly, tentatively
     unfolding [bar (m+1)] leaves a [match] whose scrutinee is a
     function application (that, itself, cannot be simplified, even
@@ -884,7 +886,7 @@ Proof.
 
 (** However, [destruct]ing/[case]ing compound expressions requires a bit of care, as
     such [case]s can sometimes provide not enough new information we
-    need to complete a proof. 
+    need to complete a proof.
 
     For example, suppose we define a function [sillyfun1] like
     this: *)
@@ -1059,7 +1061,7 @@ Proof.
   (* FILL IN HERE *) Admitted.
 (** [] *)
 
-(** **** Exercise: 3 stars, advanced (filter_exercise)  
+(** **** Exercise: 3 stars, advanced (filter_exercise)
 
     This one is a bit challenging.  Pay attention to the form of your
     induction hypothesis. *)

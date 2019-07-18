@@ -22,26 +22,30 @@ EmptySmall == /\small' = 0
 EmptyBig == /\big' = 0
             /\small' = small
 
-SmallToBig == \/ /\ big + small <= 5
-                 /\ big'   = big + small
-                 /\ small' = 0
-              \/ /\ big + small > 5
-                 /\ big'   = 5
-                 /\ small' = small - (5 - big)
+SmallToBigA == /\ big + small <= 5
+               /\ big'   = big + small
+               /\ small' = 0
 
-BigToSmall == \/ /\ big + small <= 3
-                 /\ small' = big + small
-                 /\ big'   = 5 - (big + small)
-              \/ /\ big + small > 3
-                 /\ small' = 3
-                 /\ big'   = big + small - 3
+SmallToBigB == /\ big + small > 5
+               /\ big'   = 5
+               /\ small' = small - (5 - big)
+
+BigToSmallA == /\ big + small <= 3
+               /\ small' = big + small
+               /\ big'   = 5 - (big + small)
+
+BigToSmallB == /\ big + small > 3
+               /\ small' = 3
+               /\ big'   = big + small - 3
 
 Next == \/ FillSmall
         \/ FillBig
         \/ EmptySmall
         \/ EmptyBig
-        \/ SmallToBig
-        \/ BigToSmall
+        \/ SmallToBigA
+        \/ SmallToBigB
+        \/ BigToSmallA
+        \/ BigToSmallB
 
 Mew == big /=4
 
