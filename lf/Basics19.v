@@ -151,7 +151,8 @@ Compute (next_weekday friday).
 Compute (next_weekday (next_weekday saturday)).
 (* ==> tuesday : day *)
 
-(** This is not the only way to run our functions in the Coq _vernacular_. Here are some other options. *)
+(** This is not the only way to run our functions in the Coq
+_vernacular_. Here are some other options. *)
 
 Eval simpl in (next_weekday (next_weekday saturday)).
 
@@ -206,7 +207,9 @@ Fact test_next_weekday_alt:
 Proof. cbn. reflexivity.
 Qed.
 
-(** Note that, as said above, we can use a different keyword ([Lemma] here) and we can prove the same statement, but cannot use the same name for it as before: *)
+(** Note that, as said above, we can use a different keyword
+([Lemma] here) and we can prove the same statement, but cannot
+use the same name for it as before: *)
 
 Fail Fact test_next_weekday:
   (next_weekday (next_weekday saturday)) = tuesday.
@@ -268,23 +271,35 @@ Abort.
 
 (**
 - The things found between [Proof] and [Qed] are _tactics_.
-- They are neither parts of Coq's core FP language (Gallina), nor vernacular commands.
-- Rather, they gradually guide Coq through the construction of a _proof term_, which lives in Gallina in the same way ordinary programs or type inhabitants do.
-- Writing [Qed] is a signal for Coq to type check the term. And we can ourselves see this proof term whenever we want to (we almost never do, especially now it wouldn't be too informative). *)
+
+- They are neither parts of Coq's core FP language (Gallina),
+  nor vernacular commands.
+
+- Rather, they gradually guide Coq through the construction of a
+  _proof term_, which lives in Gallina in the same way ordinary
+  programs or type inhabitants do.
+
+- Writing [Qed] is a signal for Coq to type check the term. And
+  we can ourselves see this proof term whenever we want to (we
+  almost never do, especially now it wouldn't be too
+  informative). *)
 
 Print  test_next_weekday_final.
 
 (* ==> test_next_weekday_alt = eq_refl
       : next_weekday (next_weekday saturday) = tuesday *)
 
-(** It doesn't matter for now what this [eq_refl] means. But note it seems to be the sole content of proofs of the same statement constructed using a different tactic: *)
+(** It doesn't matter for now what this [eq_refl] means. But
+note it seems to be the sole content of proofs of the same
+statement constructed using a different tactic: *)
 
 Print test_next_weekday_alt.
 
 (* ==> test_next_weekday_alt = eq_refl
      : next_weekday (next_weekday saturday) = tuesday *)
 
-(** Of course, you can imagine things will not be easy with more complicated theorems and proofs. *)
+(** Of course, you can imagine things will not be easy with more
+complicated theorems and proofs. *)
 
 (** Do we also have a proof for the false theorem we tried? *)
 
@@ -320,9 +335,9 @@ Theorem test_next_weekday_with_ss_reflect:
 
 Proof. by []. Qed.
 
-(** The tactic [by] is built from several other tactics and actually does far
-more than just [simpl] and [reflexivity]; we will explain in due course what
-exactly happens here. **)
+(** The tactic [by] is built from several other tactics and
+actually does far more than just [simpl] and [reflexivity]; we
+will explain in due course what exactly happens here. **)
 
 (* ----------------------------------------------------------------- *)
 (** *** Aside on program extraction *)
@@ -358,7 +373,6 @@ this would cause unnecessary problems later on. *)
 Print bool.
 
 (* ==> [Inductive bool : Set :=  true : bool | false : bool] *)
-
 (**  "[Set] _instead of the more general [Type] declares that we are defining a
 datatype that should be thought of as a constituent of programs. There are other
 options for defining datatypes in the universe of proofs or in an infinite hierarchy of universes,
@@ -369,13 +383,16 @@ encompassing both programs and proofs, that is useful in higher-order constructi
 (* ----------------------------------------------------------------- *)
 (** *** First encounter with  function types *)
 
-(** The standard library also defines basic functions on booleans for us. Let us start with negation [negb].  *)
+(** The standard library also defines basic functions on
+booleans for us. Let us start with negation [negb]. *)
 
 (** Functions like [negb] itself are also data values, just like
     [true] and [false].  Their types are called _function types_, and of course
     they are written with arrows. *)
 
-(** If we just want to check the type of an existing function (or any data value) rather than its definition, we can use [Check]: *)
+(** If we just want to check the type of an existing function
+(or any data value) rather than its definition, we can use
+[Check]: *)
 
 Check negb.
 (* ===> negb : bool -> bool *)
@@ -387,7 +404,8 @@ Check negb.
 (* ----------------------------------------------------------------- *)
 (** *** The definition of boolean negation *)
 
-(** But, of course, we are interested in the actual definition of [negb], not just its type, so we need to use [Print]. *)
+(** But, of course, we are interested in the actual definition
+of [negb], not just its type, so we need to use [Print]. *)
 
 Print negb.
 
@@ -400,7 +418,9 @@ Print negb.
  - Note also the lambda abstraction keyword [fun]. *)
 
 
-(** Actually, let us try to achieve the same effect. In order not to override the standard library definitions, let's use Coq's _module system_. *)
+(** Actually, let us try to achieve the same effect. In order
+not to override the standard library definitions, let's use
+Coq's _module system_. *)
 
 (* ================================================================= *)
 (** ** Modules *)
@@ -430,7 +450,7 @@ Print bool.
 
 Definition negb (b:bool) : bool :=
   match b with
-  | true => false
+  | true  => false
   | false => true
   end.
 
@@ -447,7 +467,10 @@ Definition andb (b1:bool) (b2:bool) : bool :=
   | false => false
   end.
 
-(** In plain Coq/Gallina/Ltac, we could achieve the same effect with [if... then... else]. But [ssreflect] messes things up a little when it comes to non-standard bools. One needs to be slightly more verbose: *)
+(** In plain Coq/Gallina/Ltac, we could achieve the same effect
+with [if... then... else]. But [ssreflect] messes things up a
+little when it comes to non-standard bools. One needs to be
+slightly more verbose: *)
 
 Definition orb (b1:bool) (b2:bool) : bool :=
   if b1 is true then true else b2.
@@ -482,11 +505,15 @@ Example test_orb4:  (orb true  true)  = true. by []. Qed.
 
 Infix "&&" := andb.
 
-(** [Infix] is just a shorthand for a special variant of [Notation]. More about the more general command later, but here's the first example: *)
+(** [Infix] is just a shorthand for a special variant of
+[Notation]. More about the more general command later, but
+here's the first example: *)
 
 Notation "x || y" := (orb x y).
 
-(** It seems that [Notation] is just a more complicated way of achieving the same. But we can also set associativity, scope, precedence/binding/priority level etc.*)
+(** It seems that [Notation] is just a more complicated way of
+achieving the same. But we can also set associativity, scope,
+precedence/binding/priority level etc.*)
 
 Example test_orb5:  false || false || true = true. by []. Qed.
 
@@ -542,7 +569,7 @@ Proof. by []. Qed.
 Definition andb3 (b1:bool) (b2:bool) (b3:bool) : bool :=
   match b1 with
     | false => false
-    | true => b2 && b3
+    | true  => b2 && b3
   end.
 
 Example test_andb31:                 (andb3 true true true) = true.
@@ -653,13 +680,13 @@ Definition isred (c : color) : bool :=
 (* ================================================================= *)
 (** ** Tuples *)
 
-(** A single constructor with multiple parameters can be used
-    to create a tuple type. As an example, consider representing
-    the four bits in a nybble (half a byte). We first define
-    a datatype [bit] that resembles [bool] (using the
-    constructors [B0] and [B1] for the two possible bit values),
-    and then define the datatype [nybble], which is essentially
-    a tuple of four bits. *)
+(** A single constructor with multiple parameters can be used to
+    create a tuple type. As an example, consider representing
+    the four bits in a nybble (half a byte). We first define a
+    datatype [bit] that resembles [bool] (using the constructors
+    [B0] and [B1] for the two possible bit values), and then
+    define the datatype [nybble], which is essentially a tuple
+    of four bits. *)
 
 Inductive bit : Type :=
   | B0
@@ -686,9 +713,14 @@ Compute (all_zero (bits B1 B0 B1 B0)).
 Compute (all_zero (bits B0 B0 B0 B0)).
 (* ===> true : bool *)
 
-(** Types/sets with finitely many elements, like [bool] are of course important and useful. But for most purposes, we need at least natural numbers. How can we define these in Coq? *)
+(** Types/sets with finitely many elements, like [bool] are of
+course important and useful. But for most purposes, we need at
+least natural numbers. How can we define these in Coq? *)
 
-(** Of course, this is where the [Inductive] adjective becomes meaningful. And of course, they are already defined in the standard library. But let us again try to have a go at it inside a [Module] playground. *)
+(** Of course, this is where the [Inductive] adjective becomes
+meaningful. And of course, they are already defined in the
+standard library. But let us again try to have a go at it inside
+a [Module] playground. *)
 
 Module NatPlayground.
 
@@ -717,19 +749,17 @@ Inductive nat : Type :=
 
 (** Let's look at this in a little more detail. *)
 
-(**
-
-    Every inductively defined set ([day], [nat], [bool], etc.) is
+(** Every inductively defined set ([day], [nat], [bool], etc.) is
     actually a set of _expressions_ built from _constructors_
-    like [O], [S], [true], [false], [monday], etc.  The definition of
-    [nat] says how expressions in the set [nat] can be built:
+    like [O], [S], [true], [false], [monday], etc. The
+    definition of [nat] says how expressions in the set [nat] can be
+    built:
 
-    - [O] and [S] are constructors;
-    - the expression [O] belongs to the set [nat];
-    - if [n] is an expression belonging to the set [nat], then [S n]
-      is also an expression belonging to the set [nat]; and
-    - expressions formed in these two ways are the only ones belonging
-      to the set [nat]. *)
+    - [O] and [S] are constructors; the expression [O] belongs
+    - to the set [nat]; if [n] is an expression belonging to the
+    - set [nat], then [S n] is also an expression belonging to the
+    - set [nat]; and expressions formed in these two ways are the
+    - only ones belonging to the set [nat]. *)
 
 (** The same rules apply for our definitions of [day] and
     [bool]. (The annotations we used for their constructors are
@@ -1004,26 +1034,25 @@ Proof. (* WORKED IN CLASS *) by []. Qed. Example test_leb2:             (leb 4 2
 Proof. (* WORKED IN CLASS *) by []. Qed. (** [] *)
 
 
-(** Since we'll be using these (especially [eqb]) a lot, let's give
-    them infix notations. *)
+(** Since we'll be using these (especially [eqb]) a lot, let's
+    give them infix notations. *)
 
 Notation "x =? y" := (beq_nat x y) (at level 70) : nat_scope.
 Notation "x <=? y" := (leb x y) (at level 70) : nat_scope.
 
 (** Here you see some additional features of [Notation]. *)
 
-(** Coq uses precedence levels from 0 to 100 (stronger are lower), and
-    _left_, _right_, or _no_ associativity.  *)
+(** Coq uses precedence levels from 0 to 100 (stronger are
+    lower), and _left_, _right_, or _no_ associativity. *)
 
-(**
-Each notation symbol is also associated with a _notation scope_. Occasionally, it is
-    necessary to help Coq out with percent-notation by writing
-    [(x*y)%nat], and sometimes in what Coq prints it will use [%nat]
-    to indicate what scope a notation is in.
- *)
+(** Each notation symbol is also associated with a _notation
+scope_. Occasionally, it is necessary to help Coq out with
+percent-notation by writing [(x*y)%nat], and sometimes in what Coq
+prints it will use [%nat] to indicate what scope a notation is in.
+*)
 
-(** Pro tip: Coq's notation mechanism is not especially powerful.
-    Don't expect too much from it! *)
+(** Pro tip: Coq's notation mechanism is not especially
+    powerful. Don't expect too much from it! *)
 
 Example test_leb3':             (4 <=? 2) = false.
 Proof. simpl. reflexivity.  Qed.

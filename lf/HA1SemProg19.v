@@ -8,24 +8,36 @@
 (** Submit your solutions  via StudOn until _Mon, May 20 @ 13:00_.  **)
 
 
-(**
-  - Please do not change the file name.
-  - Do not post your solution in any publically available location.
+(** - Please do not change the file name.
+
+  - Do not post your solution in any publically available
+    location.
+
   - Please submit on time, late solutions not accepted.
-  - Before submission, please check from command line if your script compiles.
-    In other words, do run [coqc] to make sure it accepts your file. If it doesn't, no points can be awarded.
-  - Please submit _only_ the source file of the solution, i.e., [*.v]! Compiled output [*.vo] is useless for submission and will not get you any points. Compile the file for testing, not in order to submit compilation output to me.
-  - Also, remember it will be run on a different machine which does not have the
-    same folder structure as yours... Please bear this in mind and be careful
-    with using load paths (absolute or relative) in your scripts.
-  - If you resubmit a solution on StudOn (which is always possible before the
-    deadline), please make sure to delete the old
-    ones! And make sure that the final submission has the right name. Remember
-    all submissions will be downloaded together as a bunch and fed through a
-    script. Having more than one solution from a given person messes up
-    automation.
-*)
-  
+
+  - Before submission, please check from command line if your
+    script compiles. In other words, do run [coqc] to make sure
+    it accepts your file. If it doesn't, no points can be
+    awarded.
+
+  - Please submit _only_ the source file of the solution, i.e.,
+    [*.v]! Compiled output [*.vo] is useless for submission and
+    will not get you any points. Compile the file for testing,
+    not in order to submit compilation output to me.
+
+  - Also, remember it will be run on a different machine which
+    does not have the same folder structure as yours... Please
+    bear this in mind and be careful with using load paths
+    (absolute or relative) in your scripts.
+
+  - If you resubmit a solution on StudOn (which is always
+    possible before the deadline), please make sure to delete
+    the old ones! And make sure that the final submission has
+    the right name. Remember all submissions will be downloaded
+    together as a bunch and fed through a script. Having more
+    than one solution from a given person messes up automation.
+    *)
+
 
 Set Warnings "-notation-overridden,-parsing".
 From Coq Require Import ssreflect ssrbool ssrfun.
@@ -47,26 +59,35 @@ Notation "x <=? y" := (leb x y) (at level 70) : nat_scope. (* [leb] comes from [
 (** ** Exercise 1 *)
 (** **** Exercise: 3 stars, standard (fold)  *)
 
-(** Recall the [fold] function. As it turns out, Coq's standard library has two versions thereof: [fold_left] and [fold_right]. This is (almost) the one we've been working with. *)
+(** Recall the [fold] function. As it turns out, Coq's standard
+library has two versions thereof: [fold_left] and [fold_right].
+This is (almost) the one we've been working with. *)
 
 Print fold_right.
 
-(** Careful, in the lecture  the order of type arguments was opposite to those in the standard library. For consistency, we flip them here, so it follows the lecture ordering. On the other hand, we do not make type arguments of [fold] implict: even in the lecture, it has caused us some problems, and in the case of HA below thinking what the type argument should be is often the first step to solve them. *)
+(** Careful, in the lecture the order of type arguments was
+opposite to those in the standard library. For consistency, we
+flip them here, so it follows the lecture ordering. On the other
+hand, we do not make type arguments of [fold] implict: even in
+the lecture, it has caused us some problems, and in the case of
+HA below thinking what the type argument should be is often the
+first step to solve them. *)
 
 Definition fold (A B: Type) f l b:= @fold_right B A f b l.
 
-(** We did length in terms of [fold]. We can also define [map] in terms of [fold].  Finish [fold_map]
-    below. *)
+(** We did length in terms of [fold]. We can also define [map]
+    in terms of [fold]. Finish [fold_map] below. *)
 
-Definition fold_map {X Y: Type} (f: X -> Y) (l: list X) : list Y
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+Definition fold_map {X Y: Type} (f: X -> Y) (l: list X) : list Y :=
+  fold _ _ (fun x xs => f x :: xs) l nil.
 
 (** Prove that fold_map is correct. *)
 
 Theorem fold_map_correct : forall X Y (f : X -> Y) (l : list X),
   fold_map f l = map f l.
 Proof.
-(* FILL IN HERE *) Admitted.
+  move => ? ? ? ?.
+Qed.
 
 (** Similarly ... *)
 
@@ -93,7 +114,7 @@ Proof.
 (* ================================================================= *)
 (** ** Exercise 2 *)
 
-(** **** Exercise: 3 stars, standard (partition)  
+(** **** Exercise: 3 stars, standard (partition)
 
     Use [filter] to write a Coq function [partition]:
 
@@ -141,8 +162,8 @@ Proof.
 (** ** Exercise 3 *)
 (** **** Exercise: 3 stars, standard (combine_after_split)  *)
 
-(** We can prove that [split] and [combine] are inverses in one sense. 
-    Proof can be made very short, but requires some care and information from final parts of [Tactics19]. 
+(** We can prove that [split] and [combine] are inverses in one sense.
+    Proof can be made very short, but requires some care and information from final parts of [Tactics19].
     In particular, you might need to:
     - make your induction hypothesis general enough
     - destruct compound expressions and not lose the information obtained
@@ -171,7 +192,7 @@ Proof.
 (* ================================================================= *)
 (** ** Exercise 5: Church addition and multiplication *)
 
-(** **** Exercise: 3 stars, standard (church_numerals)  
+(** **** Exercise: 3 stars, standard (church_numerals)
 
     This exercise explores an alternative way of defining natural
     numbers, using the so-called _Church numerals_, named after
@@ -211,7 +232,7 @@ Definition zero : nat :=
 
 (** Successor of a natural number: *)
 
-Definition succ (n : nat) : nat 
+Definition succ (n : nat) : nat
   (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
 
 Example succ_1 : succ zero = one.
@@ -255,14 +276,14 @@ Proof. (* FILL IN HERE *) Admitted.
 (* ================================================================= *)
 (** ** Bonus Exercise 6: Church exponentiation *)
 
-(** **** Exercise: 3 stars, advanced (church_exponentiation)  
+(** **** Exercise: 3 stars, advanced (church_exponentiation)
 
     Exponentiation is somewhat more difficult. _Hint_: Polymorphism plays a
     crucial role here. However, choosing the right type to iterate over can be
     tricky. If you hit a "Universe inconsistency" error, try iterating over a
     different type: [nat] itself is usually problematic. *)
 
-Definition exp (n m : nat) : nat 
+Definition exp (n m : nat) : nat
   (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
 
 Example exp_1 : exp two two = plus two two.
@@ -275,5 +296,5 @@ Example exp_3 : exp three zero = one.
 Proof. (* FILL IN HERE *) Admitted.
 
 (** [] *)
-  
+
 (* Sun Jul 14 22:07:53 MSK 2019 *)

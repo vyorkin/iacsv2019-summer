@@ -17,7 +17,8 @@
 Set Warnings "-notation-overridden,-parsing".
 From Coq Require Import ssreflect ssrbool ssrfun.
 
-(** And instead of our list development in the [Poly19] chapter, let's go for the standard library ... *)
+(** And instead of our list development in the [Poly19] chapter,
+let's go for the standard library ... *)
 
 From Coq Require Import List.
 Import List.ListNotations.
@@ -40,32 +41,34 @@ Notation "x <=? y" := (leb x y) (at level 70) : nat_scope. (* [leb] comes from [
     previously proved lemma. *)
 
 Theorem silly1 : forall (n m o p : nat),
-     n = m  ->
-     [n;o] = [n;p] ->
-     [n;o] = [m;p].
+    n = m ->
+    [n;o] = [n;p] ->
+    [n;o] = [m;p].
 Proof.
-(** Interlude: Writing an arrow instead of an identifier after a [=>]
-    tactical tries to rewrite immediately using the top of the proof
-    stack. So the following _anonymously_ introduces the four natural
-    numbers, introduces [n = m] temporarily and rewrites the rest of
-    the goal with it. *)
+
+(** Interlude: Writing an arrow instead of an identifier after a
+    [=>] tactical tries to rewrite immediately using the top of
+    the proof stack. So the following _anonymously_ introduces
+    the four natural numbers, introduces [n = m] temporarily and
+    rewrites the rest of the goal with it. *)
 
   move=> ? ? ? ? <-.
 
-(** Recall the variables introduced anonymously have special names.
-    These kinds of names are reserved notation and _cannot_ be used
-    any further in the proof. *)
+(** Recall the variables introduced anonymously have special
+    names. These kinds of names are reserved notation and
+    _cannot_ be used any further in the proof. *)
 
-(** Here, we could finish with "[move=> eq. rewrite eq.  by [].]" as we
-    have done several times before.  We can achieve the same effect in
-    a single step by using the [apply] tactic instead: *)
+(** Here, we could finish with "[move=> eq. rewrite eq. by [].]"
+    as we have done several times before. We can achieve the
+    same effect in a single step by using the [apply] tactic
+    instead: *)
 
-  by apply. Qed.
+  apply. Qed.
 
 (** The [apply] tactic also works with _conditional_ hypotheses
-    and lemmas: if the statement being applied is an implication, then
-    the premises of this implication will be added to the list of
-    subgoals needing to be proved. *)
+    and lemmas: if the statement being applied is an
+    implication, then the premises of this implication will be
+    added to the list of subgoals needing to be proved. *)
 
 Theorem silly2 : forall (n m o p : nat),
      n = m  ->
@@ -312,13 +315,14 @@ Proof.
   by rewrite eq1 eq2.
 Qed.
 
+Unset Printing Notations.
 Example case_ex3 : forall (X : Type) (x y z : X) (l j : list X),
   x :: y :: l = z :: j ->
   y :: l = x :: j ->
   x = y.
 Proof.
   (* WORKED IN CLASS *)
-  move=> X x y z l j eq1 eq2. symmetry.
+  move=> X x y z l j eq1 eq2.
   by case: eq2. Qed.
 
 Theorem discriminate_ex1 : forall (n m o : nat), S n = O -> m = o.

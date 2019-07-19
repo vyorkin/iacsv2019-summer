@@ -110,7 +110,10 @@ Inductive natlist : Type :=
   | nil_nat : natlist
   | con_nat : nat -> natlist -> natlist.
 
-(** Of course, this is something you have seen in functional programming and all of you expect to see a polymorphic definition. This is how it looks like in the standard library: *)
+(** Of course, this is something you have seen in functional
+programming and all of you expect to see a polymorphic
+definition. This is how it looks like in the standard library:
+*)
 
 Print list.
 
@@ -170,7 +173,8 @@ Check (1 :: 2 :: nil).
      : list nat
 *)
 
-(** If you want to see how notation is defined, here is how you do it in [ssreflect]: *)
+(** If you want to see how notation is defined, here is how you
+do it in [ssreflect]: *)
 
 Locate "_ :: _".
 
@@ -182,7 +186,9 @@ Notation
 
 (** Note the use of [list_scope] *)
 
-(** If you want to see a list of theorems, lemmas etc. using this notation, replace [Locate] with [Search] above. Warning: this is going to be a long list! *)
+(** If you want to see a list of theorems, lemmas etc. using
+this notation, replace [Locate] with [Search] above. Warning:
+this is going to be a long list! *)
 
 (* ================================================================= *)
 (** ** Standard functions on lists *)
@@ -279,24 +285,35 @@ Print option.
 Inductive option (A : Type) : Type :=  Some : A -> option A | None : option A
 *)
 
-(** Define the obvious [option_hd] function. This is how you make an argument implicit, by the way. *)
+(** Define the obvious [option_hd] function. This is how you
+make an argument implicit, by the way. *)
 
-Fixpoint option_hd {A : Type} (l: list A) : option A
-(* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+Fixpoint option_hd {A : Type} (l: list A) : option A :=
+  match l with
+    | nil => None
+    | x :: l' => Some x
+  end.
 
 Example test_hd1: option_hd [1;2;3] = Some 1.
-Proof. (* FILL IN HERE *) Admitted.
+Proof.  by [].
 Example test_hd2 (A:Type) : @option_hd A [] = None.
-Proof. (* FILL IN HERE *) Admitted.
+Proof.  by [].
 
 (* ----------------------------------------------------------------- *)
 (** *** First non-trivial proof for lists *)
 
 (** These work just by case analysis. *)
 
-Theorem hd_is_hd1 : forall (A : Type) (l : list A) (default : A), option_hd l = None -> hd default l = default.
+Theorem hd_is_hd1 : forall (A : Type) (l : list A) (default : A),
+    option_hd l = None -> hd default l = default.
 Proof.
-(* FILL IN HERE *) Admitted.
+  move => T l1 default H.
+  case l1.
+  - reflexivity.
+  - move => x l2.
+    case l2.
+    * simpl.
+    -
 
 Theorem hd_is_hd2 : forall (A : Type) (l : list A) (default : A) (a: A), option_hd l = Some a -> hd default l = a.
 Proof.
@@ -485,8 +502,7 @@ fun (A B : Type) (f : A -> B) (o : option A) => match o with
     operation that lies at the heart of Google's map/reduce
     distributed programming framework. *)
 
-Fixpoint fold {X Y:Type} (f: X->Y->Y) (l:list X) (b:Y)
-                         : Y :=
+Fixpoint fold {X Y:Type} (f: X->Y->Y) (l:list X) (b:Y) : Y :=
   match l with
   | nil => b
   | h :: t => f h (fold f t b)
@@ -537,16 +553,21 @@ Proof. by []. Qed.
 Definition fold_length (X : Type) (l : list X) : nat :=
   fold (fun _ n => S n) l 0.
 
-(** Note it is quite useful here that the function f in the definition of [fold] can take arguments of mixed type. *)
+(** Note it is quite useful here that the function f in the
+definition of [fold] can take arguments of mixed type. *)
 
 Arguments fold_length {X}.
 
-(** This is an alternative way of making arguments implicit, by the way. Sometimes it might make sense: e.g., you want to make constructors of a polymorphic type easier to write, but the type to remain explicitly polymorphic. *)
+(** This is an alternative way of making arguments implicit, by
+the way. Sometimes it might make sense: e.g., you want to make
+constructors of a polymorphic type easier to write, but the type
+to remain explicitly polymorphic. *)
 
 Example test_fold_length1 : fold_length [4;7;0] = 3.
 Proof. by []. Qed.
 
-(** Prove the correctness of [fold_length]. This is our first encounter with induction on lists. *)
+(** Prove the correctness of [fold_length]. This is our first
+encounter with induction on lists. *)
 
 Theorem fold_length_correct : forall X (l : list X),
   fold_length l = length l.
@@ -557,15 +578,22 @@ Proof.
     by rewrite -IHl.
 Qed.
 
+Theorem fold_length_correct' : forall X (l : list X),
+  fold_length l = length l.
+(* WORKED IN CLASS *)
+Proof.
+  move => ?.
+  by elim=> /= [|hl tl <-].
+Qed.
 
-(** We can do the same thing with [map], i.e., define it using [fold]. Can you see how?  *)
-
-
+(** We can do the same thing with [map], i.e., define it using
+[fold]. Can you see how? *)
 
 (* ----------------------------------------------------------------- *)
 (** *** An example of a more complicated proof *)
 
-(** The strandard library has a lot of useful theorems about list programs and transformations we have seen.  One example: *)
+(** The strandard library has a lot of useful theorems about
+list programs and transformations we have seen. One example: *)
 
 Check rev_length.
 
@@ -619,7 +647,7 @@ Proof.
   (* WORKED IN CLASS *)
   move => ?.
   elim => [| n l1' IHl1'] /= .
-  - by [].
+  - reflexivity.
   - move => ?. by rewrite IHl1'. Qed.
 
 

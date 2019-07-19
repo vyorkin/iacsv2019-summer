@@ -320,8 +320,11 @@ Qed.
     in the middle.  One reasonable convention is to limit yourself to
     80-character lines. *)
 
-(** There is a short way to throw the same tactic on every subgoal. It is provided by the [;] _tactical_. "Tacticals" are tactics that take other tactics as
-    arguments -- "higher-order tactics," if you will. We have already seen an example of one: it was [by] of [ssreflect]. *)
+(** There is a short way to throw the same tactic on every
+    subgoal. It is provided by the [;] _tactical_. "Tacticals"
+    are tactics that take other tactics as arguments --
+    "higher-order tactics," if you will. We have already seen an
+    example of one: it was [by] of [ssreflect]. *)
 
 Theorem plus_1_neq_0'' : forall n : nat,
   beq_nat (n + 1) 0 = false.
@@ -348,12 +351,14 @@ Qed.
       T; [T' | T' | ... | T']
 *)
 
-(** Again, [ssreflect] provides an even shorter way to split things by using [case]. *)
+(** Again, [ssreflect] provides an even shorter way to split
+things by using [case]. *)
 
 Theorem plus_1_neq_0''' : forall n : nat,
   (n + 1 =? 0) = false.
-Proof. by case.
-Qed.
+Proof.
+    case.
+    Abort.
 
 (**
     The [destruct] tactic and its relatives can be used with any inductively defined
@@ -472,20 +477,25 @@ Qed.
 (* ================================================================= *)
 (** ** Proof by Induction *)
 
-(** Let us now return to the type of problems we began with: seemingly trivial reordering making theorem impossible to prove. *)
+(** Let us now return to the type of problems we began with:
+seemingly trivial reordering making theorem impossible to prove.
+*)
 
 Check plus_1_l.
 
+Print Nat.add.
+
+(* Set Printing All. *)
 Theorem plus_1_r_attempt : forall n, S n = n + 1.
 Proof.
-  Fail reflexivity.
   intros [].
   - reflexivity.
   - Fail reflexivity.
 Abort.
 
 
-(** [ssreflect] also cannot handle examples such as this one using tactics we've learned so far: *)
+(** [ssreflect] also cannot handle examples such as this one
+using tactics we've learned so far: *)
 
 Theorem plus_1_r_ssr_attempt : forall n, S n = n + 1.
 Proof.
@@ -548,20 +558,43 @@ Qed.
 (** *** Induction in [ssreflect] *)
 
 (** [ssreflect] avoids the tactic [induction] (along with other
-    tactics, like [intro] and [inversion], which we will introduce
-    later) since they implement _fragile context manipulation
-    heuristics which hinder precise bookkeeping_; as you already
-    witnessed, these tactics generate variable names on their own,
-    which are possibly referenced later in the proof script …
+    tactics, like [intro] and [inversion], which we will
+    introduce later) since they implement _fragile context
+    manipulation heuristics which hinder precise bookkeeping_;
+    as you already witnessed, these tactics generate variable
+    names on their own, which are possibly referenced later in
+    the proof script …
 
-   Instead, the more basic induction tactic [elim] is preferred. *)
+   Instead, the more basic induction tactic [elim] is preferred.
+   *)
 
-
+(* Pro version *)
 Theorem plus_1_r n : S n = n + 1.
 Proof.
   by elim: n => [| n' /= ->].
 Qed.
 
+(* Dumb version 1 *)
+Theorem plus_1_r1 n : S n = n + 1.
+Proof.
+  elim: n => [//| n' H].
+  - simpl. rewrite H. reflexivity.
+Qed.
+
+
+(* Dumb version 2 *)
+Theorem plus_1_r2 n : S n = n + 1.
+Proof.
+  elim: n => [//| n' H].
+  - simpl. by rewrite H.
+Qed.
+
+(* Dumb version 3 *)
+Theorem plus_1_r3 n : S n = n + 1.
+Proof.
+  elim: n => [//| n' H] /=.
+  - by rewrite H.
+Qed.
 
 (** We see here how on-the-fly simplification is done in
     [ssreflect] (using the switch [/=]). *)
@@ -573,9 +606,12 @@ Proof.
     by elim.
 Qed.
 
-  (* elim => [//| n] /=. *)
-  (* - by []. *)
-  (* Qed. *)
+Theorem minus_diag' : forall n,
+  minus n n = 0.
+Proof.
+    elim => [//| n].
+    - by [].
+Qed.
 
 Theorem minus_diag_with_ltac : forall n,
   minus n n = 0.
@@ -680,10 +716,22 @@ Standard Ltac:
     need an induction hypothesis about [n - 2]. The following lemma
     gives a better characterization of [evenb (S n)]: *)
 
-Theorem evenb_S : forall n : nat,
+(* Dumb v1 *)
+Theorem evenb_S1 : forall n : nat,
   evenb (S n) = negb (evenb n).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  elim.
+  - by [].
+  - move => n ->.
+    rewrite negb_involutive.
+    reflexivity.
+Qed.
+
+Theorem evenb_S2 : forall n : nat,
+  evenb (S n) = negb (evenb n).
+Proof.
+  by elim => [//| ? ->]; rewrite negb_involutive.
+Qed.
 (** [] *)
 
 
