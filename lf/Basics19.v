@@ -176,8 +176,9 @@ Eval cbv in (next_weekday (next_weekday saturday)).
 (* ----------------------------------------------------------------- *)
 (** *** The first encounter with theorems and proofs... *)
 
-(** We can record what we _expect_ the result to be. A "unit test" for our function -- i.e., a mathematical
-    claim about its behavior: *)
+(** We can record what we _expect_ the result to be. A "unit
+    test" for our function -- i.e., a mathematical claim about
+    its behavior: *)
 
 Example test_next_weekday:
   (next_weekday (next_weekday saturday)) = tuesday.
@@ -189,10 +190,15 @@ Example test_next_weekday:
 (** Notice what happened now in the goals window? This is Coq's way of asking us to finish the job. We have to prove the statement we made. *)
 
 (**
- - The keyword [Example] could be also [Theorem], [Lemma], [Proposition], [Fact], [Remark] or [Corollary].
- - The choice is for our convenience, and doesn't matter from Coq's point of view.
- - It would be a bit stupid though to use a more pompous word than [Example] for something so trivial. *)
 
+ - The keyword [Example] could be also [Theorem], [Lemma],
+   [Proposition], [Fact], [Remark] or [Corollary].
+
+ - The choice is for our convenience, and doesn't matter from
+   Coq's point of view.
+
+ - It would be a bit stupid though to use a more pompous word
+   than [Example] for something so trivial. *)
 
 (** Here's a proof script giving evidence for the claim. Notice what happens in the goals window when you step through it. *)
 
@@ -373,12 +379,15 @@ this would cause unnecessary problems later on. *)
 Print bool.
 
 (* ==> [Inductive bool : Set :=  true : bool | false : bool] *)
-(**  "[Set] _instead of the more general [Type] declares that we are defining a
-datatype that should be thought of as a constituent of programs. There are other
-options for defining datatypes in the universe of proofs or in an infinite hierarchy of universes,
-encompassing both programs and proofs, that is useful in higher-order constructions_." --Adam Chlipala *)
+(** "[Set] _instead of the more general [Type] declares that we
+are defining a datatype that should be thought of as a
+constituent of programs. There are other options for defining
+datatypes in the universe of proofs or in an infinite hierarchy
+of universes, encompassing both programs and proofs, that is
+useful in higher-order constructions_." --Adam Chlipala *)
 
-(** For standard library datatypes, see [Coq.Init.Datatypes] in the Coq library documentation. *)
+(** For standard library datatypes, see [Coq.Init.Datatypes] in
+the Coq library documentation. *)
 
 (* ----------------------------------------------------------------- *)
 (** *** First encounter with  function types *)
@@ -426,15 +435,16 @@ Coq's _module system_. *)
 (** ** Modules *)
 
 (** Coq provides a _module system_, to aid in organizing large
-    developments.  In this course we won't need most of its features,
-    but one is useful: If we enclose a collection of declarations
-    between [Module X] and [End X] markers, then, in the remainder of
-    the file after the [End], these definitions are referred to by
-    names like [X.foo] instead of just [foo].  We will use this
-    feature to introduce the definition of the type [nat] in an inner
-    module so that it does not interfere with the one from the
-    standard library (which we want to use in the rest because it
-    comes with a tiny bit of convenient special notation).  *)
+    developments. In this course we won't need most of its
+    features, but one is useful: If we enclose a collection of
+    declarations between [Module X] and [End X] markers, then,
+    in the remainder of the file after the [End], these
+    definitions are referred to by names like [X.foo] instead of
+    just [foo]. We will use this feature to introduce the
+    definition of the type [nat] in an inner module so that it
+    does not interfere with the one from the standard library
+    (which we want to use in the rest because it comes with a
+    tiny bit of convenient special notation). *)
 
 Module BoolPlayground.
 
@@ -446,7 +456,8 @@ Print bool.
 
 (* ==> Inductive bool : Set :=  true : bool | false : bool *)
 
-(** As you see, our own definition was also automatically taken by Coq to be a [Set], not just an arbitary [Type]. *)
+(** As you see, our own definition was also automatically taken
+by Coq to be a [Set], not just an arbitary [Type]. *)
 
 Definition negb (b:bool) : bool :=
   match b with
@@ -830,25 +841,26 @@ Check S.
 Check pred.
 Check minustwo.
 
-(** These are all things that can be applied to a number to yield a
-    number.  However, there is a fundamental difference between the
-    first one and the other two: functions like [pred] and [minustwo]
-    come with _computation rules_ -- e.g., the definition of [pred]
-    says that [pred 2] can be simplified to [1] -- while the
-    definition of [S] has no such behavior attached.  Although it is
-    like a function in the sense that it can be applied to an
-    argument, it does not _do_ anything at all!  It is just a way of
-    writing down numbers.  (Think about standard arabic numerals: the
-    numeral [1] is not a computation; it's a piece of data.  When we
-    write [111] to mean the number one hundred and eleven, we are
-    using [1], three times, to write down a concrete representation of
-    a number.)
+(** These are all things that can be applied to a number to
+    yield a number. However, there is a fundamental difference
+    between the first one and the other two: functions like
+    [pred] and [minustwo] come with _computation rules_ -- e.g.,
+    the definition of [pred] says that [pred 2] can be
+    simplified to [1] -- while the definition of [S] has no such
+    behavior attached. Although it is like a function in the
+    sense that it can be applied to an argument, it does not
+    _do_ anything at all! It is just a way of writing down
+    numbers. (Think about standard arabic numerals: the numeral
+    [1] is not a computation; it's a piece of data. When we
+    write [111] to mean the number one hundred and eleven, we
+    are using [1], three times, to write down a concrete
+    representation of a number.)
 
-    For most function definitions over numbers, just pattern matching
-    is not enough: we also need recursion.  For example, to check that
-    a number [n] is even, we may need to recursively check whether
-    [n-2] is even.  To write such functions, we use the keyword
-    [Fixpoint]. *)
+    For most function definitions over numbers, just pattern
+    matching is not enough: we also need recursion. For example,
+    to check that a number [n] is even, we may need to
+    recursively check whether [n-2] is even. To write such
+    functions, we use the keyword [Fixpoint]. *)
 
 Fixpoint evenb (n:nat) : bool :=
   match n with

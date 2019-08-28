@@ -304,20 +304,31 @@ Proof.  by [].
 
 (** These work just by case analysis. *)
 
-Theorem hd_is_hd1 : forall (A : Type) (l : list A) (default : A),
+(* Pro version *)
+Theorem hd_is_hd1' : forall (A : Type) (l : list A) (default : A),
     option_hd l = None -> hd default l = default.
 Proof.
-  move => T l1 default H.
+  by move => T; case.
+Qed.
+
+(* Dumb version *)
+Theorem hd_is_hd1 :
+  forall (A : Type) (l : list A) (default : A),
+  option_hd l = None -> hd default l = default.
+Proof.
+  move => T l1 default.
   case l1.
   - reflexivity.
-  - move => x l2.
-    case l2.
-    * simpl.
-    -
+  - by [].
+Qed.
 
-Theorem hd_is_hd2 : forall (A : Type) (l : list A) (default : A) (a: A), option_hd l = Some a -> hd default l = a.
+Theorem hd_is_hd2 :
+  forall (A : Type) (l : list A) (default : A) (a: A),
+  option_hd l = Some a -> hd default l = a.
 Proof.
-(* FILL IN HERE *) Admitted.
+  move => T.
+  by case=> [|? ? ? ? []].
+Qed.
 
 (* ----------------------------------------------------------------- *)
 (** *** Length  *)
@@ -362,27 +373,34 @@ Require Import Nat.
 (** This gives us a function [odd] ... *)
 
 
-Fixpoint oddmembers (l:list nat) : (list nat)
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+Fixpoint oddmembers (l:list nat) : (list nat) :=
+  match l with
+  | nil    => nil
+  | h :: t =>
+    match (oddb h) with
+    | true  => h :: oddmembers t
+    | false => oddmembers t
+    end
+  end.
 
 Example test_oddmembers:
   oddmembers [0;1;0;2;3;0;0] = [1;3].
-(* FILL IN HERE *) Admitted.
+by []. Qed.
 
-Definition countoddmembers (l:list nat) : nat
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+Definition countoddmembers (l:list nat) : nat :=
+  length (oddmembers l).
 
 Example test_countoddmembers1:
   countoddmembers [1;0;3;1;4;5] = 4.
-  (* FILL IN HERE *) Admitted.
+by []. Qed.
 
 Example test_countoddmembers2:
   countoddmembers [0;2;4] = 0.
-  (* FILL IN HERE *) Admitted.
+by []. Qed.
 
 Example test_countoddmembers3:
   countoddmembers nil = 0.
-  (* FILL IN HERE *) Admitted.
+by []. Qed.
 
 (** It seems we could think of a more general pattern here. *)
 
@@ -420,7 +438,7 @@ fix filter (l : list A) : list A :=
     a list containing just the even members of [l]. *)
 
 Example test_filter1: filter odd [1;2;3;4] = [1;3].
-Proof. by [].  Qed.
+Proof. by []. Qed.
 
 (** We now need our boolean equality on [nat]. *)
 

@@ -73,7 +73,7 @@ the lecture, it has caused us some problems, and in the case of
 HA below thinking what the type argument should be is often the
 first step to solve them. *)
 
-Definition fold (A B: Type) f l b:= @fold_right B A f b l.
+Definition fold (A B: Type) f l b := @fold_right B A f b l.
 
 (** We did length in terms of [fold]. We can also define [map]
     in terms of [fold]. Finish [fold_map] below. *)
@@ -86,28 +86,35 @@ Definition fold_map {X Y: Type} (f: X -> Y) (l: list X) : list Y :=
 Theorem fold_map_correct : forall X Y (f : X -> Y) (l : list X),
   fold_map f l = map f l.
 Proof.
-  move => ? ? ? ?.
+  move => ? ? ? l.
+  by elim: l => [//| ? ? /= ->].
 Qed.
 
 (** Similarly ... *)
 
-Definition fold_flat_map {X Y: Type} (f: X -> list Y) (l: list X) : list Y
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+Definition fold_flat_map {X Y: Type} (f: X -> list Y) (l: list X) : list Y :=
+  fold _ _ (fun x xs => f x ++ xs) l nil.
+
+Compute (fold_flat_map (fun x => [x; x]) [1; 2]).
 
 Theorem fold_flat_map_correct : forall X Y (f : X -> list Y) (l : list X),
   fold_flat_map f l = flat_map f l.
 Proof.
-(* FILL IN HERE *) Admitted.
+  move => ? ? ? l.
+  by elim: l => [//| ? ? /= ->].
+Qed.
 
 (** And finally, append itself can be defined in terms of fold *)
 
-Definition fold_append {X : Type} (l l': list X) : list X
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+Definition fold_append {X : Type} (l l': list X) : list X :=
+  fold _ _ (fun x xs => x :: xs) l l'.
 
 Theorem fold_append_correct : forall X (l l' : list X),
   fold_append l l' = app l l'.
 Proof.
-(* FILL IN HERE *) Admitted.
+  move => ? l ?.
+  by elim l => [//| ? ? /= ->].
+Qed.
 
 (** [] *)
 
