@@ -107,7 +107,7 @@ Qed.
 (** And finally, append itself can be defined in terms of fold *)
 
 Definition fold_append {X : Type} (l l': list X) : list X :=
-  fold _ _ (fun x xs => x :: xs) l l'.
+  fold _ _ cons l l'.
 
 Theorem fold_append_correct : forall X (l l' : list X),
   fold_append l l' = app l l'.
@@ -137,21 +137,24 @@ Qed.
    list.
  *)
 
-Definition partition {X : Type}
-                     (test : X -> bool)
-                     (l : list X)
-                   : list X * list X
-(* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+Definition partition
+           {X : Type}
+           (test : X -> bool)
+           (l : list X) : list X * list X :=
+  (filter test l, filter (fun x => negb (test x)) l).
+
 
 Example test_partition1: partition odd [1;2;3;4;5] = ([1;3;5], [2;4]).
-(* FILL IN HERE *) Admitted.
+Proof. by []. Qed.
 
 Example test_partition2: partition (fun x => false) [5;9;0] = (nil, [5;9;0]).
-(* FILL IN HERE *) Admitted.
+Proof. by []. Qed.
 
 Print fst.
 
-(** Now prove the following characterization theorems for [partition]. Warning: you might need some material that is covered at the end of Tactics19. *)
+(** Now prove the following characterization theorems for
+[partition]. Warning: you might need some material that is
+covered at the end of Tactics19. *)
 
 Theorem partition_fst: forall (X : Type)  (test : X -> bool) (l : list X),
                          fold _ _ andb (map test (fst (partition test l))) true = true.

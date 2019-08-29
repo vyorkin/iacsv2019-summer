@@ -167,7 +167,7 @@ Theorem plus_id_example' : forall n m:nat,
 
 Proof.
     by
-      move => n m H;
+      move=> n m H;
                rewrite H. Qed.
 
 (** The use of [move =>] has its advantages, especially regarding
@@ -332,6 +332,12 @@ Proof.
   intros [| n'];  reflexivity.
 Qed.
 
+Theorem plus_1_neq_0''' : forall n : nat,
+  beq_nat (n + 1) 0 = false.
+Proof.
+  intros [| n'];  [reflexivity | reflexivity].
+Qed.
+
 (* ----------------------------------------------------------------- *)
 (** *** The [;] Tactical (General Form) *)
 
@@ -354,7 +360,7 @@ Qed.
 (** Again, [ssreflect] provides an even shorter way to split
 things by using [case]. *)
 
-Theorem plus_1_neq_0''' : forall n : nat,
+Theorem plus_1_neq_0'''' : forall n : nat,
   (n + 1 =? 0) = false.
 Proof.
     case.
@@ -580,7 +586,6 @@ Proof.
   elim: n => [//| n' H].
   - simpl. rewrite H. reflexivity.
 Qed.
-
 
 (* Dumb version 2 *)
 Theorem plus_1_r2 n : S n = n + 1.

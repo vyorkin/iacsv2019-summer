@@ -52,7 +52,7 @@ Proof.
     the four natural numbers, introduces [n = m] temporarily and
     rewrites the rest of the goal with it. *)
 
-  move=> ? ? ? ? <-.
+  move=> n m o p <-.
 
 (** Recall the variables introduced anonymously have special
     names. These kinds of names are reserved notation and
@@ -71,11 +71,11 @@ Proof.
     added to the list of subgoals needing to be proved. *)
 
 Theorem silly2 : forall (n m o p : nat),
-     n = m  ->
+     n = m ->
      (forall (q r : nat), q = r -> [q;o] = [r;p]) ->
      [n;o] = [m;p].
 Proof.
-  move=> ? ? ? ? eq. apply. apply: eq. Qed.
+  move=> n m o p eq. apply. apply: eq. Qed.
 
 (** ... and here's [Ltac] style: *)
 
@@ -86,10 +86,14 @@ Theorem silly2' : forall (n m o p : nat),
 Proof.
 
 
-  (** ... see these confusing names below btw? Before we get here with CoqIDE/Proof General, do you see what they refer to? *)
+  (** ... see these confusing names below btw? Before we get
+  here with CoqIDE/Proof General, do you see what they refer to?
+  *)
 
-  intros. apply H0. apply H. Qed.
-
+  intros.
+  apply H0.
+  apply H.
+Qed.
 
 
 (** You may find it instructive to experiment with this proof
@@ -105,7 +109,7 @@ Proof.
     gets instantiated with [m]. *)
 
 Theorem silly2a : forall (n m : nat),
-     (n,n) = (m,m)  ->
+     (n,n) = (m,m) ->
      (forall (q r : nat), (q,q) = (r,r) -> [q] = [r]) ->
      [n] = [m].
 Proof.
@@ -120,7 +124,7 @@ Proof.
 
 (* Set Printing All. *)
 Theorem silly3_firsttry : forall (n : nat),
-     true = (n =? 5)  ->
+     true = (n =? 5) ->
      (S (S n) =? 7) = true.
 Proof.
   move=> n H.
@@ -145,14 +149,21 @@ Theorem rev_exercise1 : forall (l l' : list nat),
      l = rev l' ->
      l' = rev l.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  move=> l l' H.
+  symmetry.
+  rewrite H.
+  apply rev_involutive.
+Qed.
 (** [] *)
 
-(** Just for yourself: briefly explain the difference between the tactics [apply] and
-    [rewrite].  What are the situations where both can usefully be
-    applied?
+(** Just for yourself: briefly explain the difference between
+    the tactics [apply] and [rewrite]. What are the situations
+    where both can usefully be applied?
 
-(* FILL IN HERE *)
+    - [rewrite] simply rewrites expression ltr or rtl.
+    - [apply] works with conditional hypotheses adding the
+      premises of implication to the list of subgoals needing to
+      be proved, feels like we're moving "backwards" ("backward reasoning")
 *)
 
 (* ================================================================= *)
@@ -166,9 +177,9 @@ Check trans_eq.
     variation on [apply]: *)
 
 Example trans_eq_example : forall (a b c d e f : nat),
-     [a;b] = [c;d] ->
-     [c;d] = [e;f] ->
-     [a;b] = [e;f].
+     [a;b] = [c;d] -> (* x = y *)
+     [c;d] = [e;f] -> (* y = z *)
+     [a;b] = [e;f].  (* x = z *)
 Proof.
   intros a b c d e f eq1 eq2.
 
@@ -177,16 +188,21 @@ Proof.
 
 (** If we simply tell Coq [apply trans_eq] at this point, it can
     tell (by matching the goal against the conclusion of the lemma)
-    that it should instantiate [X] with [[nat]], [n] with [[a,b]], and
-    [o] with [[e,f]].  However, the matching process doesn't determine
-    an instantiation for [m]: we have to supply one explicitly by
-    adding [with (m:=[c,d])] to the invocation of [apply]. *)
+    that it should instantiate [A] with [[nat]], [x] with [[a,b]], and
+    [z] with [[e,f]].
+
+    However, the matching process doesn't determine
+    an instantiation for [y]: we have to supply one explicitly by
+    adding [with (y := [c; d])] to the invocation of [apply]. *)
+
 
   (* eapply trans_eq. *)
-  apply trans_eq with (y:=[c;d]).
-  apply eq1. apply eq2.   Qed.
+  apply trans_eq with (y := [c; d]).
+  (* x = [c; d] -> [c; d] = z -> x = z *)
+  apply eq1. apply eq2.
+Qed.
 
-(** Actually, we usually don't have to include the name [m] in
+(** Actually, we usually don't have to include the name [y] in
     the [with] clause; Coq is often smart enough to figure out which
     instantiation we're giving. We could instead write: [apply
     trans_eq with [c;d]]. *)
@@ -231,13 +247,14 @@ Definition minustwo (n : nat) : nat :=
 
 
 Example trans_eq_exercise : forall (n m o p : nat),
-     m = (minustwo o) ->
-     (n + p) = m ->
-     (n + p) = (minustwo o).
+     m = (minustwo o) ->      (* x = y *)
+     (n + p) = m ->           (* y = z*)
+     (n + p) = (minustwo o). (* x = z *)
 Proof.
-  (* WORKED IN CLASS *)
   move=> ? ? ? ? eq1 eq2.
-  apply: trans_eq eq2 eq1.
+  apply: trans_eq.
+  (* x = [c; d] -> [c; d] = z -> x = z *)
+  apply eq2. apply eq1.
 Qed.
 
 (* ================================================================= *)
@@ -315,13 +332,12 @@ Proof.
   by rewrite eq1 eq2.
 Qed.
 
-Unset Printing Notations.
+(* Unset Printing Notations. *)
 Example case_ex3 : forall (X : Type) (x y z : X) (l j : list X),
   x :: y :: l = z :: j ->
   y :: l = x :: j ->
   x = y.
 Proof.
-  (* WORKED IN CLASS *)
   move=> X x y z l j eq1 eq2.
   by case: eq2. Qed.
 
@@ -336,9 +352,10 @@ Proof.
   by [].
 Qed.
 
-(** This is an instance of a logical principle known as the _principle
-    of explosion_ or, in Latin, _ex falso quodlibet_, which asserts that a contradictory hypothesis
-    entails anything, even false things! *)
+(** This is an instance of a logical principle known as the
+    _principle of explosion_ or, in Latin, _ex falso quodlibet_,
+    which asserts that a contradictory hypothesis entails
+    anything, even false things! *)
 
 Theorem explosion_ex4 : forall (n : nat),
   S n = O ->
@@ -358,8 +375,9 @@ Proof. by []. Qed.
     principle of explosion of more detail in the next chapter. *)
 
 (** To summarize this discussion, suppose [H] is a hypothesis in the
-    context or a previously proven lemma of the form [[ c a1 a2 ... an
-    = d b1 b2 ... bm ]] for some constructors [c] and [d] and
+    context or a previously proven lemma of the form
+    [[ c a1 a2 ... an = d b1 b2 ... bm ]]
+    for some constructors [c] and [d] and
     arguments [a1 ... an] and [b1 ... bm]. Then:
 
     - If [c] and [d] are the same constructor, then, by the
@@ -371,7 +389,12 @@ Proof. by []. Qed.
       considered at all. In this case, [by []] marks the current goal
       as completed. *)
 
-(** [Ltac] has another powerful tactic incorporating these principles. It is called [inversion]. It goes completely against the philosophy you've been seeing in [ssreflect], it's quite messy and can moreover slow down significantly larger proofs. We will avoid it... when we can. But sometimes this big hammer comes really handy. *)
+(** [Ltac] has another powerful tactic incorporating these
+    principles. It is called [inversion]. It goes completely against
+    the philosophy you've been seeing in [ssreflect], it's quite
+    messy and can moreover slow down significantly larger proofs. We
+    will avoid it... when we can. But sometimes this big hammer
+    comes really handy. *)
 
 (** The injectivity of constructors allows us to reason that
     [forall (n m : nat), S n = S m -> n = m].  The converse of this
@@ -382,7 +405,16 @@ Proof. by []. Qed.
 Check f_equal.
 Theorem f_equal_reproved : forall (A B : Type) (f: A -> B) (x y: A),
   x = y -> f x = f y.
-Proof. by move=> ? ? ? ? ? ->. Qed.
+Proof.
+  by move=> ? ? ? ? ? ->. Qed.
+
+
+Theorem f_equal_reproved' : forall (A B : Type) (f: A -> B) (x y: A),
+  x = y -> f x = f y.
+Proof.
+  move=> A B f x y H.
+  by rewrite H.
+Qed.
 
 (* ================================================================= *)
 (** ** Using Tactics on Hypotheses *)
@@ -399,12 +431,17 @@ Theorem S_inj : forall (n m : nat) (b : bool),
      (S n) =? (S m) = b  ->
      n =? m = b.
 Proof.
-  move=> n m b H. move=> /= in H. by []. Qed.
+  move=> n m b H.
+  move=> /= in H.
+  by [].
+Qed.
 
-(** [in] is a powerful and versatile tactical in [ssreflect], but numerous tactics can be combined with [in] also in [Ltac] style: *)
+(** [in] is a powerful and versatile tactical in [ssreflect],
+but numerous tactics can be combined with [in] also in [Ltac]
+style: *)
 
 Theorem S_inj' : forall (n m : nat) (b : bool),
-     (S n) =? (S m) = b  ->
+     (S n) =? (S m) = b ->
      n =? m = b.
 Proof.
   intros. simpl in H. apply H. Qed.
@@ -449,13 +486,14 @@ Proof.
     but in some situations the forward style can be easier to think
     about.  *)
 
-(** There are numerous functions in the standard library that can help you here, such as [Nat.add_succ_r] or [Nat.add_succ_l] ... *)
+(** There are numerous functions in the standard library that
+    can help you here, such as [Nat.add_succ_r] or
+    [Nat.add_succ_l] ... *)
 
 Theorem plus_n_n_injective : forall n m,
      n + n = m + m ->
      n = m.
 Proof.
-  (* WORKED IN CLASS *)
   elim=> [|n IH m eq] /=; first by case.
   case: m eq => //. (* <- the need to mention eq arises b/c [case] is more controlling than [inversion]... *)
   move=> m' eq. apply: f_equal. apply: IH. move: eq. (* <- see what happened? *)
@@ -615,7 +653,12 @@ Qed.
 Theorem beq_nat_true : forall n m,
     (n =? m) = true -> n = m.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  elim=> [|n IH]; first by case.
+  case; first by [].
+  move=> m' eq.
+  apply: f_equal.
+  apply: IH.
+Qed.
 (** [] *)
 
 (** Give a careful informal proof of [beq_nat_true], being as explicit
